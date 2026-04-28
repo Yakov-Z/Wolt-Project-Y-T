@@ -32,14 +32,14 @@ set(CORE_SOURCES
 )
 
 # Create the project main exe with all logic files
-add_executable(RecommenderApp 
-    src/main.cpp 
-    ${CORE_SOURCES}
-)
+# add_executable(RecommenderApp 
+#     src/main.cpp 
+#     ${CORE_SOURCES}
+# )
 
 # Define all the test files as TEST_SOURCES
 set(TEST_SOURCES
-    # tests/ConsoleInputReaderTest.cpp
+    tests/ConsoleInputReaderTest.cpp
     # tests/MemoryDataRepositoryTest.cpp
 )
 
