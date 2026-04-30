@@ -2,6 +2,7 @@
 #include <string>
 #include "ConsoleOutputWriter.h"
 
+
 ConsoleOutputWriter::ConsoleOutputWriter() {}
 
 void ConsoleOutputWriter::writeLine(const std::string& text) {

@@ -2,6 +2,7 @@
 #include <string>
 #include "IOutputWriter.h"
 
+
 // Class that implements the IOutputWriter to write output to the console
 class ConsoleOutputWriter : public IOutputWriter {
 public:

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 
+
 // Interface for writing output to some destination, without knowing where
 class IOutputWriter {
 public:
