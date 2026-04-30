@@ -17,4 +17,5 @@ public:
     void addView(const std::string& userId, const std::string& productId) override;
     std::unordered_set<std::string> getProductsByUser(const std::string& userId) const override;
     std::unordered_set<std::string> getUsersByProduct(const std::string& productId) const override;
+    void loadFromFile(const std::string& filePath);
 };

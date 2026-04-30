@@ -59,7 +59,7 @@ StorageDataList FileRepository::loadAllData() {
         // Read the rest of the numbers (products) on the same line
         while(sLine >> productStr) {
             if(std::all_of(productStr.begin(), productStr.end(), ::isdigit)) {
-                userData.products.push_back(std::stoi(productStr));
+                userData.products.insert(std::stoi(productStr));
             } else { 
                 // If one product is bad (like letters or negative), mark user as invalid
                 isUserValid = false; 
@@ -69,7 +69,7 @@ StorageDataList FileRepository::loadAllData() {
         
         // Only keep users that have at least one valid product
         if(isUserValid && !userData.products.empty()){
-            allData.push_back(userData);
+            allData.insert(userData);
         }       
     }
     
