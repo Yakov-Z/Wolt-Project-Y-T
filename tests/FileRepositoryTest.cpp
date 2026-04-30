@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include "FileRepository.h"
-#include "IPersistanceDataRepository.h"
+#include "IPersistanceData.h"
 
 // Test fixture for FileRepository tests
 class FileRepositoryTest : public ::testing::Test {

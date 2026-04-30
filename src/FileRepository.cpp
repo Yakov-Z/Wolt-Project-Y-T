@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
 #include "FileRepository.h"
 
 FileRepository::FileRepository(const std::string& path) : filePath(path) {}
@@ -29,5 +32,33 @@ void FileRepository::saveData(const StorageDataList& allData) {
 }
 
 StorageDataList FileRepository::loadAllData() {
-    std::ifstream outFile(filePath);
+    StorageDataList Alldata;
+    std::ifstream inFile(filePath);
+    if (!inFile.is_open()) {
+        return Alldata; 
+    }
+    std::string line;
+    
+    while (std::getline(inFile, line)) {
+        UserStorageRecord userData;
+        std::stringstream sLine(line);
+        std::string userId;
+        if(sLine >> userId && std::all_of(userId.begin(), userId.end(), ::isdigit)){
+            userData.userId = std::stoi(userId);
+        } else { continue; }
+        std::string product;
+        bool isUserValid = true;
+        while(sLine >> product) {
+            if(std::all_of(product.begin(), product.end(), ::isdigit)) {
+                userData.products.push_back(std::stoi(product));
+            } else { isUserValid = false; break; }
+        }
+        if(isUserValid && userData.products.size() != 0){
+            Alldata.push_back(userData);
+        }       
+    }
+    
+    inFile.close();
+
+    return Alldata;
 }

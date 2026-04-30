@@ -21,9 +21,9 @@ using StorageDataList = std::vector<UserStorageRecord>;
  * Why: Separates the recommendation logic from file operations, 
  * keeping the system flexible for future storage changes (e.g., Database).
  */
-class IPersistanceDataRepository {
+class IPersistanceData {
 public:
-    virtual ~IPersistanceDataRepository() = default;
+    virtual ~IPersistanceData() = default;
 
     /**
      * @brief Saves a single user's record to storage, by overwriting the entire data.

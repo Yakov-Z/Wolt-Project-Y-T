@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 #include <fstream>
-#include "IDataRepository.h"
+#include "IPersistanceData.h"
 
-class FileRepository : public IDataRepository {
+class FileRepository : public IPersistanceData {
 private:
     std::string filePath;
 
