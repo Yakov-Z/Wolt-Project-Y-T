@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(googletest)
 
 # Define all the logic files as CORE_SOURCE
 set(CORE_SOURCES
-    # src/ConsoleInputReader.cpp
+    src/ConsoleInputReader.cpp
      src/ConsoleOutputWriter.cpp
     # src/MemoryDataRepository.cpp
     # src/FilePersistence.cpp

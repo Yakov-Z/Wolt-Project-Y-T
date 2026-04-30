@@ -17,5 +17,5 @@ COPY . .
 RUN cmake -B build
 RUN cmake --build build
 
-# Run the tests as deafault command when the container starts
+# Run the app as deafault command when the container starts
 CMD ["./build/RecommenderApp"]
