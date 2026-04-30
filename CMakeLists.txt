@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(googletest)
 set(CORE_SOURCES
     src/ConsoleInputReader.cpp
     # src/ConsoleOutputWriter.cpp
-     src/MemoryDataRepository.cpp
+    src/MemoryDataRepository.cpp
     # src/FilePersistence.cpp
     # src/CommonUsersStrategy.cpp
     # src/CLIParser.cpp
@@ -35,12 +35,13 @@ set(CORE_SOURCES
 # add_executable(RecommenderApp 
 #     src/main.cpp 
 #     ${CORE_SOURCES}
+    
 # )
 
 # Define all the test files as TEST_SOURCES
 set(TEST_SOURCES
     tests/ConsoleInputReaderTest.cpp
-    tests/MemoryDataRepositoryTest.cpp
+     tests/MemoryDataRepositoryTest.cpp
 )
 
 # Create the test exe with all test files
