@@ -23,6 +23,7 @@ set(CORE_SOURCES
     src/ConsoleInputReader.cpp
     src/ConsoleOutputWriter.cpp
     src/FileRepository.cpp
+    src/HelpCommand.cpp
 )
 
 # Create the project main exe with all logic files
@@ -37,6 +38,7 @@ set(TEST_SOURCES
     tests/ConsoleInputReaderTest.cpp
     tests/ConsoleOutputWriterTest.cpp
     tests/FileRepositoryTest.cpp
+    tests/HelpCommandTest.cpp
 )
 
 # Create the test exe with all test files
