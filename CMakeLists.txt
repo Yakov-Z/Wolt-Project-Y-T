@@ -21,9 +21,10 @@ FetchContent_MakeAvailable(googletest)
 # Define all the logic files as CORE_SOURCE
 set(CORE_SOURCES
     src/ConsoleInputReader.cpp
-    # src/ConsoleOutputWriter.cpp
+     src/ConsoleOutputWriter.cpp
     src/MemoryDataRepository.cpp
     src/HelpCommand.cpp
+    src/FileRepository.cpp
     # src/FilePersistence.cpp
     # src/CommonUsersStrategy.cpp
     # src/CLIParser.cpp
@@ -42,8 +43,11 @@ set(CORE_SOURCES
 # Define all the test files as TEST_SOURCES
 set(TEST_SOURCES
     tests/ConsoleInputReaderTest.cpp
+    tests/ConsoleOutputWriterTest.cpp
      tests/MemoryDataRepositoryTest.cpp
     tests/HelpCommandTest.cpp
+    tests/FileRepositoryTest.cpp
+    
 )
 
 # Create the test exe with all test files
