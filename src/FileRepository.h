@@ -17,7 +17,7 @@ public:
     explicit FileRepository(const std::string& path);
 
     // Saves the list to the file, overwriting any old data
-    void saveData(const StorageDataList& allData);
+    void saveData(const UserStorageRecord& data);
 
     // Reads the file and returns a list of valid users and their products
     StorageDataList loadAllData();
