@@ -23,6 +23,7 @@ set(CORE_SOURCES
     src/ConsoleInputReader.cpp
     # src/ConsoleOutputWriter.cpp
     src/MemoryDataRepository.cpp
+    src/HelpCommand.cpp
     # src/FilePersistence.cpp
     # src/CommonUsersStrategy.cpp
     # src/CLIParser.cpp
@@ -42,6 +43,7 @@ set(CORE_SOURCES
 set(TEST_SOURCES
     tests/ConsoleInputReaderTest.cpp
      tests/MemoryDataRepositoryTest.cpp
+    tests/HelpCommandTest.cpp
 )
 
 # Create the test exe with all test files
