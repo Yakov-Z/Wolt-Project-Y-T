@@ -27,7 +27,7 @@ void FileRepository::saveData(const UserStorageRecord& data) {
         outFile << " " << productId;
     }        
     
-    // New line for this user makes it easier to read the file later chiko
+    // New line for this user makes it easier to read the file later
     outFile << "\n";
     
     // Close the file to flush the buffer and release the lock
