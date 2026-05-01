@@ -1,10 +1,22 @@
 #include <gtest/gtest.h>
 #include <unordered_set>
 #include "MemoryDataRepository.h"
+#include "IPersistanceData.h"
+
+class MockPersistenceData : public IPersistanceData {
+public:
+    void saveData(const UserStorageRecord& data) override {
+    }
+    
+    StorageDataList loadAllData() override {
+        return {}; // Return an empty list for testing
+    }
+};
 
 // Test 1: Check User to Products set
 TEST(MemoryDataRepositoryTest, RetrievesProductsByUserIdNoDuplicates) {
-    MemoryDataRepository repo;
+    MockPersistenceData persistence; // You can create a mock or stub if needed
+    MemoryDataRepository repo(persistence);
     
     
     repo.addView("user1", "productA");
@@ -22,9 +34,9 @@ TEST(MemoryDataRepositoryTest, RetrievesProductsByUserIdNoDuplicates) {
 
 // Test 2: Check Product to Users set
 TEST(MemoryDataRepositoryTest, RetrievesUsersByProductIdNoDuplicates) {
-    MemoryDataRepository repo;
-    
-    
+    MockPersistenceData persistence;
+    MemoryDataRepository repo(persistence);
+
     repo.addView("user1", "productA");
     repo.addView("user2", "productA");
     //check duplicates

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 // Interface for Saving the products that every user saw, and the users that saw every product
 class IDataRepository {
