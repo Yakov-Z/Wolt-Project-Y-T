@@ -7,8 +7,8 @@
  * making it easy to change how data is stored or transferred later.
  */
 struct UserStorageRecord {
-    int userId;
-    std::vector<int> products;
+    std::string userId;
+    std::vector<std::string> products;
 };
 
 /**
@@ -26,11 +26,11 @@ public:
     virtual ~IPersistanceData() = default;
 
     /**
-     * @brief Saves a single user's record to storage, by overwriting the entire data.
+     * @brief Saves a single user's record to storage.
      * Why: Called automatically after every 'add' command to ensure no data is lost.
      * @param record The entire updated data.
      */
-    virtual void saveData(const StorageDataList& data) = 0;
+    virtual void saveData(const UserStorageRecord& data) = 0;
    
     /**
      * @brief Loads all user records from storage.

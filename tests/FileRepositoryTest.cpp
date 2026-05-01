@@ -40,29 +40,25 @@ TEST_F(FileRepositoryTest, StandardLoad) {
 
     // Verify the number of users and specific values[cite: 3].
     ASSERT_EQ(testData.size(), 3);
-    EXPECT_EQ(testData[0].userId, 1);
-    EXPECT_EQ(testData[0].products[0], 10);
+    EXPECT_EQ(testData[0].userId, "1");
+    EXPECT_EQ(testData[0].products[0], "10");
 }
 
 // Check if saving data produces the expected text format in the file[cite: 3].
 TEST_F(FileRepositoryTest, StandardSave) {
-    UserStorageRecord user1 = {1, {500, 501, 502}};
-    UserStorageRecord user2 = {2, {600, 601}};
-    StorageDataList data = {user1, user2};
+    UserStorageRecord user1 = {"1", {"500", "501", "502"}};
     FileRepository repo(testFilePath);
 
-    repo.saveData(data);
+    repo.saveData(user1);
 
     std::string line1, line2;
     std::ifstream inFile(testFilePath);
     ASSERT_TRUE(inFile.is_open());
     std::getline(inFile, line1);
-    std::getline(inFile, line2);
     inFile.close();
 
     // Verify the file content matches our expected space-separated format[cite: 3].
     EXPECT_EQ(line1, "1 500 501 502");
-    EXPECT_EQ(line2, "2 600 601");
 }
 
 // Test what happens when the file exists but is empty[cite: 3].
@@ -98,8 +94,8 @@ TEST_F(FileRepositoryTest, StrangeFile) {
 
     // We expect only 1 valid user to be loaded[cite: 3].
     ASSERT_EQ(testData.size(), 1);
-    ASSERT_EQ(testData[0].userId, 1);
-    ASSERT_EQ(testData[0].products[0], 101);
+    ASSERT_EQ(testData[0].userId, "1");
+    ASSERT_EQ(testData[0].products[0], "101");
 }
 
 // Test that a user with an ID but zero products is ignored[cite: 3].
@@ -130,6 +126,6 @@ TEST_F(FileRepositoryTest, SameUser) {
 
     // The system should treat these as separate entries in the list[cite: 3].
     ASSERT_EQ(testData.size(), 3);
-    ASSERT_EQ(testData[0].userId, 1);
-    ASSERT_EQ(testData[2].userId, 1);
+    ASSERT_EQ(testData[0].userId, "1");
+    ASSERT_EQ(testData[2].userId, "1");
 }

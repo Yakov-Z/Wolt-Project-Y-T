@@ -8,25 +8,28 @@
 
 FileRepository::FileRepository(const std::string& path) : filePath(path) {}
 
-void FileRepository::saveData(const StorageDataList& allData) {
-    std::ofstream outFile(filePath);
+void FileRepository::saveData(const UserStorageRecord& data) {
+    // Open the file in append mode (std::ios::app)
+    // This ensures we add the new user to the end of the file without deleting existing data
+    std::ofstream outFile(filePath, std::ios::app);
     
     // If the file can't open, we stop to avoid crashing
     if (!outFile.is_open()) {
         return;
     }
 
-    for (const auto& userRecord : allData) {
-        // Write the User ID first
-        outFile << userRecord.userId;
-        
-        // Add each product ID separated by a space
-        for (int productId : userRecord.products) {
-            outFile << " " << productId;
-        }        
-        // New line for each user makes it easier to read the file later
-        outFile << "\n";
-    }    
+    // Write the User ID first
+    outFile << data.userId;
+    
+    // Add each product ID separated by a space
+    for (std::string productId : data.products) {
+        outFile << " " << productId;
+    }        
+    
+    // New line for this user makes it easier to read the file later
+    outFile << "\n";
+    
+    // Close the file to flush the buffer and release the lock
     outFile.close();
 }
 
@@ -48,7 +51,7 @@ StorageDataList FileRepository::loadAllData() {
         
         // Use '>>' to get the first word and check if it is a positive number
         if(sLine >> userIdStr && std::all_of(userIdStr.begin(), userIdStr.end(), ::isdigit)){
-            userData.userId = std::stoi(userIdStr);
+            userData.userId = userIdStr;
         } else { 
             continue; // Skip the whole line if the User ID is not a valid number
         }
@@ -59,7 +62,7 @@ StorageDataList FileRepository::loadAllData() {
         // Read the rest of the numbers (products) on the same line
         while(sLine >> productStr) {
             if(std::all_of(productStr.begin(), productStr.end(), ::isdigit)) {
-                userData.products.push_back(std::stoi(productStr));
+                userData.products.push_back(productStr);
             } else { 
                 // If one product is bad (like letters or negative), mark user as invalid
                 isUserValid = false; 
