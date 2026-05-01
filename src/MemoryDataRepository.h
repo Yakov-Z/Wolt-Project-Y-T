@@ -20,10 +20,9 @@ private:
 public:
     // Override the interface methods
     void addView(const std::string& userId, const std::string& productId) override;
-    void addViews(const std::string& userId, const std::vector<std::string>& productIds);
+    void addView(const std::string& userId, const std::vector<std::string>& productIds);
     MemoryDataRepository(IPersistanceData& p) : persistence(p) {}
     std::unordered_set<std::string> getProductsByUser(const std::string& userId) const override;
     std::unordered_set<std::string> getUsersByProduct(const std::string& productId) const override;
-    void loadFromFile(const std::string& filePath);
-    void loadDatatoHash();
+    void loadDatatoMemory();
 };

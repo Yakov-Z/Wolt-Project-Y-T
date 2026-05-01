@@ -6,6 +6,7 @@
 #include <cctype>
 #include "FileRepository.h"
 
+
 FileRepository::FileRepository(const std::string& path) : filePath(path) {}
 
 void FileRepository::saveData(const UserStorageRecord& data) {
@@ -26,7 +27,7 @@ void FileRepository::saveData(const UserStorageRecord& data) {
         outFile << " " << productId;
     }        
     
-    // New line for this user makes it easier to read the file later
+    // New line for this user makes it easier to read the file later chiko
     outFile << "\n";
     
     // Close the file to flush the buffer and release the lock
@@ -62,11 +63,7 @@ StorageDataList FileRepository::loadAllData() {
         // Read the rest of the numbers (products) on the same line
         while(sLine >> productStr) {
             if(std::all_of(productStr.begin(), productStr.end(), ::isdigit)) {
-<<<<<<< HEAD
-                userData.products.insert(std::stoi(productStr));
-=======
                 userData.products.push_back(productStr);
->>>>>>> main
             } else { 
                 // If one product is bad (like letters or negative), mark user as invalid
                 isUserValid = false; 
@@ -76,7 +73,7 @@ StorageDataList FileRepository::loadAllData() {
         
         // Only keep users that have at least one valid product
         if(isUserValid && !userData.products.empty()){
-            allData.insert(userData);
+            allData.push_back(userData);
         }       
     }
     

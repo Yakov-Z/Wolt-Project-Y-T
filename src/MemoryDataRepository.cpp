@@ -13,7 +13,7 @@ void MemoryDataRepository::addView(const std::string& userId, const std::string&
 }
 
 //fuction overload - get more than 1 product
-void MemoryDataRepository::addViews(const std::string& userId, const std::vector<std::string>& productIds) {
+void MemoryDataRepository::addView(const std::string& userId, const std::vector<std::string>& productIds) {
     
     for (const std::string& productId : productIds) {
         userToProducts[userId].insert(productId);
@@ -22,12 +22,12 @@ void MemoryDataRepository::addViews(const std::string& userId, const std::vector
 }
 
 //initial load from file to the hash, for get the history
-void MemoryDataRepository::loadDatatoHash() {
+void MemoryDataRepository::loadDatatoMemory() {
     
     StorageDataList allData = persistence.loadAllData();
     
     for (const UserStorageRecord& record : allData) {
-        addViews(record.userId, record.products); 
+        addView(record.userId, record.products); 
     }
 }
 
