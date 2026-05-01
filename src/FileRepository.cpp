@@ -6,6 +6,7 @@
 #include <cctype>
 #include "FileRepository.h"
 
+
 FileRepository::FileRepository(const std::string& path) : filePath(path) {}
 
 void FileRepository::saveData(const UserStorageRecord& data) {
