@@ -50,29 +50,23 @@ StorageDataList FileRepository::loadAllData() {
         std::stringstream sLine(line);
         std::string userIdStr;
         
-        // Use '>>' to get the first word and check if it is a positive number
-        if(sLine >> userIdStr && std::all_of(userIdStr.begin(), userIdStr.end(), ::isdigit)){
+        // Use '>>' to get the first word
+        if(sLine >> userIdStr) {
             userData.userId = userIdStr;
         } else { 
-            continue; // Skip the whole line if the User ID is not a valid number
+            continue; // Skip the whole line if there is no user ID (like an empty line)
         }
         
         std::string productStr;
         bool isUserValid = true;
         
-        // Read the rest of the numbers (products) on the same line
+        // Read the rest of the Id's (products) on the same line
         while(sLine >> productStr) {
-            if(std::all_of(productStr.begin(), productStr.end(), ::isdigit)) {
-                userData.products.push_back(productStr);
-            } else { 
-                // If one product is bad (like letters or negative), mark user as invalid
-                isUserValid = false; 
-                break; 
-            }
+            userData.products.push_back(productStr);
         }
         
-        // Only keep users that have at least one valid product
-        if(isUserValid && !userData.products.empty()){
+        // Only keep users that have at least one product
+        if(!userData.products.empty()){
             allData.push_back(userData);
         }       
     }
