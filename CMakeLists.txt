@@ -26,7 +26,7 @@ set(CORE_SOURCES
     src/HelpCommand.cpp
     src/FileRepository.cpp
     # src/FilePersistence.cpp
-    # src/CommonUsersStrategy.cpp
+    src/CommonUsersRecommend.cpp
     # src/CLIParser.cpp
     src/AddCommand.cpp
     # src/RecommendCommand.cpp
@@ -48,6 +48,7 @@ set(TEST_SOURCES
     tests/HelpCommandTest.cpp
     tests/FileRepositoryTest.cpp
     tests/AddCommandTest.cpp
+    tests/CommonUsersRecommendTest.cpp
 )
 
 # Create the test exe with all test files
