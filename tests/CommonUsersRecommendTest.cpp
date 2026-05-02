@@ -81,6 +81,18 @@ TEST(CommonUsersRecommendTest, EmptyRecommendationForUnknownUser) {
     EXPECT_TRUE(recommendations.empty());
 }
 
+TEST(CommonUsersRecommendTest, StandardRecommend) {
+    MockPersistanceData mockPersistence;
+    MemoryDataRepository repo(mockPersistence);
+    
+    populateAssignmentData(repo);
+
+    CommonUsersRecommend recommender(repo, "1", "104");
+    std::vector<std::string> recommendations = recommender.recommend();
+    std::vector<std::string> expected = {"105", "106", "111", "110", "112", "113", "107", "108", "109", "114"};
+    EXPECT_EQ(recommendations, expected);
+}
+
 TEST(CommonUsersRecommendTest, EmptyDatabase) {
     MockPersistanceData mockPersistence;
     MemoryDataRepository repo(mockPersistence);
@@ -88,4 +100,59 @@ TEST(CommonUsersRecommendTest, EmptyDatabase) {
     CommonUsersRecommend recommender(repo, "1", "104");
     std::vector<std::string> recommendations = recommender.recommend();
     EXPECT_TRUE(recommendations.empty());
+}
+
+// Test 1: Scenario where the algorithm finds LESS than 10 recommendations.
+// It should return exactly the number of products found.
+TEST(CommonUsersRecommendTest, LessThanTenRecommendations) {
+    MockPersistanceData mockPersistence;
+    MemoryDataRepository repo(mockPersistence);
+
+    // Setup: 
+    // User 1 only watched product 100.
+    repo.addView("1", "100");
+    
+    // User 2 watched 100 (so similarity is 1) and 3 other unique products.
+    repo.addView("2", {"100", "201", "202", "203"});
+
+    // Execute: Get recommendations for User 1 based on product 100.
+    CommonUsersRecommend recommender(repo, "1", "100");
+    std::vector<std::string> recommendations = recommender.recommend();
+
+    // Verify: We expect exactly 3 recommendations.
+    EXPECT_EQ(recommendations.size(), 3);
+    
+    // Since weight is equal (1 for all), they should be sorted by ID ascending.
+    std::vector<std::string> expected = {"201", "202", "203"};
+    EXPECT_EQ(recommendations, expected);
+}
+
+// Test 2: Scenario where the algorithm finds MORE than 10 recommendations.
+// According to the assignment requirements, it must cap the output at exactly 10[cite: 6].
+TEST(CommonUsersRecommendTest, CappedAtTenRecommendations) {
+    MockPersistanceData mockPersistence;
+    MemoryDataRepository repo(mockPersistence);
+
+    // Setup: 
+    // User 1 only watched product 100.
+    repo.addView("1", "100");
+    
+    // User 2 watched 100 (similarity is 1) and 12 other unique products.
+    repo.addView("2", {"100", "201", "202", "203", "204", "205", 
+                       "206", "207", "208", "209", "210", "211", "212"});
+
+    // Execute: Get recommendations for User 1 based on product 100.
+    CommonUsersRecommend recommender(repo, "1", "100");
+    std::vector<std::string> recommendations = recommender.recommend();
+
+    // Verify: Even though 12 products are relevant, we expect exactly 10[cite: 6].
+    EXPECT_EQ(recommendations.size(), 10);
+    
+    // The top 10 should be selected. Since weights are equal, they are sorted by ID.
+    // Therefore, 211 and 212 must be dropped from the final result.
+    std::vector<std::string> expected = {
+        "201", "202", "203", "204", "205", 
+        "206", "207", "208", "209", "210"
+    };
+    EXPECT_EQ(recommendations, expected);
 }
