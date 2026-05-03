@@ -4,16 +4,19 @@
 #include <sstream>
 #include <vector>
 
+InputParser::InputParser(std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>> commandMap, IInputReader& inputReader)
+    : CommandObjectCreate(std::move(commandMap)), reader(inputReader) {}
+
 void InputParser::mapCommand(const std::string& name, std::function<ICommand*(const std::vector<std::string>&)> creator) {
     CommandObjectCreate[name] = creator;
 }
 
 ICommand* InputParser::parseNextCommand() {
-    std::string line;
-
-    if (!std::getline(std::cin, line)) {
+    
+    if (!reader.hasNext()) {
         return nullptr;
     }
+    std:: string line=reader.readLine();
     
     std::stringstream Words_Line(line);
     std::string commandName;

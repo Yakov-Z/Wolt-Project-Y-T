@@ -12,10 +12,14 @@ public:
     }
 };
 
+
+
 TEST(HelpCommandTest, OutputTest) {
     MockOutputWriter mockWriter;
     // -- Start class test --
-    HelpCommand help(mockWriter);
+    HelpCommand help(mockWriter, "add [userid] [productid1] [productid2] ...\n"
+                                "recommend [userid] [productid]\n"
+                                "help\n");
     
     //Write the exact string from the assignment
     std::string helpText = "add [userid] [productid1] [productid2] ...\n"

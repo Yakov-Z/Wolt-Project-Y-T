@@ -2,9 +2,8 @@
 #include <string>
 #include "HelpCommand.h"
 
-HelpCommand::HelpCommand(IOutputWriter& outputWriter) : writer(outputWriter) {}
+HelpCommand::HelpCommand(IOutputWriter& outputWriter, const std::string& text) :
+ writer(outputWriter), helpText(text) {}
 void HelpCommand::execute() {
-    writer.writeLine("add [userid] [productid1] [productid2] ...\n"
-                           "recommend [userid] [productid]\n"
-                           "help\n");
+    writer.writeLine(helpText);
 }
