@@ -4,86 +4,107 @@
 #include <vector>
 #include <string>
 #include <sstream> 
+#include <map>
+#include <functional>
 #include "IInputReader.h"
 
-// simulate get input from the user
+// Define a type alias for the command map to make the code cleaner
+using CommandMap = std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>>;
+
+// Simulate getting input from the user
 class FakeInputReader : public IInputReader {
 private:
     std::istringstream stream;
+    std::string nextLine;
+    bool hasNextLine;
 
 public:
     explicit FakeInputReader(const std::string& simulatedInput) {
-        // \n in the end to simulate the enter
-        stream.str(simulatedInput + "\n"); 
+        // Initialize the stream with the simulated input
+        stream.str(simulatedInput);
+        // Pre-fetch the first line to determine if input exists
+        hasNextLine = (bool)std::getline(stream, nextLine);
     }
     
-    bool readLine(std::string& outLine) override {
-        if (std::getline(stream, outLine)) {
-            return true; 
-        }
-        return false; 
+    // Check if there is more input to read
+    bool hasNext() override {
+        return hasNextLine;
+    }
+
+    // Read a line of input and return it as a string
+    std::string readLine() override {
+        std::string currentLine = nextLine;
+        hasNextLine = (bool)std::getline(stream, nextLine);
+        return currentLine;
     }
 };
 
-//check the parser on not real command
-class notrealCommand : public ICommand {
+// Dummy command for testing the parser
+class MockCommand : public ICommand {
 public:
     void execute() override {}
 };
 
-
-//deal with empty line
+// Test handling of an empty line
 TEST(InputParserTest, EmptyLine) {
     FakeInputReader fake("");
-    InputParser parser(&fake); // Fixed: fake instead of fakeReader
+    CommandMap emptyMap;
+    // Pass the map first, then the reader
+    InputParser parser(emptyMap, fake); 
     
     ICommand* command = parser.parseNextCommand();
     
     EXPECT_EQ(command, nullptr);
 }
 
-//deal with illegal command
-TEST(InputParserTest, ilegalCommand) {
+// Test handling of an illegal or unmapped command
+TEST(InputParserTest, IllegalCommand) {
     FakeInputReader fake("chikooooo");
-    InputParser parser(&fake); // Fixed: fake instead of fakeReader
+    CommandMap emptyMap;
+    // Pass the map first, then the reader
+    InputParser parser(emptyMap, fake); 
     
-    ICommand* command = parser.parseNextCommand(); // Fixed: removed arguments
+    ICommand* command = parser.parseNextCommand(); 
     
     EXPECT_EQ(command, nullptr);
 }
 
-//deal with real command
-TEST(InputParserTest, real_command) {
-    FakeInputReader fake("Hapoel_command 92 94"); // Put the full command here
-    InputParser parser(&fake); 
+// Test parsing of a valid mapped command
+TEST(InputParserTest, RealCommand) {
+    FakeInputReader fake("test_command 92 94"); 
+    CommandMap commands;
+    // Pass the map first, then the reader
+    InputParser parser(commands, fake); 
     
-    // Moved mapping to happen AFTER parser is initialized
-    parser.mapCommand("Hapoel_command", [](const std::vector<std::string>& args) -> ICommand* {
-        return new notrealCommand(); 
+    // Map the command before parsing
+    parser.mapCommand("test_command", [](const std::vector<std::string>& args) -> ICommand* {
+        return new MockCommand(); 
     });
 
-    ICommand* command = parser.parseNextCommand(); // Fixed: read from the fake reader
+    ICommand* command = parser.parseNextCommand(); 
     
     EXPECT_NE(command, nullptr);
     delete command;
 }
 
-//check if the arguments pass well to the function
+// Test if arguments are correctly passed to the command creator
 TEST(InputParserTest, PassArguments) {
-    FakeInputReader fake("real_command 51 4"); // Added the FakeInputReader
-    InputParser parser(&fake); // Injected the reader
+    FakeInputReader fake("test_command 51 4"); 
+    CommandMap commands;
+    // Pass the map first, then the reader
+    InputParser parser(commands, fake); 
     
     bool argsPass = false; 
 
-    parser.mapCommand("real_command", [&argsPass](const std::vector<std::string>& args) -> ICommand* {
-        // Checking sizes and values inside the mapped command
+    parser.mapCommand("test_command", [&argsPass](const std::vector<std::string>& args) -> ICommand* {
+        // Check sizes and values inside the mapped command
         if (args.size() == 2 && args[0] == "51" && args[1] == "4") {
             argsPass = true;
         }
-        return new notrealCommand();
+        return new MockCommand();
     });
 
-    ICommand* command = parser.parseNextCommand(); // Fixed call
+    ICommand* command = parser.parseNextCommand(); 
     
     EXPECT_NE(command, nullptr);
     EXPECT_TRUE(argsPass);

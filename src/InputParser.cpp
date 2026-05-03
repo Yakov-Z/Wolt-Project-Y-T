@@ -4,6 +4,9 @@
 #include <sstream>
 #include <vector>
 
+InputParser::InputParser(std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>> commandMap, IInputReader& inputReader)
+    : CommandObjectCreate(std::move(commandMap)), reader(inputReader) {}
+
 void InputParser::mapCommand(const std::string& name, std::function<ICommand*(const std::vector<std::string>&)> creator) {
     CommandObjectCreate[name] = creator;
 }
