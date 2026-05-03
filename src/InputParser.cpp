@@ -9,11 +9,11 @@ void InputParser::mapCommand(const std::string& name, std::function<ICommand*(co
 }
 
 ICommand* InputParser::parseNextCommand() {
-    std::string line;
-
-    if (!std::getline(std::cin, line)) {
+    
+    if (!reader.hasNext()) {
         return nullptr;
     }
+    std:: string line=reader.readLine();
     
     std::stringstream Words_Line(line);
     std::string commandName;
