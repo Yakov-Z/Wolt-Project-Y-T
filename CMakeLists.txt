@@ -25,12 +25,9 @@ set(CORE_SOURCES
     src/MemoryDataRepository.cpp
     src/HelpCommand.cpp
     src/FileRepository.cpp
-    # src/FilePersistence.cpp
     src/CommonUsersRecommend.cpp
-    # src/CLIParser.cpp
     src/AddCommand.cpp
-    # src/RecommendCommand.cpp
-    # src/HelpCommand.cpp
+    src/RecommendCommand.cpp
     src/InputParser.cpp
 )
 
@@ -51,6 +48,7 @@ set(TEST_SOURCES
     tests/AddCommandTest.cpp
     tests/InputParserTest.cpp
     tests/CommonUsersRecommendTest.cpp
+    tests/RecommendCommandTest.cpp
 )
 
 # Create the test exe with all test files
