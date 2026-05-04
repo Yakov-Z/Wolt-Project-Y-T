@@ -29,6 +29,7 @@ set(CORE_SOURCES
     src/AddCommand.cpp
     src/RecommendCommand.cpp
     src/InputParser.cpp
+    src/App.cpp
 )
 
 # Create the project main exe with all logic files
@@ -49,6 +50,7 @@ set(TEST_SOURCES
     tests/InputParserTest.cpp
     tests/CommonUsersRecommendTest.cpp
     tests/RecommendCommandTest.cpp
+    tests/AppTest.cpp
 )
 
 # Create the test exe with all test files
