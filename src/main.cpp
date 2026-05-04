@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include "InputParser.h"
-#include "App.h"
 #include "FileRepository.h"       
 #include "MemoryDataRepository.h"   
 #include "ConsoleOutputWriter.h" 
@@ -10,14 +9,21 @@
 #include "RecommendCommand.h"
 #include "HelpCommand.h"
 #include "CommonUsersRecommend.h"
+#include "ConsoleInputReader.h"
+#include "App.h"
+
 
 int main() {
     
     FileRepository persistenceManager("users_data.txt");
-    MemoryDataRepository dataRepository; 
+    MemoryDataRepository dataRepository(persistenceManager); 
+    dataRepository.loadDatatoMemory();
     ConsoleOutputWriter outputWriter;
+    ConsoleInputReader inputReader;
    
-    InputParser parser;
+    std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>> emptyMap;
+    InputParser parser(emptyMap, inputReader);
+
     //map the add command
     parser.mapCommand("add", [&dataRepository, &persistenceManager](const std::vector<std::string>& args) -> ICommand* {
         //the user most to add at least 1 product
@@ -60,3 +66,5 @@ int main() {
 
     return 0; 
 }
+
+
