@@ -5,9 +5,10 @@
 
 class RecommendCommand : public ICommand {
 private:
-    IRecommend& recommender;
+    IRecommend* recommender;
     IOutputWriter& writer;
 public:
-    RecommendCommand(IRecommend& recommender, IOutputWriter& writer);
+    RecommendCommand(IRecommend* recommender, IOutputWriter& writer);
+    ~RecommendCommand() override;
     void execute() override;
 };

@@ -11,5 +11,6 @@ void App::run() {
             continue;
         }
         command->execute();
+        delete command;
     }
 }

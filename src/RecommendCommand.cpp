@@ -2,10 +2,10 @@
 #include <string>
 #include "RecommendCommand.h"
 
-RecommendCommand::RecommendCommand(IRecommend& recommender,IOutputWriter& outputWriter) : recommender(recommender),
+RecommendCommand::RecommendCommand(IRecommend* recommender,IOutputWriter& outputWriter) : recommender(recommender),
                                      writer(outputWriter) {}
 void RecommendCommand::execute() {
-    std::vector<std::string> recommendations = recommender.recommend();
+    std::vector<std::string> recommendations = recommender->recommend();
     std::string Recommandationtext = "";
     for(int i = 0; i < recommendations.size(); ++i) {
         Recommandationtext += recommendations[i];
@@ -16,4 +16,7 @@ void RecommendCommand::execute() {
     }
     
     writer.writeLine(Recommandationtext);
+}
+RecommendCommand::~RecommendCommand() {
+    delete recommender;
 }
