@@ -29,6 +29,8 @@ set(CORE_SOURCES
     src/AddCommand.cpp
     src/RecommendCommand.cpp
     src/InputParser.cpp
+    src/main.cpp 
+    src/App.cpp
 )
 
 # Create the project main exe with all logic files
