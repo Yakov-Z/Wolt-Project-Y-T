@@ -29,7 +29,6 @@ set(CORE_SOURCES
     src/AddCommand.cpp
     src/RecommendCommand.cpp
     src/InputParser.cpp
-    src/main.cpp 
     src/App.cpp
 )
 
@@ -51,6 +50,7 @@ set(TEST_SOURCES
     tests/InputParserTest.cpp
     tests/CommonUsersRecommendTest.cpp
     tests/RecommendCommandTest.cpp
+    tests/AppTest.cpp
 )
 
 # Create the test exe with all test files
