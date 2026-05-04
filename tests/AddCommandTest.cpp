@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <sstream>
-#include "../src/AddCommand.h"
+#include "AddCommand.h"
 
 /**
  * A Spy/Fake implementation of IDataRepository used exclusively for testing.

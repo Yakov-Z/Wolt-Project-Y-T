@@ -54,7 +54,6 @@ int main() {
         //the string of the command. we can easily add another text in the future
         std::string helpText = "add [userid] [productid1] [productid2] … \n"
                                "recommend [userid] [productid] \n"
-                               "recommend [userid] [productid] \n"
                                "help";
                                
         return new HelpCommand(outputWriter, helpText);
