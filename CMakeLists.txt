@@ -50,6 +50,7 @@ set(TEST_SOURCES
     tests/CommonUsersRecommendTest.cpp
     tests/RecommendCommandTest.cpp
     tests/AppTest.cpp
+    tests/IntegrationTest.cpp
 )
 
 # Create the test exe with all test files
