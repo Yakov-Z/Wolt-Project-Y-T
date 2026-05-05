@@ -4,8 +4,8 @@ This project is a CLI-based product recommendation system written in C++. It is 
 
 ## Prerequisites
 
-*   **Docker and Docker Compose** installed on your machine.
-*   Ensure there is a folder named `data` in the root directory of the project (alongside this `README.md` file). 
+* **Docker and Docker Compose** installed on your machine.
+* Ensure there is a folder named `data` in the root directory of the project (alongside this `README.md` file). 
 
 ## Getting Started
 
@@ -17,33 +17,36 @@ To compile the C++ code and build the Docker image, run the following command in
 
 ```bash
 docker-compose build
-
-2. Run the Application
+```
+### 2. Run the Application
 
 To start the Interactive Command Line Interface (CLI), run:
 
 ```bash
 docker-compose run --rm app
+```
 
-Note: The --rm flag ensures the container is automatically cleaned up after you exit the application. Any data you enter (e.g., via the add command) will be safely saved to data/users_data.txt on your local machine and will be loaded automatically on the next run.
+> **Note:** The `--rm` flag ensures the container is automatically cleaned up after you exit the application. Any data you enter (e.g., via the `add` command) will be safely saved to `data/users_data.txt` on your local machine and will be loaded automatically on the next run.
 
-3. Run the Unit Tests
+### 3. Run the Unit Tests
 
 To execute the Google Test (gtest) suite and verify the system's logic, run:
 
 ```bash
 docker-compose run --rm app ./build/runTests
+```
 
->(If your test executable has a different name, replace ./build/runTests with the correct path, e.g., ./build/RecommenderTests).
-Commands
+*(If your test executable has a different name, replace `./build/runTests` with the correct path, e.g., `./build/RecommenderTests`).*
+
+## Commands
 
 Once the application is running, you can use the following commands:
 
-    add [userid] [productid1] [productid2] ...
-    Associates a list of products with a specific user. This data is saved automatically.
+* `add [userid] [productid1] [productid2] ...`
+  Associates a list of products with a specific user. This data is saved automatically.
 
-    recommend [userid] [productid]
-    Provides up to 10 product recommendations based on other users with similar tastes who also watched the specified product.
+* `recommend [userid] [productid]`
+  Provides up to 10 product recommendations based on other users with similar tastes who also watched the specified product.
 
-    help
-    Displays the list of available commands.
+* `help`
+  Displays the list of available commands.
