@@ -8,7 +8,10 @@
 class MockPersistanceData : public IPersistanceData {
 public:
     void saveData(const UserStorageRecord& data) override {}
-    StorageDataList loadAllData() override {}
+    
+    StorageDataList loadAllData() override {
+        return StorageDataList(); 
+    }
 };
 
 // Helper function to populate the repository with the assignment's dataset
@@ -110,6 +113,7 @@ TEST(CommonUsersRecommendTest, LessThanTenRecommendations) {
 
     // Setup: 
     // User 1 only watched product 100.
+    // Fixed: Added {} to match the vector signature
     repo.addView("1", "100");
     
     // User 2 watched 100 (so similarity is 1) and 3 other unique products.
@@ -128,13 +132,14 @@ TEST(CommonUsersRecommendTest, LessThanTenRecommendations) {
 }
 
 // Test 2: Scenario where the algorithm finds MORE than 10 recommendations.
-// According to the assignment requirements, it must cap the output at exactly 10[cite: 6].
+// According to the assignment requirements, it must cap the output at exactly 10.
 TEST(CommonUsersRecommendTest, CappedAtTenRecommendations) {
     MockPersistanceData mockPersistence;
     MemoryDataRepository repo(mockPersistence);
 
     // Setup: 
     // User 1 only watched product 100.
+    // Fixed: Added {} to match the vector signature
     repo.addView("1", "100");
     
     // User 2 watched 100 (similarity is 1) and 12 other unique products.
@@ -145,7 +150,7 @@ TEST(CommonUsersRecommendTest, CappedAtTenRecommendations) {
     CommonUsersRecommend recommender(repo, "1", "100");
     std::vector<std::string> recommendations = recommender.recommend();
 
-    // Verify: Even though 12 products are relevant, we expect exactly 10[cite: 6].
+    // Verify: Even though 12 products are relevant, we expect exactly 10.
     EXPECT_EQ(recommendations.size(), 10);
     
     // The top 10 should be selected. Since weights are equal, they are sorted by ID.

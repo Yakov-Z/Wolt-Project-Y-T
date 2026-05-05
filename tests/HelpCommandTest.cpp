@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <sstream>
-#include "../src/HelpCommand.h"
+#include "HelpCommand.h"
 
 class MockOutputWriter : public IOutputWriter {
 public:

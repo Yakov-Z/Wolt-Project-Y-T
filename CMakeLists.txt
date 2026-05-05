@@ -6,8 +6,8 @@ project(RecommendationSystem)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# src is the headers directory
-include_directories(src)
+# include is the headers directory
+include_directories(include)
 
 # Download the Gtest Engine source code and prepare it 
 include(FetchContent)
@@ -33,11 +33,10 @@ set(CORE_SOURCES
 )
 
 # Create the project main exe with all logic files
-# add_executable(RecommenderApp 
-#     src/main.cpp 
-#     ${CORE_SOURCES}
-    
-# )
+add_executable(RecommenderApp 
+    src/main.cpp 
+    ${CORE_SOURCES}    
+)
 
 # Define all the test files as TEST_SOURCES
 set(TEST_SOURCES
@@ -51,6 +50,7 @@ set(TEST_SOURCES
     tests/CommonUsersRecommendTest.cpp
     tests/RecommendCommandTest.cpp
     tests/AppTest.cpp
+    tests/IntegrationTest.cpp
 )
 
 # Create the test exe with all test files

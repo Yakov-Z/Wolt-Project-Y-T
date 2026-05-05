@@ -21,7 +21,7 @@ public:
 };
 
 TEST(RecommendCommandTest, RecommendTest) {
-    MockOutputRecommender mockRecommender;
+    MockOutputRecommender* mockRecommender = new MockOutputRecommender();
     MockOutputWriter mockWriter;
     // -- Start class test --
     RecommendCommand recommend(mockRecommender, mockWriter);

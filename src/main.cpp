@@ -11,11 +11,20 @@
 #include "CommonUsersRecommend.h"
 #include "ConsoleInputReader.h"
 #include "App.h"
+#include <filesystem>
 
 
 int main() {
+    // 1. Ensure the 'data' directory exists
+    std::string dataDirPath = "/app/data";
+    if (!std::filesystem::exists(dataDirPath)) {
+        std::filesystem::create_directory(dataDirPath);
+    }
+
+    // 2. Pass the updated path including the directory
+    std::string filePath = dataDirPath + "/users_data.txt";
     
-    FileRepository persistenceManager("users_data.txt");
+    FileRepository persistenceManager(filePath);
     MemoryDataRepository dataRepository(persistenceManager); 
     dataRepository.loadDatatoMemory();
     ConsoleOutputWriter outputWriter;
@@ -44,8 +53,7 @@ int main() {
         std::string userId = args[0];
         std::string productId = args[1];
         IRecommend* common = new CommonUsersRecommend(dataRepository, userId, productId);
-        
-        return new RecommendCommand(*common, outputWriter);
+        return new RecommendCommand(common, outputWriter);
     });
 
     //map the help command
@@ -53,7 +61,6 @@ int main() {
         
         //the string of the command. we can easily add another text in the future
         std::string helpText = "add [userid] [productid1] [productid2] … \n"
-                               "recommend [userid] [productid] \n"
                                "recommend [userid] [productid] \n"
                                "help";
                                
@@ -66,5 +73,3 @@ int main() {
 
     return 0; 
 }
-
-
