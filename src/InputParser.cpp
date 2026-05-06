@@ -18,6 +18,12 @@ ICommand* InputParser::parseNextCommand() {
     }
     std:: string line=reader.readLine();
     
+    // Check if the line contains a tab character
+    // If it does, it's an illegal command format, return null
+    if (line.find('\t') != std::string::npos) {
+        return nullptr; 
+    }
+    
     std::stringstream Words_Line(line);
     std::string commandName;
     // First word is the command
