@@ -43,12 +43,20 @@ std::vector<std::string> CommonUsersRecommend::recommend() {
     std::sort(sortedProducts.begin(), sortedProducts.end(),
         [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
             // Rule 1: Sort by weight in descending order
-            if (a.second != b.second) {
-                return a.second > b.second; 
-            }
-            // Rule 2: If weights are equal, sort by Product ID in ascending order.
-            // Using std::stoi ensures that "20" comes before "100" mathematically.
-            return std::stoi(a.first) < std::stoi(b.first); 
+        if (a.second != b.second) return a.second > b.second; 
+        
+        // Helper to check if string is purely numeric
+        auto isNum = [](const std::string& s) { 
+            return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit); 
+        };
+
+        // Rule 2: Sort mathematically if both are numbers and lengths differ
+        if (isNum(a.first) && isNum(b.first) && a.first.length() != b.first.length()) {
+            return a.first.length() < b.first.length();
+        }
+        
+        // Fallback: Lexicographical sort (works for equal length numbers and strings)
+        return a.first < b.first;
         });
 
     // Step 4: Extract the results
@@ -61,4 +69,4 @@ std::vector<std::string> CommonUsersRecommend::recommend() {
         recommendations.resize(10);
     }
     return recommendations;
-}    
+}
