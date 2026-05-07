@@ -45,7 +45,7 @@ int main() {
     });
 
     //map the recommend command
-    parser.mapCommand("recommend", [&dataRepository, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
+    parser.mapCommand("GET", [&dataRepository, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
         
         //thre is exactly 1 user ID and 1 productID
         if (args.size() != 2) return nullptr; 
@@ -60,8 +60,10 @@ int main() {
     parser.mapCommand("help", [&outputWriter](const std::vector<std::string>& args) -> ICommand* {
         
         //the string of the command. we can easily add another text in the future
-        std::string helpText = "add [userid] [productid1] [productid2] … \n"
-                               "recommend [userid] [productid] \n"
+        std::string helpText = "DELETE, arguments: [userid] [productid1] [productid2] …  \n"
+                               "GET, arguments: [userid] [productid] \n"
+                               "PATCH, arguments: [userid] [productid1] [productid2] …  \n"
+                               "POST, arguments: [userid] [productid1] [productid2] …  \n"
                                "help";
                                
         return new HelpCommand(outputWriter, helpText);
