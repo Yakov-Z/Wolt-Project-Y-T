@@ -62,8 +62,8 @@ int main() {
         //the string of the command. we can easily add another text in the future
         std::string helpText = "DELETE, arguments: [userid] [productid1] [productid2] …  \n"
                                "GET, arguments: [userid] [productid] \n"
-                               "patch, arguments: [userid] [productid1] [productid2] …  \n"
-                               "post, arguments: [userid] [productid1] [productid2] …  \n"
+                               "PATCH, arguments: [userid] [productid1] [productid2] …  \n"
+                               "POST, arguments: [userid] [productid1] [productid2] …  \n"
                                "help";
                                
         return new HelpCommand(outputWriter, helpText);
