@@ -12,6 +12,7 @@ public:
     StorageDataList loadAllData() override {
         return StorageDataList(); 
     }
+    void deleteData(const UserStorageRecord& data) override {}
 };
 
 // Helper function to populate the repository with the assignment's dataset

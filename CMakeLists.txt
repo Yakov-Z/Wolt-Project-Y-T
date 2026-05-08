@@ -29,6 +29,7 @@ set(CORE_SOURCES
     src/AddCommand.cpp
     src/RecommendCommand.cpp
     src/InputParser.cpp
+    src/DeleteCommand.cpp
     src/App.cpp
 )
 
@@ -42,13 +43,14 @@ add_executable(RecommenderApp
 set(TEST_SOURCES
     tests/ConsoleInputReaderTest.cpp
     tests/ConsoleOutputWriterTest.cpp
-     tests/MemoryDataRepositoryTest.cpp
+    tests/MemoryDataRepositoryTest.cpp
     tests/HelpCommandTest.cpp
     tests/FileRepositoryTest.cpp
     tests/AddCommandTest.cpp
     tests/InputParserTest.cpp
     tests/CommonUsersRecommendTest.cpp
     tests/RecommendCommandTest.cpp
+    tests/DeleteCommandTest.cpp
     tests/AppTest.cpp
     tests/IntegrationTest.cpp
 )

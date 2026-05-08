@@ -34,6 +34,76 @@ void FileRepository::saveData(const UserStorageRecord& data) {
     outFile.close();
 }
 
+void FileRepository::deleteData(const UserStorageRecord& data) {
+    //open the file for reading
+    std::ifstream inFile(filePath);
+    
+    //if the file can't open, we stop to avoid crashing
+    if (!inFile.is_open()) {
+        return; 
+    }
+
+    std::vector<std::string> allLines;
+    std::string line;
+
+    //read the file line by line
+    while (std::getline(inFile, line)) {
+        std::istringstream input_line(line);
+        std::string currentUserId;
+        input_line >> currentUserId;
+
+        //if this is the user we need to delete his products
+        if (currentUserId == data.userId) {
+            std::vector<std::string> productsToKeep;
+            std::string productId;
+            
+            //read all products in this line
+            while (input_line >> productId) {
+                bool needDelete = false;
+                //check if this product is in the list of products to delete
+                for (const std::string& prodToDelete : data.products) {
+                    if (productId == prodToDelete) {
+                        needDelete = true;
+                        break;
+                    }
+                }
+                
+                //if it's not in the delete list, we keep it
+                if (!needDelete) {
+                    productsToKeep.push_back(productId);
+                }
+            } 
+
+            //after we classified the prodycts, we write the line back only with the stayed products
+            std::string newLine = currentUserId;
+            for (const std::string& p : productsToKeep) {
+                newLine += " " + p;
+            }
+            allLines.push_back(newLine);
+
+        } else { 
+            //this is a different user, keep the line exactly as it was
+            allLines.push_back(line);
+        }
+    } 
+    
+    inFile.close();
+
+    //open the file in TRUNCATE mode, so we can write the updated data without override data
+    std::ofstream outFile(filePath, std::ios::trunc);
+    if (!outFile.is_open()) {
+        return;
+    }
+
+    //write everything back
+    for (const std::string& updatedLine : allLines) {
+        outFile << updatedLine << "\n";
+    }
+
+    outFile.close();
+}
+
+
 StorageDataList FileRepository::loadAllData() {
     StorageDataList allData;
     std::ifstream inFile(filePath);

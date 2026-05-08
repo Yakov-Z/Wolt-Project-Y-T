@@ -31,6 +31,13 @@ public:
      * @param record The entire updated data.
      */
     virtual void saveData(const UserStorageRecord& data) = 0;
+
+    /**
+     * @brief dekete a single user's products .
+     * Why: Called automatically after every 'delete' command to ensure no deleted data is stay.
+     * @param record The entire updated data.
+     */
+    virtual void deleteData(const UserStorageRecord& data) = 0;
    
     /**
      * @brief Loads all user records from storage.

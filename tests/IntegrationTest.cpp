@@ -15,6 +15,7 @@ class FakePersistence : public IPersistanceData {
 public:
     void saveData(const UserStorageRecord& data) override {} // Do nothing in memory test
     StorageDataList loadAllData() override { return {}; }
+    void deleteData(const UserStorageRecord& data) override {}
 };
 
 TEST(SystemIntegrationTest, Exe_Example) {

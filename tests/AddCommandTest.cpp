@@ -7,7 +7,7 @@
  * A Spy/Fake implementation of IDataRepository used exclusively for testing.
  * It captures the inputs passed to it into a string so we can verify them later.
  */
-class MockDataManager : public IDataRepository {
+class MockDataManager2 : public IDataRepository {
 public:
     std::string capturedOutput = "";
 
@@ -31,13 +31,16 @@ public:
     }
     void loadDatatoMemory() override {
     }
+    void deleteView(const std::string& userId, const std::string& productId) override {}
+    void deleteView(const std::string& userId, const std::vector<std::string>& productIds) override {}
+    bool validDelete(const std::string& userId, const std::vector<std::string>& productIds) override { return true; }
 };
 
 /**
  * A Spy/Fake implementation of IPersistanceData used exclusively for testing.
  * Like the MockDataManager, it captures the data given to saveData.
  */
-class MockPersistenceManager : public IPersistanceData {
+class MockPersistenceManager2 : public IPersistanceData {
 public:
     std::string capturedOutput = "";
 
@@ -53,12 +56,13 @@ public:
     StorageDataList loadAllData() override {
         return {}; 
     }
+    void deleteData(const UserStorageRecord& data) override {}
 };
 
 // Tests if AddCommand properly passes the data to the DataRepository.
 TEST(AddCommandTest, LocalDataTest) {
-    MockDataManager mockDataManager;
-    MockPersistenceManager persistenceManager;
+    MockDataManager2 mockDataManager;
+    MockPersistenceManager2 persistenceManager;
     // -- Start class test --
     std::vector<std::string> productIds = {"101", "102", "103"};
     
@@ -74,8 +78,8 @@ TEST(AddCommandTest, LocalDataTest) {
 
 // Tests if AddCommand properly passes the data to the PersistenceData manager.
 TEST(AddCommandTest, PersistenceDataTest) {
-    MockDataManager mockDataManager;
-    MockPersistenceManager persistenceManager;
+    MockDataManager2 mockDataManager;
+    MockPersistenceManager2 persistenceManager;
     // -- Start class test --
     std::vector<std::string> productIds = {"101", "102", "103"};
     

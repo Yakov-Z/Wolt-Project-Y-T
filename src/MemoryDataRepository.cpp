@@ -21,6 +21,41 @@ void MemoryDataRepository::addView(const std::string& userId, const std::vector<
     }
 }
 
+bool MemoryDataRepository::validDelete(const std::string& userId, const std::vector<std::string>& productIds) {
+    
+    //check if the user exist
+    auto userIt = userToProducts.find(userId);
+    if (userIt == userToProducts.end()) {
+        return false; 
+    }
+
+    //check if the user deleted a product that not in the list
+    const auto& products = userIt->second;
+    for (const std::string& productID : productIds) {
+        if (products.find(productID) == products.end()) {
+            return false; 
+        }
+    }
+
+    //the delete command is valid
+    return true; 
+}
+
+void MemoryDataRepository::deleteView(const std::string& userId, const std::string& productId) {
+    // we use sets to prevent duplicates
+    userToProducts[userId].erase(productId);
+    productToUsers[productId].erase(userId);
+}
+
+//fuction overload - get more than 1 product
+void MemoryDataRepository::deleteView(const std::string& userId, const std::vector<std::string>& productIds) {
+    
+    for (const std::string& productId : productIds) {
+        userToProducts[userId].erase(productId);
+        productToUsers[productId].erase(userId);
+    }
+}
+
 //initial load from file to the hash, for get the history
 void MemoryDataRepository::loadDatatoMemory() {
     

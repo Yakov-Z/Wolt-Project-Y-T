@@ -6,6 +6,7 @@
 #include "MemoryDataRepository.h"   
 #include "ConsoleOutputWriter.h" 
 #include "AddCommand.h"
+#include "DeleteCommand.h"
 #include "RecommendCommand.h"
 #include "HelpCommand.h"
 #include "CommonUsersRecommend.h"
@@ -33,18 +34,18 @@ int main() {
     std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>> emptyMap;
     InputParser parser(emptyMap, inputReader);
 
-    //map the add command
-    parser.mapCommand("add", [&dataRepository, &persistenceManager](const std::vector<std::string>& args) -> ICommand* {
-        //the user most to add at least 1 product
+    //map the delete command
+    parser.mapCommand("DELETE", [&dataRepository, &persistenceManager, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
+        //the user most to delete at least 1 product
         if (args.size() < 2) return nullptr; 
      
         std::string userId = args[0];
         std::vector<std::string> productIds(args.begin() + 1, args.end());
         
-        return new AddCommand(dataRepository, persistenceManager, userId, productIds);
+        return new DeleteCommand(dataRepository, persistenceManager, userId, productIds, outputWriter);
     });
 
-    //map the recommend command
+    //map the GET command
     parser.mapCommand("GET", [&dataRepository, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
         
         //thre is exactly 1 user ID and 1 productID
