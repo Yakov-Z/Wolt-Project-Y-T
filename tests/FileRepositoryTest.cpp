@@ -133,3 +133,32 @@ TEST_F(FileRepositoryTest, SameUser) {
     ASSERT_EQ(testData[0].userId, "1");
     ASSERT_EQ(testData[2].userId, "1");
 }
+
+// Test if deleteData removes the products from the persistance file.
+TEST_F(FileRepositoryTest, TestDelete) {
+   
+    //add fake data
+    std::string initialData = "1 101 102 103\n2 201 202\n";
+    std::ofstream outFile(testFilePath);
+    ASSERT_TRUE(outFile.is_open());
+    outFile << initialData;
+    outFile.close();
+
+    FileRepository repo(testFilePath);
+    UserStorageRecord dataToDelete = {"1", {"102"}};
+    repo.deleteData(dataToDelete);
+
+    StorageDataList testData = repo.loadAllData();
+
+    ASSERT_EQ(testData.size(), 2);
+
+    //check the delete
+    EXPECT_EQ(testData[0].userId, "1");
+    ASSERT_EQ(testData[0].products.size(), 2);
+    EXPECT_EQ(testData[0].products[0], "101");
+    EXPECT_EQ(testData[0].products[1], "103");
+
+    //check that we don't override the second user data
+    EXPECT_EQ(testData[1].userId, "2");
+    ASSERT_EQ(testData[1].products.size(), 2);
+}
