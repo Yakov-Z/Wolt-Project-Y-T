@@ -22,6 +22,7 @@ void PatchCommand::execute() {
         writer.writeLine("404 Not Found\n");
         return; 
         }
+        
 
     // Saves the raw data to the file/persistent storage first.
     persistenceManager.saveData({userId , productIds});
