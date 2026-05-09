@@ -26,10 +26,11 @@ set(CORE_SOURCES
     src/HelpCommand.cpp
     src/FileRepository.cpp
     src/CommonUsersRecommend.cpp
-    src/AddCommand.cpp
     src/RecommendCommand.cpp
     src/InputParser.cpp
     src/DeleteCommand.cpp
+    src/PostCommand.cpp
+    src/PatchCommand.cpp
     src/App.cpp
 )
 
@@ -46,11 +47,12 @@ set(TEST_SOURCES
     tests/MemoryDataRepositoryTest.cpp
     tests/HelpCommandTest.cpp
     tests/FileRepositoryTest.cpp
-    tests/AddCommandTest.cpp
     tests/InputParserTest.cpp
     tests/CommonUsersRecommendTest.cpp
     tests/RecommendCommandTest.cpp
     tests/DeleteCommandTest.cpp
+    tests/PostCommandTest.cpp
+    tests/PatchCommandTest.cpp
     tests/AppTest.cpp
     tests/IntegrationTest.cpp
 )

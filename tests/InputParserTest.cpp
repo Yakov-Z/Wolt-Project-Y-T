@@ -7,6 +7,7 @@
 #include <map>
 #include <functional>
 #include "IInputReader.h"
+#include "IOutputWriter.h"
 
 // Define a type alias for the command map to make the code cleaner
 using CommandMap = std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>>;
@@ -39,6 +40,14 @@ public:
     }
 };
 
+class FakeOutputWriter : public IOutputWriter {
+public:
+    std::string capturedOutput = "";
+    void writeLine(const std::string& message) override {
+        capturedOutput += message;
+    }
+};
+
 // Dummy command for testing the parser
 class MockCommand : public ICommand {
 public:
@@ -48,9 +57,10 @@ public:
 // Test handling of an empty line
 TEST(InputParserTest, EmptyLine) {
     FakeInputReader fake("");
+    FakeOutputWriter fake2;
     CommandMap emptyMap;
     // Pass the map first, then the reader
-    InputParser parser(emptyMap, fake); 
+    InputParser parser(emptyMap, fake, fake2); 
     
     ICommand* command = parser.parseNextCommand();
     
@@ -60,9 +70,10 @@ TEST(InputParserTest, EmptyLine) {
 // Test handling of an illegal or unmapped command
 TEST(InputParserTest, IllegalCommand) {
     FakeInputReader fake("chikooooo");
+    FakeOutputWriter fake2;
     CommandMap emptyMap;
     // Pass the map first, then the reader
-    InputParser parser(emptyMap, fake); 
+    InputParser parser(emptyMap, fake, fake2); 
     
     ICommand* command = parser.parseNextCommand(); 
     
@@ -72,12 +83,15 @@ TEST(InputParserTest, IllegalCommand) {
 // Test parsing of a valid mapped command
 TEST(InputParserTest, RealCommand) {
     FakeInputReader fake("test_command 92 94"); 
+    FakeOutputWriter fake2;
+
     CommandMap commands;
     // Pass the map first, then the reader
-    InputParser parser(commands, fake); 
+    InputParser parser(commands, fake, fake2); 
+    
     
     // Map the command before parsing
-    parser.mapCommand("test_command", [](const std::vector<std::string>& args) -> ICommand* {
+    parser.mapCommand("TEST_COMMAND", [](const std::vector<std::string>& args) -> ICommand* {
         return new MockCommand(); 
     });
 
@@ -90,13 +104,14 @@ TEST(InputParserTest, RealCommand) {
 // Test if arguments are correctly passed to the command creator
 TEST(InputParserTest, PassArguments) {
     FakeInputReader fake("test_command 51 4"); 
+    FakeOutputWriter fake2;
     CommandMap commands;
     // Pass the map first, then the reader
-    InputParser parser(commands, fake); 
+    InputParser parser(commands, fake, fake2); 
     
     bool argsPass = false; 
 
-    parser.mapCommand("test_command", [&argsPass](const std::vector<std::string>& args) -> ICommand* {
+    parser.mapCommand("TEST_COMMAND", [&argsPass](const std::vector<std::string>& args) -> ICommand* {
         // Check sizes and values inside the mapped command
         if (args.size() == 2 && args[0] == "51" && args[1] == "4") {
             argsPass = true;

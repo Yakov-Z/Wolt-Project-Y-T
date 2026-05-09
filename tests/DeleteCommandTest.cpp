@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include "DeleteCommand.h"
-#include "AddCommand.h"
+#include "PostCommand.h"
 #include "IOutputWriter.h"
 
 /**
@@ -20,13 +20,31 @@ public:
             capturedOutput+=" "+productId;
         }
     }
-    void addView(const std::string& userId, const std::vector<std::string>& productIds) override {
-        
+    
+    void postView(const std::string& userId, const std::vector<std::string>& productIds) override {
+        capturedOutput += userId;
+        for(const std::string& productId : productIds) {
+            capturedOutput += " " + productId;
+        }
     }
     
-    void addView(const std::string& userId, const std::string& productId) override {
-        
+    void postView(const std::string& userId, const std::string& productId) override {
+        capturedOutput += userId + " " + productId;
     }
+
+    
+    void patchView(const std::string& userId, const std::vector<std::string>& productIds) override {
+        capturedOutput += userId;
+        for(const std::string& productId : productIds) {
+            capturedOutput += " " + productId;
+        }
+    }
+    
+    void patchView(const std::string& userId, const std::string& productId) override {
+        capturedOutput += userId + " " + productId;
+    }
+
+    bool userExists(const std::string& userId) const override { return true; }
     
     // Dummy implementations for the rest of the interface's pure virtual methods.
     // These are required for the class to compile, even if unused in this specific test.
@@ -97,10 +115,10 @@ TEST(DeleteCommandTest, LocalDataTest) {
     std::vector<std::string> productIds2 = {"101", "102", "103", "104"};
 
     // Inject the mock/spy dependencies into the command.
-    AddCommand addCommand(mockDataManager, persistenceManager, "1", productIds2);
+    PostCommand postCommand(mockDataManager, persistenceManager, "1", productIds2, mockWriter);
 
     // Trigger the execution.
-    addCommand.execute();
+    postCommand.execute();
 
     mockDataManager.capturedOutput = "";
 
@@ -125,10 +143,10 @@ TEST(DeleteCommandTest, PersistenceDataTest) {
     std::vector<std::string> productIds = {"101", "102", "103", "104"};
     
     // Inject the mock/spy dependencies into the command.
-    AddCommand addCommand(mockDataManager, persistenceManager, "1", productIds);
+    PostCommand postCommand(mockDataManager, persistenceManager, "1", productIds, mockWriter);
 
     // Trigger the execution.
-    addCommand.execute();
+    postCommand.execute();
 
     persistenceManager.capturedOutput = ""; 
     
@@ -153,11 +171,12 @@ TEST(DeleteCommandTest, CheckValid) {
     std::vector<std::string> productIds = {"105"};
     
     // Inject the mock/spy dependencies into the command.
-    AddCommand addCommand(mockDataManager, persistenceManager, "1", productIds2);
+    PostCommand postCommand(mockDataManager, persistenceManager, "1", productIds2, mockWriter);
 
     // Trigger the execution.
-    addCommand.execute();
+    postCommand.execute();
 
+     mockWriter.capturedOutput = "";
      mockDataManager.capturedOutput = ""; 
     
     // Inject the mock/spy dependencies into the command.

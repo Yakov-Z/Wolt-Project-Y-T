@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "App.h"
 #include "IInputReader.h"
+#include "IOutputWriter.h"
 #include "InputParser.h"
 #include "ICommand.h"
 #include <string>
@@ -37,6 +38,15 @@ public:
     }
 };
 
+// A simple MockOutputWriter to print output in tests
+class MockOutputWriter : public IOutputWriter {
+public:
+    std::string capturedOutput = "";
+    void writeLine(const std::string& message) override {
+        capturedOutput += message;
+    }
+};
+
 // A simple mock command to track if execute() was successfully called
 class AppTestMockCommand : public ICommand {
 private:
@@ -51,15 +61,16 @@ public:
 // Test parsing and executing a valid mapped command
 TEST(AppTest, StandartCommand) {
     MockInputReader reader;
+    MockOutputWriter writer;
     // Queue the command we want to test
     reader.lines = {"good_command"}; 
     CommandMap emptyMap;
-    InputParser parser(emptyMap, reader);
+    InputParser parser(emptyMap, reader, writer);
     
     bool isExecuted = false;
     
     // Map our dummy command to change the boolean flag when executed
-    parser.mapCommand("good_command", [&isExecuted](const std::vector<std::string>& args) -> ICommand* {
+    parser.mapCommand("GOOD_COMMAND", [&isExecuted](const std::vector<std::string>& args) -> ICommand* {
         return new AppTestMockCommand(isExecuted);
     });
 
@@ -75,10 +86,11 @@ TEST(AppTest, StandartCommand) {
 // Test how App handles an unmapped/bad command
 TEST(AppTest, BadCommand) {
     MockInputReader reader;
+    MockOutputWriter writer;
     // Queue an illegal command
     reader.lines = {"bad_command_that_does_not_exist"}; 
     CommandMap emptyMap;
-    InputParser parser(emptyMap, reader);
+    InputParser parser(emptyMap, reader, writer);
     App app(parser);
     
     // We expect it to ignore the bad command (continue) and try to read again, throwing our exception
@@ -88,10 +100,11 @@ TEST(AppTest, BadCommand) {
 // Test how App handles an empty input
 TEST(AppTest, EmptyCommand) {
     MockInputReader reader;
+    MockOutputWriter writer;
     // Queue an empty string
     reader.lines = {""}; 
     CommandMap emptyMap;
-    InputParser parser(emptyMap, reader);
+    InputParser parser(emptyMap, reader, writer);
     App app(parser);
     
     // We expect it to ignore the empty line (continue) and try to read again

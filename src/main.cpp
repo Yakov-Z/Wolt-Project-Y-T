@@ -5,10 +5,11 @@
 #include "FileRepository.h"       
 #include "MemoryDataRepository.h"   
 #include "ConsoleOutputWriter.h" 
-#include "AddCommand.h"
 #include "DeleteCommand.h"
 #include "RecommendCommand.h"
 #include "HelpCommand.h"
+#include "PatchCommand.h"
+#include "PostCommand.h"
 #include "CommonUsersRecommend.h"
 #include "ConsoleInputReader.h"
 #include "App.h"
@@ -32,7 +33,7 @@ int main() {
     ConsoleInputReader inputReader;
    
     std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>> emptyMap;
-    InputParser parser(emptyMap, inputReader);
+    InputParser parser(emptyMap, inputReader, outputWriter);
 
     //map the delete command
     parser.mapCommand("DELETE", [&dataRepository, &persistenceManager, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
@@ -43,6 +44,28 @@ int main() {
         std::vector<std::string> productIds(args.begin() + 1, args.end());
         
         return new DeleteCommand(dataRepository, persistenceManager, userId, productIds, outputWriter);
+    });
+
+     //map the patch command
+    parser.mapCommand("PATCH", [&dataRepository, &persistenceManager, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
+        //the user most to patch at least 1 product
+        if (args.size() < 2) return nullptr; 
+     
+        std::string userId = args[0];
+        std::vector<std::string> productIds(args.begin() + 1, args.end());
+        
+        return new PatchCommand(dataRepository, persistenceManager, userId, productIds, outputWriter);
+    });
+
+     //map the post command
+    parser.mapCommand("POST", [&dataRepository, &persistenceManager, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
+        //the user most to post at least 1 product
+        if (args.size() < 2) return nullptr; 
+     
+        std::string userId = args[0];
+        std::vector<std::string> productIds(args.begin() + 1, args.end());
+        
+        return new PostCommand(dataRepository, persistenceManager, userId, productIds, outputWriter);
     });
 
     //map the GET command

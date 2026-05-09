@@ -3,9 +3,11 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
+#include <cctype>
 
-InputParser::InputParser(std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>> commandMap, IInputReader& inputReader)
-    : CommandObjectCreate(std::move(commandMap)), reader(inputReader) {}
+InputParser::InputParser(std::map<std::string, std::function<ICommand*(const std::vector<std::string>&)>> commandMap, IInputReader& inputReader, IOutputWriter& outputwriter)
+    : CommandObjectCreate(std::move(commandMap)), reader(inputReader), writer(outputwriter) {}
 
 void InputParser::mapCommand(const std::string& name, std::function<ICommand*(const std::vector<std::string>&)> creator) {
     CommandObjectCreate[name] = creator;
@@ -29,6 +31,8 @@ ICommand* InputParser::parseNextCommand() {
     // First word is the command
     Words_Line >> commandName; 
 
+    std::transform(commandName.begin(), commandName.end(), commandName.begin(), ::toupper);
+
     std::vector<std::string> words;
     std::string word;
     
@@ -43,6 +47,7 @@ ICommand* InputParser::parseNextCommand() {
         // Execute the lambda function and return the new ICommand*
         return iterator->second(words); 
     }
-// Ilegal/no exist command
-    return nullptr; 
+    //no exist command
+    writer.writeLine("400 Bad Request "); 
+    return nullptr;
 }
