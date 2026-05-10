@@ -30,8 +30,6 @@ public:
     // Dummy implementations for the rest of the interface's pure virtual methods.
     // These are required for the class to compile, even if unused in this specific test.
     
-    void patchView(const std::string& userId, const std::vector<std::string>& productIds) override {}
-    void patchView(const std::string& userId, const std::string& productId) override {}
     std::unordered_set<std::string> getProductsByUser(const std::string& userId) const override {
         if (user_Exist) {
             return {"11"}; 

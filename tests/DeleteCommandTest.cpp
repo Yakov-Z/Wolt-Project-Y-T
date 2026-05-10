@@ -32,17 +32,6 @@ public:
         capturedOutput += userId + " " + productId;
     }
 
-    
-    void patchView(const std::string& userId, const std::vector<std::string>& productIds) override {
-        capturedOutput += userId;
-        for(const std::string& productId : productIds) {
-            capturedOutput += " " + productId;
-        }
-    }
-    
-    void patchView(const std::string& userId, const std::string& productId) override {
-        capturedOutput += userId + " " + productId;
-    }
 
     bool userExists(const std::string& userId) const override { return true; }
     

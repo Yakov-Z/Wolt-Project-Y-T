@@ -22,13 +22,13 @@ void PatchCommand::execute() {
         writer.writeLine("404 Not Found\n");
         return; 
         }
-        
+
 
     // Saves the raw data to the file/persistent storage first.
     persistenceManager.saveData({userId , productIds});
     
     // Updates the in-memory data repository to reflect the new views immediately.
-    dataRepository.patchView(userId,productIds);
+    dataRepository.postView(userId,productIds);
 
     writer.writeLine("204 No Content\n");
 }

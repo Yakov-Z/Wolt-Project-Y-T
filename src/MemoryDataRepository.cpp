@@ -20,20 +20,6 @@ void MemoryDataRepository::postView(const std::string& userId, const std::vector
         productToUsers[productId].insert(userId);
     }
 }
-void MemoryDataRepository::patchView(const std::string& userId, const std::string& productId) {
-    // we use sets to prevent duplicates
-    userToProducts[userId].insert(productId);
-    productToUsers[productId].insert(userId);
-}
-
-//fuction overload - get more than 1 product
-void MemoryDataRepository::patchView(const std::string& userId, const std::vector<std::string>& productIds) {
-    
-    for (const std::string& productId : productIds) {
-        userToProducts[userId].insert(productId);
-        productToUsers[productId].insert(userId);
-    }
-}
 
 bool MemoryDataRepository::validDelete(const std::string& userId, const std::vector<std::string>& productIds) {
     
@@ -77,11 +63,9 @@ void MemoryDataRepository::loadDatatoMemory() {
     StorageDataList allData = persistence.loadAllData();
     
     for (const UserStorageRecord& record : allData) {
-        if (userToProducts.count(record.userId) > 0) {
-            patchView(record.userId, record.products);
-        } else {
+       
             postView(record.userId, record.products);
-        } 
+         
     }
 }
 

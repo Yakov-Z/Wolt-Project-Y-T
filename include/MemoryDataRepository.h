@@ -20,8 +20,7 @@ public:
     // Override the interface methods
     void postView(const std::string& userId, const std::string& productId) override;
     void postView(const std::string& userId, const std::vector<std::string>& productIds);
-    void patchView(const std::string& userId, const std::string& productId) override;
-    void patchView(const std::string& userId, const std::vector<std::string>& productIds);
+  
     MemoryDataRepository(IPersistanceData& p) : persistence(p) {}
     std::unordered_set<std::string> getProductsByUser(const std::string& userId) const override;
     std::unordered_set<std::string> getUsersByProduct(const std::string& productId) const override;

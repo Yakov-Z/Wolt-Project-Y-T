@@ -13,7 +13,7 @@ public:
     std::string capturedOutput = "";
 
     // Overrides the target method to record its execution state instead of actually doing the work.
-    void patchView(const std::string& userId, const std::vector<std::string>& productIds) override {
+    void postView(const std::string& userId, const std::vector<std::string>& productIds) override {
         capturedOutput+= userId;
         for(const std::string& productId : productIds) {
             capturedOutput+=" "+productId;
@@ -22,9 +22,6 @@ public:
     bool user_Exist=true;
     bool userExists(const std::string& userId) const override { return user_Exist; }
     // Dummy implementations for the rest of the interface's pure virtual methods.
-    void patchView(const std::string& userId, const std::string& productId) override {
-    }
-    void postView(const std::string& userId, const std::vector<std::string>& productIds) override {}
     void postView(const std::string& userId, const std::string& productId) override {}
     std::unordered_set<std::string> getProductsByUser(const std::string& userId) const override {
         if (user_Exist) {
