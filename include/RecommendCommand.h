@@ -11,4 +11,5 @@ public:
     RecommendCommand(IRecommend* recommender, IOutputWriter& writer);
     ~RecommendCommand() override;
     void execute() override;
+    bool isUserExist();
 };

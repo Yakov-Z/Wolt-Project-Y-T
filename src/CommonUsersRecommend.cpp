@@ -5,10 +5,15 @@
 #include <map>
 #include <algorithm>
 
+bool CommonUsersRecommend::isUserExist() {
+    return dataRepository.userExists(currentUserId);
+}
+
 CommonUsersRecommend::CommonUsersRecommend(IDataRepository& repo, const std::string& userId, const std::string& productId)
     : dataRepository(repo), currentUserId(userId), currentProductId(productId) {}
 
 std::vector<std::string> CommonUsersRecommend::recommend() {
+    if (!isUserExist()) return {};
     std::vector<std::string> recommendations;
     std::unordered_set<std::string> usersWatched = dataRepository.getUsersByProduct(currentProductId);
     std::unordered_set<std::string> productsWatched = dataRepository.getProductsByUser(currentUserId);

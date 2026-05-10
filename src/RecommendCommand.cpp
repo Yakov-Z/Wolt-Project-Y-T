@@ -6,7 +6,11 @@ RecommendCommand::RecommendCommand(IRecommend* recommender,IOutputWriter& output
                                      writer(outputWriter) {}
 void RecommendCommand::execute() {
     std::vector<std::string> recommendations = recommender->recommend();
-    std::string Recommandationtext = "";
+    if (!recommender->isUserExist()) {
+        writer.writeLine("404 Not Found\n");
+        return;
+    }
+    std::string Recommandationtext = "200 Ok\n\n";
     for(int i = 0; i < recommendations.size(); ++i) {
         Recommandationtext += recommendations[i];
         
