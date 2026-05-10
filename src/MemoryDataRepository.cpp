@@ -6,14 +6,14 @@
 #include "IPersistanceData.h"
 
 
-void MemoryDataRepository::addView(const std::string& userId, const std::string& productId) {
+void MemoryDataRepository::postView(const std::string& userId, const std::string& productId) {
     // we use sets to prevent duplicates
     userToProducts[userId].insert(productId);
     productToUsers[productId].insert(userId);
 }
 
 //fuction overload - get more than 1 product
-void MemoryDataRepository::addView(const std::string& userId, const std::vector<std::string>& productIds) {
+void MemoryDataRepository::postView(const std::string& userId, const std::vector<std::string>& productIds) {
     
     for (const std::string& productId : productIds) {
         userToProducts[userId].insert(productId);
@@ -41,6 +41,7 @@ bool MemoryDataRepository::validDelete(const std::string& userId, const std::vec
     return true; 
 }
 
+
 void MemoryDataRepository::deleteView(const std::string& userId, const std::string& productId) {
     // we use sets to prevent duplicates
     userToProducts[userId].erase(productId);
@@ -62,8 +63,15 @@ void MemoryDataRepository::loadDatatoMemory() {
     StorageDataList allData = persistence.loadAllData();
     
     for (const UserStorageRecord& record : allData) {
-        addView(record.userId, record.products); 
+       
+            postView(record.userId, record.products);
+         
     }
+}
+
+//checks if the user exist
+bool MemoryDataRepository::userExists(const std::string& userId) const {
+    return userToProducts.count(userId) > 0;
 }
 
 

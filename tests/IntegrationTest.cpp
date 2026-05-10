@@ -5,7 +5,7 @@
 
 
 #include "MemoryDataRepository.h"
-#include "AddCommand.h"
+#include "PostCommand.h"
 #include "RecommendCommand.h"
 #include "CommonUsersRecommend.h"
 #include "ConsoleOutputWriter.h" 
@@ -25,16 +25,16 @@ TEST(SystemIntegrationTest, Exe_Example) {
     ConsoleOutputWriter writer; 
    
     //insert the data
-    AddCommand(repo, fake, "1",  {"100", "101", "102", "103"}).execute();
-    AddCommand(repo, fake, "2",  {"101", "102", "104", "105", "106"}).execute();
-    AddCommand(repo, fake, "3",  {"100", "104", "105", "107", "108"}).execute();
-    AddCommand(repo, fake, "4",  {"101", "105", "106", "107", "109", "110"}).execute();
-    AddCommand(repo, fake, "5",  {"100", "102", "103", "105", "108", "111"}).execute();
-    AddCommand(repo, fake, "6",  {"100", "103", "104", "110", "111", "112", "113"}).execute();
-    AddCommand(repo, fake, "7",  {"102", "105", "106", "107", "108", "109", "110"}).execute();
-    AddCommand(repo, fake, "8",  {"101", "104", "105", "106", "109", "111", "114"}).execute();
-    AddCommand(repo, fake, "9",  {"100", "103", "105", "107", "112", "113", "115"}).execute();
-    AddCommand(repo, fake, "10", {"100", "102", "105", "106", "107", "109", "110", "116"}).execute();
+    PostCommand(repo, fake, "1",  {"100", "101", "102", "103"}, writer).execute();
+    PostCommand(repo, fake, "2",  {"101", "102", "104", "105", "106"}, writer).execute();
+    PostCommand(repo, fake, "3",  {"100", "104", "105", "107", "108"}, writer).execute();
+    PostCommand(repo, fake, "4",  {"101", "105", "106", "107", "109", "110"}, writer).execute();
+    PostCommand(repo, fake, "5",  {"100", "102", "103", "105", "108", "111"}, writer).execute();
+    PostCommand(repo, fake, "6",  {"100", "103", "104", "110", "111", "112", "113"}, writer).execute();
+    PostCommand(repo, fake, "7",  {"102", "105", "106", "107", "108", "109", "110"}, writer).execute();
+    PostCommand(repo, fake, "8",  {"101", "104", "105", "106", "109", "111", "114"}, writer).execute();
+    PostCommand(repo, fake, "9",  {"100", "103", "105", "107", "112", "113", "115"}, writer).execute();
+    PostCommand(repo, fake, "10", {"100", "102", "105", "106", "107", "109", "110", "116"}, writer).execute();
 
     //Run Recommendation for User 1 on Product 104
     CommonUsersRecommend algo(repo, "1", "104");

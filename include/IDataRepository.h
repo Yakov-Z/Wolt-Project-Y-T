@@ -7,13 +7,16 @@
 class IDataRepository {
 public:
     // Saves a record that a user viewed a specific product
-    virtual void addView(const std::string& userId, const std::string& productId) = 0;
+    virtual void postView(const std::string& userId, const std::string& productId) = 0;
 
     // Saves a record that a user viewed a list of products
-    virtual void addView(const std::string& userId, const std::vector<std::string>& productIds) = 0;
+    virtual void postView(const std::string& userId, const std::vector<std::string>& productIds) = 0;
 
     // Saves a record that a user wants to delete a specific product
     virtual void deleteView(const std::string& userId, const std::string& productId) = 0;
+
+    // Checks if user exist in the system
+    virtual bool userExists(const std::string& userId) const = 0;
 
     // Saves a record that a user wants to delete viewed a list of products
     virtual void deleteView(const std::string& userId, const std::vector<std::string>& productIds) = 0;

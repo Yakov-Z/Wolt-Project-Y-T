@@ -22,11 +22,11 @@ TEST(MemoryDataRepositoryTest, RetrievesProductsByUserIdNoDuplicates) {
     MemoryDataRepository repo(persistence);
     
     
-    repo.addView("user1", "productA");
-    repo.addView("user1", "productB");
+    repo.postView("user1", "productA");
+    repo.postView("user1", "productB");
     //check duplicates
-    repo.addView("user1", "productA"); 
-    repo.addView("user2", "productC");
+    repo.postView("user1", "productA"); 
+    repo.postView("user2", "productC");
     
     std::unordered_set<std::string> expectedForUser1 = {"productA", "productB"};
     EXPECT_EQ(repo.getProductsByUser("user1"), expectedForUser1);
@@ -40,11 +40,11 @@ TEST(MemoryDataRepositoryTest, RetrievesUsersByProductIdNoDuplicates) {
     MockPersistenceData persistence;
     MemoryDataRepository repo(persistence);
 
-    repo.addView("user1", "productA");
-    repo.addView("user2", "productA");
+    repo.postView("user1", "productA");
+    repo.postView("user2", "productA");
     //check duplicates
-    repo.addView("user1", "productA"); 
-    repo.addView("user3", "productB"); 
+    repo.postView("user1", "productA"); 
+    repo.postView("user3", "productB"); 
     
     
     std::unordered_set<std::string> expectedForProductA = {"user1", "user2"};
@@ -56,9 +56,9 @@ TEST(MemoryDataRepositoryTest, DeletesValidProducts) {
     MockPersistenceData persistence;
     MemoryDataRepository repo(persistence);
     
-    repo.addView("user1", "productA");
-    repo.addView("user1", "productB");
-    repo.addView("user1", "productC");
+    repo.postView("user1", "productA");
+    repo.postView("user1", "productB");
+    repo.postView("user1", "productC");
 
     //check before the delete
      std::unordered_set<std::string> before = repo.getProductsByUser("user1");

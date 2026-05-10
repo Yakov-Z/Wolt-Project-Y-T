@@ -17,16 +17,16 @@ public:
 
 // Helper function to populate the repository with the assignment's dataset
 void populateAssignmentData(MemoryDataRepository& repo) {
-    repo.addView("1", {"100", "101", "102", "103"});
-    repo.addView("2", {"101", "102", "104", "105", "106"});
-    repo.addView("3", {"100", "104", "105", "107", "108"});
-    repo.addView("4", {"101", "105", "106", "107", "109", "110"});
-    repo.addView("5", {"100", "102", "103", "105", "108", "111"});
-    repo.addView("6", {"100", "103", "104", "110", "111", "112", "113"});
-    repo.addView("7", {"102", "105", "106", "107", "108", "109", "110"});
-    repo.addView("8", {"101", "104", "105", "106", "109", "111", "114"});
-    repo.addView("9", {"100", "103", "105", "107", "112", "113", "115"});
-    repo.addView("10", {"100", "102", "105", "106", "107", "109", "110", "116"});
+    repo.postView("1", {"100", "101", "102", "103"});
+    repo.postView("2", {"101", "102", "104", "105", "106"});
+    repo.postView("3", {"100", "104", "105", "107", "108"});
+    repo.postView("4", {"101", "105", "106", "107", "109", "110"});
+    repo.postView("5", {"100", "102", "103", "105", "108", "111"});
+    repo.postView("6", {"100", "103", "104", "110", "111", "112", "113"});
+    repo.postView("7", {"102", "105", "106", "107", "108", "109", "110"});
+    repo.postView("8", {"101", "104", "105", "106", "109", "111", "114"});
+    repo.postView("9", {"100", "103", "105", "107", "112", "113", "115"});
+    repo.postView("10", {"100", "102", "105", "106", "107", "109", "110", "116"});
 }
 
 // Test 1: Verifying recommendation logic for a different user and product
@@ -115,10 +115,10 @@ TEST(CommonUsersRecommendTest, LessThanTenRecommendations) {
     // Setup: 
     // User 1 only watched product 100.
     // Fixed: Added {} to match the vector signature
-    repo.addView("1", "100");
+    repo.postView("1", "100");
     
     // User 2 watched 100 (so similarity is 1) and 3 other unique products.
-    repo.addView("2", {"100", "201", "202", "203"});
+    repo.postView("2", {"100", "201", "202", "203"});
 
     // Execute: Get recommendations for User 1 based on product 100.
     CommonUsersRecommend recommender(repo, "1", "100");
@@ -141,10 +141,10 @@ TEST(CommonUsersRecommendTest, CappedAtTenRecommendations) {
     // Setup: 
     // User 1 only watched product 100.
     // Fixed: Added {} to match the vector signature
-    repo.addView("1", "100");
+    repo.postView("1", "100");
     
     // User 2 watched 100 (similarity is 1) and 12 other unique products.
-    repo.addView("2", {"100", "201", "202", "203", "204", "205", 
+    repo.postView("2", {"100", "201", "202", "203", "204", "205", 
                        "206", "207", "208", "209", "210", "211", "212"});
 
     // Execute: Get recommendations for User 1 based on product 100.

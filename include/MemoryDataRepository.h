@@ -18,13 +18,15 @@ private:
 
 public:
     // Override the interface methods
-    void addView(const std::string& userId, const std::string& productId) override;
-    void addView(const std::string& userId, const std::vector<std::string>& productIds);
+    void postView(const std::string& userId, const std::string& productId) override;
+    void postView(const std::string& userId, const std::vector<std::string>& productIds);
+  
     MemoryDataRepository(IPersistanceData& p) : persistence(p) {}
     std::unordered_set<std::string> getProductsByUser(const std::string& userId) const override;
     std::unordered_set<std::string> getUsersByProduct(const std::string& productId) const override;
     void loadDatatoMemory();
     void deleteView(const std::string& userId, const std::string& productId) override;
+    bool userExists(const std::string& userId) const override;
     bool validDelete(const std::string& userId, const std::vector<std::string>& productIds) override;
     void deleteView(const std::string& userId, const std::vector<std::string>& productIds);
 };
