@@ -10,6 +10,7 @@ private:
     std::string currentUserId;
     std::string currentProductId;
 public:
+    bool isUserExist();
     CommonUsersRecommend(IDataRepository& repo, const std::string& userId, const std::string& productId);
     std::vector<std::string> recommend() override;
 };
