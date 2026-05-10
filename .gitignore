@@ -2,3 +2,4 @@
 build/
 .dockerignore
 .devcontainer
+details.txt

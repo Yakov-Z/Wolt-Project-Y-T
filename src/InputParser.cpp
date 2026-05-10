@@ -48,6 +48,6 @@ ICommand* InputParser::parseNextCommand() {
         return iterator->second(words); 
     }
     //no exist command
-    writer.writeLine("400 Bad Request "); 
+    writer.writeLine("400 Bad Request\n"); 
     return nullptr;
 }
