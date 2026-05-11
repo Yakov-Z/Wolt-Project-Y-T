@@ -135,10 +135,7 @@ StorageDataList FileRepository::loadAllData() {
             userData.products.push_back(productStr);
         }
         
-        // Only keep users that have at least one product
-        if(!userData.products.empty()){
-            allData.push_back(userData);
-        }       
+        allData.push_back(userData);     
     }
     
     inFile.close();
