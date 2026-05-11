@@ -1,4 +1,3 @@
-#pragma once
 #include "SingleSocketServer.h"
 #include <iostream>
 #include <sys/socket.h>
