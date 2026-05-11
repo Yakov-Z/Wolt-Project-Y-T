@@ -53,7 +53,7 @@ TEST(SingleSocketServerTest, BindsAndListensSuccessfully) {
 
 // Test 2: Verify that the server successfully accepts a client and stores its socket descriptor
 TEST(SingleSocketServerTest, AcceptsClientConnection) {
-    int testPort = 1234;
+    int testPort = 1235;
     SingleSocketServer server(testPort);
 
     // Run the server in a separate thread so it doesn't block the main test execution
@@ -62,7 +62,7 @@ TEST(SingleSocketServerTest, AcceptsClientConnection) {
     });
 
     // Wait briefly to ensure the server is ready to accept connections
-    this_thread::sleep_for(chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // Create a standard client socket for communication
     int client = socket(AF_INET, SOCK_STREAM, 0);
