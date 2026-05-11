@@ -32,6 +32,7 @@ set(CORE_SOURCES
     src/PostCommand.cpp
     src/PatchCommand.cpp
     src/App.cpp
+    src/SingleSocketServer.cpp
 )
 
 # Create the project main exe with all logic files
@@ -55,6 +56,7 @@ set(TEST_SOURCES
     tests/PatchCommandTest.cpp
     tests/AppTest.cpp
     tests/IntegrationTest.cpp
+    tests/SingleSocketServerTest.cpp
 )
 
 # Create the test exe with all test files
