@@ -21,7 +21,7 @@ FetchContent_MakeAvailable(googletest)
 # Define all the logic files as CORE_SOURCE
 set(CORE_SOURCES
     src/ConsoleInputReader.cpp
-     src/ConsoleOutputWriter.cpp
+    src/ConsoleOutputWriter.cpp
     src/MemoryDataRepository.cpp
     src/HelpCommand.cpp
     src/FileRepository.cpp
@@ -35,6 +35,7 @@ set(CORE_SOURCES
     src/SingleSocketServer.cpp
     src/SocketInputReader.cpp
     src/SocketOutputWriter.cpp
+    src/ServerRunner.cpp
 )
 
 # Create the project main exe with all logic files
