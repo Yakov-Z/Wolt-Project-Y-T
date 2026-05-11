@@ -33,6 +33,8 @@ set(CORE_SOURCES
     src/PatchCommand.cpp
     src/App.cpp
     src/SingleSocketServer.cpp
+    src/SocketInputReader.cpp
+    src/SocketOutputWriter.cpp
 )
 
 # Create the project main exe with all logic files
@@ -57,6 +59,8 @@ set(TEST_SOURCES
     tests/AppTest.cpp
     tests/IntegrationTest.cpp
     tests/SingleSocketServerTest.cpp
+    tests/SocketInputReaderTest.cpp
+    tests/SocketOutputWriterTest.cpp
 )
 
 # Create the test exe with all test files
