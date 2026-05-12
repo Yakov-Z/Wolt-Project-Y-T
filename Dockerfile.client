@@ -1,0 +1,11 @@
+# Use an official Ubuntu as a parent image
+FROM python:3.11-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the python client code into the container at /app
+COPY src/SocketClient.py /app/
+
+# Run the app as default command when the container starts
+CMD ["python", "./SocketClient.py"]
