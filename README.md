@@ -25,20 +25,18 @@ The transition from a monolithic console app to a client-server architecture dem
 
 Follow these steps to build, run, and test the application using Docker Compose.
 
-### 1. Build and Run the System
+### 1. Build the System
 
-To automatically build both the C++ server and Python client images and start the system, run the following command in the root directory:
+To compile the C++ code and build the Docker images for both the server and the client, run the following command in the root directory:
 
 ```bash
-docker-compose up --build
+docker-compose build
 ```
-> **Note:** By default, the system is configured to run on port `777`. The port argument is passed to the server's `main` function and the client's `main` via the `docker-compose.yml` file. If you wish to test the system with a different port, please change the port number in the `command` field for both the `server_app` and `client_app` services inside `docker-compose.yml` before running.
+> **Note:** By default, the system is configured to run on port `777`. The port argument is passed to the server's `main` function and the client's script via the `docker-compose.yml` file. If you wish to test the system with a different port, please change the port number in the `command` field for both the `ServerApp` and `ClientApp` services inside `docker-compose.yml` before running.
 
-Once the system is up, you must interact with the client in a separate terminal.
+### 2. Run the Application
 
-### 2. Interact with the Client
-
-Because `docker-compose up` runs the containers in the background, you need to attach a terminal to the Python client to interact with it. In a **new terminal window**, run:
+To start the system, you only need to run the client. Docker Compose will automatically start the server in the background (due to the configured dependency) and attach your terminal directly to the interactive Python client. Run:
 
 ```bash
 docker-compose run client_app
@@ -50,11 +48,12 @@ This will open an interactive prompt where you can start typing commands. The cl
 The C++ server unit tests (developed using TDD) run in complete isolation from the main server/client applications. To execute the Google Test suite, run:
 
 ```bash
-docker-compose run Tests
+docker-compose run tests
 ```
+
 ### 4. Stopping the System
 
-When you are finished, stop and remove the background containers by running:
+When you are finished and have exited the client, stop the background server and clean up the network by running:
 
 ```bash
 docker-compose down
