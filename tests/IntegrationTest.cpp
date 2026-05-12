@@ -138,7 +138,7 @@ TEST(IntegrationTest, FullSystemFlow) {
     bytesRead = recv(clientSock, buffer, sizeof(buffer) - 1, 0);
     ASSERT_GT(bytesRead, 0);
     response = buffer;
-    EXPECT_EQ(response, "200 Ok\n\n101");
+    EXPECT_EQ(response, "200 Ok\n\n101\n");
 
     // Simulate removing user data and verify the server acknowledges the deletion
     command = "delete 1 100\n";

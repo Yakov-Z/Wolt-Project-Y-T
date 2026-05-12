@@ -46,7 +46,10 @@ int ServerRunner::run(int port) {
 
     // Map the DELETE command. Requires validation to ensure target products are specified.
     parser.mapCommand("DELETE", [&dataRepository, &persistenceManager, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
-        if (args.size() < 2) return nullptr; 
+        if (args.size() < 2) {
+            outputWriter.writeLine("400 Bad Request\n");
+            return nullptr; 
+        }
         std::string userId = args[0];
         std::vector<std::string> productIds(args.begin() + 1, args.end());
         return new DeleteCommand(dataRepository, persistenceManager, userId, productIds, outputWriter);
@@ -54,7 +57,10 @@ int ServerRunner::run(int port) {
 
     // Map the PATCH command. Requires validation to ensure products are provided for the update.
     parser.mapCommand("PATCH", [&dataRepository, &persistenceManager, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
-        if (args.size() < 2) return nullptr; 
+        if (args.size() < 2) {
+            outputWriter.writeLine("400 Bad Request\n");
+            return nullptr; 
+        } 
         std::string userId = args[0];
         std::vector<std::string> productIds(args.begin() + 1, args.end());
         return new PatchCommand(dataRepository, persistenceManager, userId, productIds, outputWriter);
@@ -62,7 +68,10 @@ int ServerRunner::run(int port) {
 
     // Map the POST command. Requires validation to ensure products are provided for insertion.
     parser.mapCommand("POST", [&dataRepository, &persistenceManager, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
-        if (args.size() < 2) return nullptr; 
+        if (args.size() < 2) {
+            outputWriter.writeLine("400 Bad Request\n");
+            return nullptr; 
+        } 
         std::string userId = args[0];
         std::vector<std::string> productIds(args.begin() + 1, args.end());
         return new PostCommand(dataRepository, persistenceManager, userId, productIds, outputWriter);
@@ -70,7 +79,10 @@ int ServerRunner::run(int port) {
 
     // Map the GET command. Expects strictly one user ID and one product ID to trigger recommendations.
     parser.mapCommand("GET", [&dataRepository, &outputWriter](const std::vector<std::string>& args) -> ICommand* {
-        if (args.size() != 2) return nullptr; 
+        if (args.size() != 2) {
+            outputWriter.writeLine("400 Bad Request\n");
+            return nullptr; 
+        } 
         std::string userId = args[0];
         std::string productId = args[1];
         IRecommend* common = new CommonUsersRecommend(dataRepository, userId, productId);
@@ -83,7 +95,7 @@ int ServerRunner::run(int port) {
                                "GET, arguments: [userid] [productid] \n"
                                "PATCH, arguments: [userid] [productid1] [productid2] …  \n"
                                "POST, arguments: [userid] [productid1] [productid2] …  \n"
-                               "help";
+                               "help\n";
         return new HelpCommand(outputWriter, helpText);
     });
     
