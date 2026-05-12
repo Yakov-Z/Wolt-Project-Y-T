@@ -1,5 +1,3 @@
-
-#pragma once
 #include "ICommand.h"
 #include "IDataRepository.h"
 #include "IPersistanceData.h"

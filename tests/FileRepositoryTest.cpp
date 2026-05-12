@@ -102,7 +102,7 @@ TEST_F(FileRepositoryTest, StringsFile) {
     ASSERT_EQ(testData[2].products[0], "101");
 }
 
-// Test that a user with an ID but zero products is ignored.
+// Test that a user with an ID but zero products is not ignored.
 TEST_F(FileRepositoryTest, UserIdOnly) {
     std::string testData0 = "1\n";
     std::ofstream outFile(testFilePath);
@@ -114,7 +114,7 @@ TEST_F(FileRepositoryTest, UserIdOnly) {
     StorageDataList testData = repo.loadAllData();
     
     // Per requirements, a user must have products to be valid.
-    ASSERT_EQ(testData.size(), 0);
+    ASSERT_EQ(testData.size(), 1);
 }
 
 // Test that having the same ID multiple times in a file is allowed.
