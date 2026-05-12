@@ -18,7 +18,7 @@ void RecommendCommand::execute() {
             Recommandationtext += " ";
         }
     }
-    
+    Recommandationtext += "\n";
     writer.writeLine(Recommandationtext);
 }
 RecommendCommand::~RecommendCommand() {
