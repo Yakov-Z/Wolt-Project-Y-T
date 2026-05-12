@@ -1,7 +1,30 @@
 services:
-  app:
-    build: .
+  server_app:
+    build: 
+      context: .
+      dockerfile: Dockerfile.server
     volumes:
       - ./data:/app/data
+    # Pass the port argument to the C++ main function at runtime
+    command: ["./build/RecommenderApp", "777"]
     stdin_open: true
     tty: true
+  client_app:
+    build: 
+      context: .
+      dockerfile: Dockerfile.client
+    # Pass the server name (as IP) and port to the Python script at runtime
+    command: ["python", "SocketClient.py", "server_app", "777"]
+    depends_on:
+      - server_app
+    stdin_open: true
+    tty: true
+  tests:
+    build: 
+      context: .
+      dockerfile: Dockerfile.server
+    command: ["./build/runTests"]
+    profiles:
+      - testing
+    volumes:
+      - ./data:/app/data
