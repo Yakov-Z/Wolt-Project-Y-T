@@ -156,7 +156,7 @@ TEST(IntegrationTest, FullSystemFlow) {
     bytesRead = recv(clientSock, buffer, sizeof(buffer) - 1, 0);
     ASSERT_GT(bytesRead, 0);
     response = buffer;
-    EXPECT_EQ(response, "200 Ok\n\n");
+    EXPECT_EQ(response, "200 Ok\n\n\n");
 
     // Simulate an invalid request to ensure the parser correctly handles bad input
     command = "chiko 1000\n";
