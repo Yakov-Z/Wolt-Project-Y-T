@@ -34,7 +34,7 @@ TEST(RecommendCommandTest, RecommendTest) {
                            
     recommend.execute();
     
-    EXPECT_EQ(mockWriter.capturedOutput, "200 Ok\n\n101 102 117");
+    EXPECT_EQ(mockWriter.capturedOutput, "200 Ok\n\n101 102 117\n");
 }
 
 TEST(RecommendCommandTest, UserNotExistTest) {
