@@ -110,7 +110,7 @@ TEST(IntegrationTest, FullSystemFlow) {
                            "GET, arguments: [userid] [productid] \n"
                            "PATCH, arguments: [userid] [productid1] [productid2] …  \n"
                            "POST, arguments: [userid] [productid1] [productid2] …  \n"
-                           "help";
+                           "help\n";
     std::string response(buffer);
     EXPECT_EQ(response, helpText);
 
