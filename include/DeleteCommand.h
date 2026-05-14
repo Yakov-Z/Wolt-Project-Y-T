@@ -20,6 +20,7 @@ private:
     std::string userId;
     std::vector<std::string> productIds;
     IOutputWriter& writer;
+    bool hasDuplicate(const std::vector<std::string>& productIds);
 
 public:
     // Constructor that initializes the command with its dependencies and arguments.
