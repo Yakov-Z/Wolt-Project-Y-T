@@ -3,6 +3,7 @@
 #include "IPersistanceData.h"
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include "DeleteCommand.h"
 #include "IOutputWriter.h"
 
@@ -14,9 +15,10 @@ DeleteCommand::DeleteCommand(IDataRepository& dataRepository, IPersistanceData& 
       userId(userId), productIds(productIds), writer(writer) {}
 // Executes the command by invoking the necessary methods on both the persistence and data managers.
 void DeleteCommand::execute() {
-    
+    bool hasDuplicates = hasDuplicate(productIds);
+
     //check if the user delete products in the list
-    if (!dataRepository.validDelete(userId, productIds)) {
+    if (!dataRepository.validDelete(userId, productIds) || hasDuplicates) {
         writer.writeLine("404 Not Found\n");
         return; 
     }
@@ -27,4 +29,23 @@ void DeleteCommand::execute() {
     dataRepository.deleteView(userId,productIds);
 
     writer.writeLine("204 No Content\n");
+}
+
+// Helper function to check for duplicate product IDs in the list.
+bool DeleteCommand::hasDuplicate(const std::vector<std::string>& productIds) {
+    // Uses an unordered_set to track seen product IDs for efficient duplicate detection.
+    int length = productIds.size();
+    std::unordered_set<std::string> seenElements;
+
+    // Iterates through the product IDs, checking if each one has been seen before.
+    // If a duplicate is found, the function returns true immediately.
+    for(int i = 0; i < length; i++) {
+        if(seenElements.find(productIds[i]) != seenElements.end()) {
+            return true;
+        }
+        seenElements.insert(productIds[i]);
+    }
+    // If no duplicates are found after checking all product IDs,
+    // the function returns false.
+    return false;
 }
