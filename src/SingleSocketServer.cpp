@@ -18,6 +18,7 @@ void SingleSocketServer::runServer() {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("error creating socket");
+        exit(1);
     }
 
     // Initialize the socket address structure
@@ -30,11 +31,13 @@ void SingleSocketServer::runServer() {
     // Bind the socket to the specified IP and port
     if (bind(sock, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
         perror("error binding socket");
+        exit(1);
     }
 
     // Start listening for incoming connections with backlog of 1
     if (listen(sock, 1) < 0) {
         perror("error listening to a socket");
+        exit(1);
     }
 
     // Prepare structure to hold client connection details
@@ -47,6 +50,7 @@ void SingleSocketServer::runServer() {
 
     if (client_sock < 0) {
         perror("error accepting client");
+        exit(1);
     }
 
     // Save the newly created client socket so other parts of the program can use it

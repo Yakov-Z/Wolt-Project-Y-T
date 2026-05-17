@@ -1,6 +1,7 @@
 #include "ServerRunner.h"
 #include <filesystem>
 #include <iostream>
+#include <string>
 
 int main(int argc, char* argv[]) {
     // Validate command-line arguments to ensure exactly one port parameter is provided
@@ -15,6 +16,11 @@ int main(int argc, char* argv[]) {
         port = std::stoi(argv[1]);
     } catch (const std::exception& e) {
         std::cerr << "Error: Invalid port number provided." << std::endl;
+        return 1;
+    }
+    
+    if (port < 1 || port > 65535) {
+        std::cerr << "Error: Port number to high/low." << std::endl;
         return 1;
     }
 
