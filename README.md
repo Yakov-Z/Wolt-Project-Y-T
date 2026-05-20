@@ -4,6 +4,12 @@ This project is a product recommendation system utilizing a Client-Server archit
 
 The system is fully containerized using Docker, ensuring consistent execution across different environments. We use `docker-compose` to seamlessly orchestrate the server, client, and testing environments, while ensuring that all user data persists between runs.
 
+## Previous Submissions
+
+Please note that the submissions for previous exercises are located in separate branches:
+* **Exercise 1:** `Ex1-submission`
+* **Exercise 2:** `Ex2-submission`
+
 ## Architecture and SOLID Principles
 
 This project was built with a strong emphasis on clean code, loose coupling, and SOLID principles to allow for easy future extensions.
