@@ -20,6 +20,12 @@ class DataRepository {
         return this.users.get(userId);
     }
 
+    getUserByDetails(username, password) {
+    return Array.from(this.users.values()).find(user => 
+        user.username === username && user.password === password
+    );
+}
+
     addRestaurant(restaurant) {
         restaurant.id = this.nextRestaurantId;
         this.nextRestaurantId++;
@@ -34,6 +40,10 @@ class DataRepository {
     getAllRestaurants() {
         return Array.from(this.restaurants.values());
     }
+
+    deleteRestaurant(restaurantId) {
+    return this.restaurants.delete(restaurantId); 
+}
 
     addOrder(order) {
         order.id = this.nextOrderId;

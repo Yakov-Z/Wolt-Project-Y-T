@@ -5,11 +5,15 @@ class Restaurant {
         this.address = address;
         this.viewedBy = []; 
         this.menu = []; 
+        this.nextProductId = 1;
     }
 
    
     addProduct(product) {
+        product.id = this.nextProductId; 
+        this.nextProductId++; 
         this.menu.push(product);
+        return product;
     }
 }
 
