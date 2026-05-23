@@ -5,10 +5,11 @@ class Restaurant {
         this.address = address;
         this.viewedBy = []; 
         this.menu = []; 
+        //give ID to the products in the menu
         this.nextProductId = 1;
     }
 
-   
+   //add a product to the restaurant menu, and give it a unique ID
     addProduct(product) {
         product.id = this.nextProductId; 
         this.nextProductId++; 
