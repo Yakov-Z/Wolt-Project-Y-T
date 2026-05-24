@@ -64,7 +64,7 @@ const deleteRestaurant = (req, res) => {
     if (!isDeleted) {
         return res.json({ error: "Restaurant not found" });
     }
-    //
+    
     res.json({});
 };
 
