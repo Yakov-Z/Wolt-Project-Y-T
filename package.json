@@ -1,0 +1,27 @@
+{
+  "name": "project_y_t",
+  "version": "1.0.0",
+  "description": "This project is a product recommendation system utilizing a Client-Server architecture over TCP. The server, implemented in C++, handles all business logic, data persistence, and calculations. The client, implemented in Python 3, acts as an interactive CLI, forwarding user commands to the server and displaying the responses.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yakov-Z/Exercise-1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Yakov-Z/Exercise-1/issues"
+  },
+  "homepage": "https://github.com/Yakov-Z/Exercise-1#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

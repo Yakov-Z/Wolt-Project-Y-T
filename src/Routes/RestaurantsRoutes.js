@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../Controllers/RestaurantController');
+const ProductsRoutes = require('./ProductsRoutes');
 
 router.route('/')
     .get(controller.getAllRestaurants)
