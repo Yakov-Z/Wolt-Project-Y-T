@@ -2,6 +2,7 @@
 const dataRepository = require('../Models/DataRepository');
 const Product = require('../Models/Product');
 const Restaurant = require('../Models/Restaurant');
+const { sendCommand } = require('../Services/tcpClient');
 
 //get all the restaurants, that save in the data repository, return the list of restaurants
 const getAllRestaurants = (req, res) => {
@@ -112,6 +113,8 @@ const getProductById = (req, res) => {
     const productId = Number(req.params.pId);
     //get the restaurant from the data repository
     const restaurant = dataRepository.getRestaurant(id);
+    // Extracting user ID from the headers
+    const userId = req.headers['userid'];
 
     //error if the restaurant don't exist
     if (!restaurant) 
@@ -122,6 +125,10 @@ const getProductById = (req, res) => {
     //error if the product don't exist
     if (!product) {
         return res.json({ error: "Product not found" });
+    }
+    // If the user is logged in, send his product view to the recommendation server
+    if(userId) {
+        sendCommand(post, userId, productId);
     }
     //return the product details
     res.json(product);

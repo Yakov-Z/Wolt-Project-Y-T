@@ -1,6 +1,7 @@
 //connect to the data repository to get and manipulate order data
 const dataRepository = require('../Models/DataRepository');
 const Order = require('../Models/Order');
+const { sendCommand } = require('../Services/tcpClient');
 
 //create a new order for the connected user
 const createOrder = (req, res) => {
@@ -22,6 +23,11 @@ const createOrder = (req, res) => {
 
     //save the order to the data repository
     const savedOrder = dataRepository.addOrder(newOrder);
+
+    // If there are products, send to the old server
+    if (products && Array.isArray(products) && products.length > 0) {
+        sendCommand('post', userId, ...products);       
+    }
 
     //return the created order
     res.json(savedOrder);
@@ -67,6 +73,25 @@ const getOrderById = (req, res) => {
 const deleteOrder = (req, res) => {
     // ID is int in our implementation, so we convert it from string to number
     const id = Number(req.params.id);
+    //get the user ID from the headers
+    const userIdHeader = req.headers['userid'];
+
+    //error if the user is not connected
+    if (!userIdHeader) {
+        return res.json({ error: "User is not connected" });
+    }
+    //convert the user ID from string to number
+    const userId = Number(userIdHeader);
+    const order = dataRepository.getOrder(id);
+    
+    if(!order) {
+        return res.json({ error: "Order not found" });
+    }
+    const products = order.products;
+
+    if (products.length > 0) {        
+        sendCommand('delete', userId, ...products);       
+    }
     //delete the order from the data repository
     const isDeleted = dataRepository.deleteOrder(id); 
     
@@ -87,11 +112,27 @@ const updateOrder = (req, res) => {
     //error if the order don't exist
     if (!order)
          return res.json({ error: "Order not found" });
+        //get the user ID from the headers
+    const userIdHeader = req.headers['userid'];
+
+    //error if the user is not connected
+    if (!userIdHeader) {
+        return res.json({ error: "User is not connected" });
+    }
+    //convert the user ID from string to number
+    const userId = Number(userIdHeader);
+
+    const { products, restaurant, totalPrice } = req.body;
     
-    //update the order details that sent in the request body
-    if (req.body.products) order.products = req.body.products;
-    if (req.body.restaurant) order.restaurant = req.body.restaurant;
-    if (req.body.totalPrice) order.totalPrice = req.body.totalPrice;
+    // If there are products, send to the old server
+    if (products.length > 0) {        
+        sendCommand('patch', userId, ...products);       
+    }
+
+    // update the order details that sent in the request body
+    if (products) order.products = products;
+    if (restaurant) order.restaurant = restaurant;
+    if (totalPrice) order.totalPrice = totalPrice;
     
     //return the updated order details
     res.json(order);
