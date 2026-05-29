@@ -9,14 +9,19 @@ services:
     command: ["./build/RecommenderApp", "8080"]
     stdin_open: true
     tty: true
-  client_app:
-    build: 
+  web_server:
+    build:
       context: .
-      dockerfile: Dockerfile.client
-    # Pass the server name (as IP) and port to the Python script at runtime
-    command: ["python", "SocketClient.py", "server_app", "8080"]
+      dockerfile: Dockerfile.web_server
+    ports:
+      # Map host port 3000 to container port 3000
+      - "3000:3000"
     depends_on:
       - server_app
+    environment:
+      # This environment variable tells Node where the C++ server is
+      - TCP_HOST=server_app
+      - TCP_PORT=8080
     stdin_open: true
     tty: true
   tests:
@@ -28,3 +33,13 @@ services:
       - testing
     volumes:
       - ./data:/app/data
+  # client_app:
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile.client
+  #   # Pass the server name (as IP) and port to the Python script at runtime
+  #   command: ["python", "SocketClient.py", "server_app", "8080"]
+  #   depends_on:
+  #     - server_app
+  #   stdin_open: true
+  #   tty: true
