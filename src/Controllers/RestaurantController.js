@@ -19,7 +19,7 @@ const createRestaurant = (req, res) => {
     const savedRestaurant = dataRepository.addRestaurant(newRestaurant);
     
     //return the restaurant profile
-    res.json(savedRestaurant);
+    res.status(201).json(savedRestaurant);
 };
 
 //get restaurant by its ID, return the restaurant profile
@@ -29,7 +29,7 @@ const getRestaurantById = (req, res) => {
     const restaurant = dataRepository.getRestaurant(id);
     //error if the restaurant don't exist
     if (!restaurant) {
-        return res.json({ error: "Restaurant not found" });
+        return res.status(404).json({ error: "Restaurant not found" });
     }
     //return the restaurant profile
     res.json(restaurant);
@@ -43,7 +43,7 @@ const updateRestaurant = (req, res) => {
     
     //error if the restaurant don't exist
     if (!restaurant) {
-        return res.json({ error: "Restaurant not found" });
+        return res.status(404).json({ error: "Restaurant not found" });
     }
     
     //update the details that sent in the request body
@@ -63,10 +63,10 @@ const deleteRestaurant = (req, res) => {
     
     //error if the restaurant don't exist
     if (!isDeleted) {
-        return res.json({ error: "Restaurant not found" });
+        return res.status(404).json({ error: "Restaurant not found" });
     }
     
-    res.json({});
+    res.status(204).send();
 };
 
 //get the menu of a restaurant by its ID, and the menu array
@@ -77,7 +77,7 @@ const getRestaurantMenu = (req, res) => {
     
      //error if the restaurant don't exist
     if (!restaurant) {
-        return res.json({ error: "Restaurant not found" });
+        return res.status(404).json({ error: "Restaurant not found" });
     }
     
     //return the menu array
@@ -91,7 +91,7 @@ const addProductToMenu = (req, res) => {
     
     //error if the restaurant don't exist
     if (!restaurant) {
-        return res.json({ error: "Restaurant not found" });
+        return res.status(404).json({ error: "Restaurant not found" });
     }
     
     //get the product details from the request body
@@ -103,7 +103,7 @@ const addProductToMenu = (req, res) => {
     //add the product to the restaurant menu
     const savedProduct = restaurant.addProduct(newProduct);
     //return the added product
-    res.json(savedProduct);
+    res.status(201).json(savedProduct);
 };
 
 //get a specific product from the restaurant menu by the restaurant ID and the product ID
@@ -118,17 +118,17 @@ const getProductById = (req, res) => {
 
     //error if the restaurant don't exist
     if (!restaurant) 
-        return res.json({ error: "Restaurant not found" });
+        return res.status(404).json({ error: "Restaurant not found" });
     
     //get the product from the restaurant menu
     const product = restaurant.menu.find(p => p.id === productId);
     //error if the product don't exist
     if (!product) {
-        return res.json({ error: "Product not found" });
+        return res.status(404).json({ error: "Product not found" });
     }
     // If the user is logged in, send his product view to the recommendation server
     if(userId) {
-        sendCommand(post, userId, productId);
+        sendCommand('post', userId, productId);
     }
     //return the product details
     res.json(product);
@@ -143,14 +143,14 @@ const updateProduct = (req, res) => {
     const restaurant = dataRepository.getRestaurant(id);
     //error if the restaurant don't exist
     if (!restaurant)
-         return res.json({ error: "Restaurant not found" });
+         return res.status(404).json({ error: "Restaurant not found" });
     
    //search for the product in the restaurant menu
     const product = restaurant.menu.find(p => p.id === productId);
 
      //error if the product don't exist
     if (!product)
-         return res.json({ error: "Product not found" });
+         return res.status(404).json({ error: "Product not found" });
     
     //update the product details that sent in the request body
     if (req.body.name) product.name = req.body.name;
@@ -170,7 +170,7 @@ const deleteProduct = (req, res) => {
     const restaurant = dataRepository.getRestaurant(id);
     //error if the restaurant don't exist
     if (!restaurant) {
-         return res.json({ error: "Restaurant not found" });
+         return res.status(404).json({ error: "Restaurant not found" });
     }
     
     //find the index of the product in the menu
@@ -178,13 +178,13 @@ const deleteProduct = (req, res) => {
         
     //error if the product don't exist
     if (index === -1) {
-        return res.json({ error: "Product not found" });
+        return res.status(404).json({ error: "Product not found" });
     }
     
     //delete the product from the restaurant menu
     restaurant.menu.splice(index, 1); 
     
-    res.json({});
+    res.status(204).send();
 };
 
 module.exports = {

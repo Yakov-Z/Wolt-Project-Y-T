@@ -8,9 +8,9 @@ const getUserProfile = (req, res) => {
     const userId = Number(req.params.id);
     const user = dataRepository.getUser(userId);
 
-    //error if the userr don't exist
+    //error if the user don't exist
     if (!user) {
-        return res.json({ error: "User not found" });
+        return res.status(404).json({ error: "User not found" });
     }
    //return the user profile
     res.json(user);
@@ -23,13 +23,13 @@ const registerUser = (req, res) => {
 
     //error if username or password is null
     if (!username || !password) {
-        return res.json({ error: "Username and password are required" });
+        return res.status(400).json({ error: "Username and password are required" });
     }
 
     //create and save the new user to the data repository
     const newUser = new User(null, username, password, address);
     const savedUser = dataRepository.addUser(newUser);
-    res.json(savedUser);
+    res.status(201).json(savedUser);
 
 };
 
@@ -43,7 +43,7 @@ const loginUser = (req, res) => {
 
     //error if the username or password is incorrect
     if (!user) {
-        return res.json({ error: "username or password is incorrect" });
+        return res.status(401).json({ error: "username or password is incorrect" });
     }
 
     res.json(user);
