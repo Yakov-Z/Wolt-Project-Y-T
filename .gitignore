@@ -3,3 +3,4 @@ build/
 .dockerignore
 .devcontainer
 details.txt
+node_modules
