@@ -2,10 +2,11 @@ const net = require('net');
 
 // Create a new TCP socket client
 const tcpClient = new net.Socket();
-const TCP_PORT = 8080;
-const TCP_HOST = '127.0.0.1';
+// Use environment variables if they exist (Docker), otherwise default to localhost
+const TCP_HOST = process.env.TCP_HOST || '127.0.0.1';
+const TCP_PORT = process.env.TCP_PORT || 8080;
 
-// Connect to the legacy C++ recommendation server
+// Connect to the C++ recommendation server
 tcpClient.connect(TCP_PORT, TCP_HOST);
 
 // Function to format and send commands to the legacy server
