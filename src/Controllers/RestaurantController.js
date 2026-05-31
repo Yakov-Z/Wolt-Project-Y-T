@@ -69,19 +69,33 @@ const deleteRestaurant = (req, res) => {
     if (!isDeleted) {
         return res.status(404).json({ error: "Restaurant not found" });
     }
-
     // delete the restaurant's orders and products from the data repository
-    for(const order of dataRepository.orders) {
-        if(order.restaurant.id == id) {
-            dataRepository.deleteOrder(order.id);
-        }
-    }
-
-    for(const product of dataRepository.products) {
-        if(product.restaurant.id == id) {
+     for(const product of dataRepository.products.values()) {
+        if(product.restaurantID == id) {
             dataRepository.deleteProduct(product.id);
         }
     }
+
+    
+    for (const user of dataRepository.users.values()) {
+            if (!user.orders) continue; 
+
+            const ordersToDelete = user.orders.filter(order => order.restaurant.id === id);
+
+            for (const order of ordersToDelete) {
+                const products = order.products;
+                if (products && products.length > 0) {
+                    const productIds = products.map(p => p.id);
+                    sendCommand('delete', user.id, ...productIds);
+                }
+                
+                dataRepository.deleteOrder(order.id);
+            }
+
+            user.orders = user.orders.filter(order => order.restaurant.id !== id);
+        }
+
+   
     res.status(204).send();
 };
 
@@ -118,7 +132,7 @@ const addProductToMenu = (req, res) => {
     }
     
     //create a new product object
-    const newProduct = new Product(null, name, price);
+    const newProduct = new Product(null, name, price, restaurant.id);
     
     //add the product to the restaurant menu
     const savedProduct = restaurant.addProduct(newProduct);
@@ -184,16 +198,16 @@ const updateProduct = (req, res) => {
 //delete a specific product from the restaurant menu by the restaurant ID and the product ID
 const deleteProduct = (req, res) => {
     // ID is int in our implementation, so we convert it from string to number
-    const id = Number(req.params.id);
+    const id_restaurant = Number(req.params.id);
     const productId = Number(req.params.pId);
     
     //get the restaurant from the data repository
-    const restaurant = dataRepository.getRestaurant(id);
+    const restaurant = dataRepository.getRestaurant(id_restaurant);
     //error if the restaurant don't exist
     if (!restaurant) {
          return res.status(404).json({ error: "Restaurant not found" });
     }
-    
+
     //find the index of the product in the menu
     const index = restaurant.menu.findIndex(p => p.id === productId);
         
@@ -201,10 +215,29 @@ const deleteProduct = (req, res) => {
     if (index === -1) {
         return res.status(404).json({ error: "Product not found" });
     }
-    
+
+    //delete the product from the data repository
+    dataRepository.deleteProduct(productId);
     //delete the product from the restaurant menu
     restaurant.menu.splice(index, 1); 
     
+    for (const user of dataRepository.users.values()) {
+            
+            let userHasProduct = false;
+            if (user.orders) {
+                userHasProduct = user.orders.some(order => 
+                    order.products.some(p => p.id === productId)
+                );
+            }
+
+            if (userHasProduct) {
+                user.orders.forEach(order => {
+            order.products = order.products.filter(p => p.id !== productId);
+        });
+                sendCommand('delete', user.id, productId);
+            }
+        }
+
     res.status(204).send();
 };
 

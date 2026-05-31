@@ -84,6 +84,12 @@ class DataRepository {
         this.products.set(product.id, product);
         return product;
     }
+
+    //delete a product by its ID
+    deleteProduct(productId) {
+        return this.products.delete(productId);
+    }
+
 }
 
 module.exports = new DataRepository();
