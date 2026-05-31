@@ -4,11 +4,13 @@ class DataRepository {
         this.users = new Map();
         this.restaurants = new Map();
         this.orders = new Map();
+        this.products = new Map();
 
         //initialize ID counters for each entity to ensure unique IDs
         this.nextUserId = 1;
         this.nextRestaurantId = 1;
         this.nextOrderId = 1;
+        this.nextProductId = 1;
     }
     
     //add a new user to the data repository and ensure it has a unique ID
@@ -26,6 +28,10 @@ class DataRepository {
 
     //get a user by his username and password for login
     getUserByDetails(username, password) {
+    // Return early if username or password are null, undefined, or empty strings
+    if (!username || !password) {
+        return undefined; 
+    }
     return Array.from(this.users.values()).find(user => 
         user.username === username && user.password === password
     );
@@ -70,6 +76,13 @@ class DataRepository {
     //delete an order by its ID
     deleteOrder(orderId) {
         return this.orders.delete(orderId);
+    }
+
+    addProduct(product) {
+        product.id = this.nextProductId;
+        this.nextProductId++;
+        this.products.set(product.id, product);
+        return product;
     }
 }
 

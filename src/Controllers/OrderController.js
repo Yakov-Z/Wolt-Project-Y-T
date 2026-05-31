@@ -82,7 +82,6 @@ const deleteOrder = (req, res) => {
 
     if (products && products.length > 0) {      
         const productIds = products.map(product => product.id);
-        // FIX: use user.id instead of undefined userId
         sendCommand('delete', user.id, ...productIds);        
     }
  

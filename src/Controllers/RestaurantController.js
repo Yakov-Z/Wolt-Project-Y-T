@@ -13,7 +13,11 @@ const getAllRestaurants = (req, res) => {
 const createRestaurant = (req, res) => {
     //get the restaurant details from the request body
     const { name, address } = req.body;
-    
+
+    if(!name || !address) {
+        return res.status(400).json({ error: "name and address are required" });
+    }
+ 
     //create and save the new restaurant to the data repository
     const newRestaurant = new Restaurant(null, name, address);
     const savedRestaurant = dataRepository.addRestaurant(newRestaurant);
@@ -65,7 +69,19 @@ const deleteRestaurant = (req, res) => {
     if (!isDeleted) {
         return res.status(404).json({ error: "Restaurant not found" });
     }
-    
+
+    // delete the restaurant's orders and products from the data repository
+    for(const order of dataRepository.orders) {
+        if(order.restaurant.id == id) {
+            dataRepository.deleteOrder(order.id);
+        }
+    }
+
+    for(const product of dataRepository.products) {
+        if(product.restaurant.id == id) {
+            dataRepository.deleteProduct(product.id);
+        }
+    }
     res.status(204).send();
 };
 
@@ -96,12 +112,17 @@ const addProductToMenu = (req, res) => {
     
     //get the product details from the request body
     const { name, price } = req.body;
+
+    if(!name || !price) {
+        return res.status(400).json({ error: "name and price are required" });
+    }
     
     //create a new product object
     const newProduct = new Product(null, name, price);
     
     //add the product to the restaurant menu
     const savedProduct = restaurant.addProduct(newProduct);
+    dataRepository.addProduct(savedProduct);
     //return the added product
     res.status(201).json(savedProduct);
 };
