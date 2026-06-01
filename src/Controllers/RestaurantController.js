@@ -13,7 +13,11 @@ const getAllRestaurants = (req, res) => {
 const createRestaurant = (req, res) => {
     //get the restaurant details from the request body
     const { name, address } = req.body;
-    
+
+    if(!name || !address) {
+        return res.status(400).json({ error: "name and address are required" });
+    }
+ 
     //create and save the new restaurant to the data repository
     const newRestaurant = new Restaurant(null, name, address);
     const savedRestaurant = dataRepository.addRestaurant(newRestaurant);
@@ -65,7 +69,34 @@ const deleteRestaurant = (req, res) => {
     if (!isDeleted) {
         return res.status(404).json({ error: "Restaurant not found" });
     }
+    // delete the restaurant's orders and products from the data repository
+     for(const product of dataRepository.products.values()) {
+        if(product.restaurantID == id) {
+            dataRepository.deleteProduct(product.id);
+        }
+    }
+
     
+    for (const user of dataRepository.users.values()) {
+    if (!user.orders) continue; 
+
+ 
+    const ordersToDelete = user.orders.filter(order => order.restaurantID === id);
+
+    for (const order of ordersToDelete) {
+        
+        const productIds = order.productsIDs; 
+        
+        if (productIds && productIds.length > 0) {
+            sendCommand('delete', user.id, ...productIds);
+        }
+        
+        dataRepository.deleteOrder(order.id);
+    }
+
+    user.orders = user.orders.filter(order => order.restaurantID !== id);
+}
+   
     res.status(204).send();
 };
 
@@ -96,12 +127,17 @@ const addProductToMenu = (req, res) => {
     
     //get the product details from the request body
     const { name, price } = req.body;
+
+    if(!name || !price) {
+        return res.status(400).json({ error: "name and price are required" });
+    }
     
     //create a new product object
-    const newProduct = new Product(null, name, price);
+    const newProduct = new Product(null, name, price, restaurant.id);
     
     //add the product to the restaurant menu
     const savedProduct = restaurant.addProduct(newProduct);
+    dataRepository.addProduct(savedProduct);
     //return the added product
     res.status(201).json(savedProduct);
 };
@@ -128,7 +164,11 @@ const getProductById = (req, res) => {
     }
     // If the user is logged in, send his product view to the recommendation server
     if(userId) {
-        sendCommand('post', userId, productId);
+        const user = dataRepository.getUser((Number(userId)));
+        if(user) {
+            sendCommand('patch', user.id, productId); 
+            user.userview.push(productId);
+        }
     }
     //return the product details
     res.json(product);
@@ -163,16 +203,16 @@ const updateProduct = (req, res) => {
 //delete a specific product from the restaurant menu by the restaurant ID and the product ID
 const deleteProduct = (req, res) => {
     // ID is int in our implementation, so we convert it from string to number
-    const id = Number(req.params.id);
+    const id_restaurant = Number(req.params.id);
     const productId = Number(req.params.pId);
     
     //get the restaurant from the data repository
-    const restaurant = dataRepository.getRestaurant(id);
+    const restaurant = dataRepository.getRestaurant(id_restaurant);
     //error if the restaurant don't exist
     if (!restaurant) {
          return res.status(404).json({ error: "Restaurant not found" });
     }
-    
+
     //find the index of the product in the menu
     const index = restaurant.menu.findIndex(p => p.id === productId);
         
@@ -180,10 +220,44 @@ const deleteProduct = (req, res) => {
     if (index === -1) {
         return res.status(404).json({ error: "Product not found" });
     }
-    
+
+    //delete the product from the data repository
+    dataRepository.deleteProduct(productId);
     //delete the product from the restaurant menu
     restaurant.menu.splice(index, 1); 
     
+    for (const user of dataRepository.users.values()) {
+            
+        // check if the user ordered the product
+        const hasOrdered = user.orders && user.orders.some(order => 
+            order.productsIDs && order.productsIDs.includes(productId)
+        );
+
+        // check if the user viewed the product
+        const hasViewed = user.userview && user.userview.includes(productId);
+
+        // if the user either ordered or viewed the product, we need to update
+        if (hasOrdered || hasViewed) {
+            
+            // clean up orders if necessary
+            if (hasOrdered) {
+                user.orders.forEach(order => {
+                    if (order.productsIDs) {
+                        order.productsIDs = order.productsIDs.filter(id => id !== productId);
+                    }
+                });
+            }
+
+            // clean up views if necessary
+            if (hasViewed) {
+                user.userview = user.userview.filter(id => id !== productId);
+            }
+
+            // send delete command to the recommendation server
+            sendCommand('delete', user.id, productId);
+        }
+    }
+
     res.status(204).send();
 };
 

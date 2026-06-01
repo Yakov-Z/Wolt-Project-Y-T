@@ -12,6 +12,16 @@ const createOrder = (req, res) => {
     const { products, restaurant } = req.body;
     let totalPrice = 0;
 
+    if(!restaurant || !products) {
+        return res.status(400).json({ error: "restaurant and products are required" });
+    }
+
+    for(const product of products) {
+        if(product.restaurantID !== restaurant.id) {
+            return res.status(400).json({ error: "All products must be from the same restaurant" });
+        }
+    }
+
     // check if products exist before iterating
     if (products && Array.isArray(products)) {
         for (const product of products) {
@@ -20,7 +30,10 @@ const createOrder = (req, res) => {
     }
 
     //create a new order object using the user ID from the user object
-    const newOrder = new Order(null, user.id, products, restaurant, totalPrice);
+    const productIds = products.map(p => p.id);
+    const restaurantId = restaurant.id; 
+
+    const newOrder = new Order(null, user.id, productIds, restaurantId, totalPrice);
 
     //save the order to the data repository
     const savedOrder = dataRepository.addOrder(newOrder);
@@ -29,7 +42,7 @@ const createOrder = (req, res) => {
     // If there are products, send to the old server
     if (products && Array.isArray(products) && products.length > 0) {
         const productIds = products.map(product => product.id);
-        sendCommand('post', user.id, ...productIds);     
+        sendCommand('patch', user.id, ...productIds);     
     }
 
     //return the created order with 201(created) status
@@ -78,11 +91,9 @@ const deleteOrder = (req, res) => {
         return res.status(404).json({ error: "Order not found" });
     }
 
-    const products = order.products;
+    const productIds = order.productsIDs;
 
-    if (products && products.length > 0) {      
-        const productIds = products.map(product => product.id);
-        // FIX: use user.id instead of undefined userId
+    if (productIds && productIds.length > 0) {      
         sendCommand('delete', user.id, ...productIds);        
     }
  
@@ -119,7 +130,7 @@ const updateOrder = (req, res) => {
             totalPrice += product.price;
         }
         // update the order products that sent in the request body
-        order.products = products;
+       order.productsIDs = products.map(p => p.id);
         order.totalPrice = totalPrice;
         // If there are products, send to the old server
         if (products.length > 0) {    
@@ -130,7 +141,9 @@ const updateOrder = (req, res) => {
     }
 
     // update the order restaurant that sent in the request body
-    if (restaurant) order.restaurant = restaurant;
+    if (restaurant && restaurant.id) {
+    order.restaurantID = restaurant.id; 
+}
     
     //return the updated order details
     res.status(200).json(order);

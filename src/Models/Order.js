@@ -1,9 +1,9 @@
 class Order {
-    constructor(id, user, products, restaurant, totalPrice) {
+    constructor(id, userID, productsIDs, restaurantID, totalPrice) {
         this.id = id;
-        this.user = user; 
-        this.products = products;
-        this.restaurant = restaurant; 
+        this.userID = userID;
+        this.productsIDs = productsIDs;
+        this.restaurantID = restaurantID; 
         this.totalPrice = totalPrice; 
     }
 }

@@ -1,6 +1,7 @@
 //connect to the data repository to get and manipulate user data
 const dataRepository = require('../Models/DataRepository');
 const User = require('../Models/User');
+const { sendCommand } = require('../Services/tcpClient');
 
 //get user by his ID, return the user profile
 const getUserProfile = (req, res) => {
@@ -22,13 +23,15 @@ const registerUser = (req, res) => {
     const { username, password, address } = req.body;
 
     //error if username or password is null
-    if (!username || !password) {
-        return res.status(400).json({ error: "Username and password are required" });
+    if (!username || !password || !address) {
+        return res.status(400).json({ error: "Username ,password and address are required" });
     }
 
     //create and save the new user to the data repository
     const newUser = new User(null, username, password, address);
     const savedUser = dataRepository.addUser(newUser);
+    // send the new user to old server by POST
+    sendCommand('post', savedUser.id, -1);
     res.status(201).json(savedUser);
 
 };

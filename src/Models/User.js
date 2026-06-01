@@ -5,6 +5,7 @@ class User {
         this.password = password;
         this.address = address;
         this.orders = []; 
+        this.userview = []; 
     }
 }
 
