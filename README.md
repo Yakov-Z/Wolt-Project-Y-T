@@ -13,7 +13,7 @@ The system is fully containerized using Docker, ensuring consistent execution ac
 Please note that the submissions for the exercises are located in separate branches:
 * **Exercise 1:** `Ex1-submission`
 * **Exercise 2:** `Ex2-submission`
-* **Exercise 3 (Current):** `EX3-SUBMISSION`
+* **Exercise 3 (Current):** `Ex3-submission`
 
 ## Architecture and SOLID Principles
 
@@ -38,6 +38,7 @@ To compile the C++ code, build the Node.js environment, and start both servers, 
 
 ```bash
 docker-compose up --build
+```
 
 > **Note:** The Web Server will be exposed on port `3000` of your host machine. Internally, it communicates with the C++ server on port `8080`.
 
