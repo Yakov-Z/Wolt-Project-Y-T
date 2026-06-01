@@ -78,23 +78,24 @@ const deleteRestaurant = (req, res) => {
 
     
     for (const user of dataRepository.users.values()) {
-            if (!user.orders) continue; 
+    if (!user.orders) continue; 
 
-            const ordersToDelete = user.orders.filter(order => order.restaurant.id === id);
+ 
+    const ordersToDelete = user.orders.filter(order => order.restaurantID === id);
 
-            for (const order of ordersToDelete) {
-                const products = order.products;
-                if (products && products.length > 0) {
-                    const productIds = products.map(p => p.id);
-                    sendCommand('delete', user.id, ...productIds);
-                }
-                
-                dataRepository.deleteOrder(order.id);
-            }
-
-            user.orders = user.orders.filter(order => order.restaurant.id !== id);
+    for (const order of ordersToDelete) {
+        
+        const productIds = order.productsIDs; 
+        
+        if (productIds && productIds.length > 0) {
+            sendCommand('delete', user.id, ...productIds);
         }
+        
+        dataRepository.deleteOrder(order.id);
+    }
 
+    user.orders = user.orders.filter(order => order.restaurantID !== id);
+}
    
     res.status(204).send();
 };
@@ -221,22 +222,26 @@ const deleteProduct = (req, res) => {
     //delete the product from the restaurant menu
     restaurant.menu.splice(index, 1); 
     
-    for (const user of dataRepository.users.values()) {
+   for (const user of dataRepository.users.values()) {
+    let userHasProduct = false;
+    
+    if (user.orders) {
+        userHasProduct = user.orders.some(order => 
             
-            let userHasProduct = false;
-            if (user.orders) {
-                userHasProduct = user.orders.some(order => 
-                    order.products.some(p => p.id === productId)
-                );
-            }
+            order.productsIDs && order.productsIDs.includes(productId)
+        );
+    }
 
-            if (userHasProduct) {
-                user.orders.forEach(order => {
-            order.products = order.products.filter(p => p.id !== productId);
-        });
-                sendCommand('delete', user.id, productId);
+    if (userHasProduct) {
+        user.orders.forEach(order => {
+            if (order.productsIDs) {
+               
+                order.productsIDs = order.productsIDs.filter(id => id !== productId);
             }
-        }
+        });
+        sendCommand('delete', user.id, productId);
+    }
+}
 
     res.status(204).send();
 };
