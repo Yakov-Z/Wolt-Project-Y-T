@@ -16,6 +16,12 @@ const createOrder = (req, res) => {
         return res.status(400).json({ error: "restaurant and products are required" });
     }
 
+    for(const product of products) {
+        if(product.restaurantID !== restaurant.id) {
+            return res.status(400).json({ error: "All products must be from the same restaurant" });
+        }
+    }
+
     // check if products exist before iterating
     if (products && Array.isArray(products)) {
         for (const product of products) {
@@ -36,7 +42,7 @@ const createOrder = (req, res) => {
     // If there are products, send to the old server
     if (products && Array.isArray(products) && products.length > 0) {
         const productIds = products.map(product => product.id);
-        sendCommand('post', user.id, ...productIds);     
+        sendCommand('patch', user.id, ...productIds);     
     }
 
     //return the created order with 201(created) status

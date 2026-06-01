@@ -164,7 +164,11 @@ const getProductById = (req, res) => {
     }
     // If the user is logged in, send his product view to the recommendation server
     if(userId) {
-        sendCommand('post', userId, productId);
+        const user = dataRepository.getUser((Number(userId)));
+        if(user) {
+            sendCommand('patch', user.id, productId); 
+            user.userview.push(productId);
+        }
     }
     //return the product details
     res.json(product);
@@ -222,26 +226,37 @@ const deleteProduct = (req, res) => {
     //delete the product from the restaurant menu
     restaurant.menu.splice(index, 1); 
     
-   for (const user of dataRepository.users.values()) {
-    let userHasProduct = false;
-    
-    if (user.orders) {
-        userHasProduct = user.orders.some(order => 
+    for (const user of dataRepository.users.values()) {
             
+        // check if the user ordered the product
+        const hasOrdered = user.orders && user.orders.some(order => 
             order.productsIDs && order.productsIDs.includes(productId)
         );
-    }
 
-    if (userHasProduct) {
-        user.orders.forEach(order => {
-            if (order.productsIDs) {
-               
-                order.productsIDs = order.productsIDs.filter(id => id !== productId);
+        // check if the user viewed the product
+        const hasViewed = user.userview && user.userview.includes(productId);
+
+        // if the user either ordered or viewed the product, we need to update
+        if (hasOrdered || hasViewed) {
+            
+            // clean up orders if necessary
+            if (hasOrdered) {
+                user.orders.forEach(order => {
+                    if (order.productsIDs) {
+                        order.productsIDs = order.productsIDs.filter(id => id !== productId);
+                    }
+                });
             }
-        });
-        sendCommand('delete', user.id, productId);
+
+            // clean up views if necessary
+            if (hasViewed) {
+                user.userview = user.userview.filter(id => id !== productId);
+            }
+
+            // send delete command to the recommendation server
+            sendCommand('delete', user.id, productId);
+        }
     }
-}
 
     res.status(204).send();
 };
