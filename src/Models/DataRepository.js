@@ -71,7 +71,7 @@ class DataRepository {
     }
     //get all orders for a specific user by the user ID
     getUserOrders(userId) {
-        return Array.from(this.orders.values()).filter(order => order.userId === userId);
+        return Array.from(this.orders.values()).filter(order => order.userID === userId);
     }
     //delete an order by its ID
     deleteOrder(orderId) {
