@@ -12,7 +12,7 @@ const createOrder = (req, res) => {
     const { products, restaurant } = req.body;
     let totalPrice = 0;
 
-    if(!restaurant || !products) {
+    if(!restaurant || !products  || !Array.isArray(products)) {
         return res.status(400).json({ error: "restaurant and products are required" });
     }
 
@@ -20,13 +20,7 @@ const createOrder = (req, res) => {
         if(product.restaurantID !== restaurant.id) {
             return res.status(400).json({ error: "All products must be from the same restaurant" });
         }
-    }
-
-    // check if products exist before iterating
-    if (products && Array.isArray(products)) {
-        for (const product of products) {
-            totalPrice += product.price;
-        }
+        totalPrice += product.price;
     }
 
     //create a new order object using the user ID from the user object
@@ -63,6 +57,9 @@ const getUserOrders = (req, res) => {
 
 //get a specific order by its ID
 const getOrderById = (req, res) => {
+
+    const user = req.user;
+
     // ID is int in our implementation, so we convert it from string to number
     const id = Number(req.params.id);
 
@@ -72,6 +69,10 @@ const getOrderById = (req, res) => {
     //error if the order don't exist
     if (!order) {
         return res.status(404).json({ error: "Order not found" });
+    }
+
+     if (order.userID !== user.id) {
+        return res.status(403).json({ error: "no permission" });
     }
 
     //return the order details
@@ -91,6 +92,10 @@ const deleteOrder = (req, res) => {
         return res.status(404).json({ error: "Order not found" });
     }
 
+    if (order.userID !== user.id) {
+        return res.status(403).json({ error: "no permission" });
+    }
+
     const productIds = order.productsIDs;
 
     if (productIds && productIds.length > 0) {      
@@ -99,7 +104,7 @@ const deleteOrder = (req, res) => {
  
     //delete the order from the data repository
     const isDeleted = dataRepository.deleteOrder(id);
-    const newOrders = user.orders.filter(ord => ord !== order);
+    const newOrders = user.orders.filter(ord => ord.id !== order.id);
     user.orders = newOrders;
     
     //error if the order don't exist
@@ -123,27 +128,49 @@ const updateOrder = (req, res) => {
     if (!order)
          return res.status(404).json({ error: "Order not found" });
 
+    if (order.userID !== user.id) {
+        return res.status(403).json({ error: "no permission" });
+    }
+
     const { products, restaurant } = req.body;
-    if (products && Array.isArray(products)) {
+
+    if (!products && !restaurant) {
+        return res.status(400).json({ error: "No data provided for update" });
+    }
+
+    const targetRestaurantId = (restaurant && restaurant.id) ? restaurant.id : order.restaurantID;
+
+    if (products !== undefined) {
+        
+        if (!Array.isArray(products)) {
+            return res.status(400).json({ error: "products must be an array" });
+        }
+
         let totalPrice = 0;
+        
+
         for (const product of products) {
+            if(product.restaurantID !== targetRestaurantId) {
+                return res.status(400).json({ error: "All products must be from the order's restaurant" });
+            }
             totalPrice += product.price;
         }
-        // update the order products that sent in the request body
-       order.productsIDs = products.map(p => p.id);
+
+        
+        order.productsIDs = products.map(p => p.id);
         order.totalPrice = totalPrice;
+
         // If there are products, send to the old server
         if (products.length > 0) {    
             const productIds = products.map(product => product.id);
             sendCommand('patch', user.id, ...productIds);     
         }
-        
     }
 
-    // update the order restaurant that sent in the request body
+   
     if (restaurant && restaurant.id) {
-    order.restaurantID = restaurant.id; 
-}
+        order.restaurantID = restaurant.id; 
+    }
     
     //return the updated order details
     res.status(200).json(order);

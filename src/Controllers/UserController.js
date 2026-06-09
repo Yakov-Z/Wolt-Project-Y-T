@@ -1,7 +1,10 @@
 //connect to the data repository to get and manipulate user data
 const dataRepository = require('../Models/DataRepository');
 const User = require('../Models/User');
+const Address = require('../Models/address');
 const { sendCommand } = require('../Services/tcpClient');
+const jwt = require("jsonwebtoken");
+const key = "like in targilon 8";
 
 //get user by his ID, return the user profile
 const getUserProfile = (req, res) => {
@@ -14,27 +17,77 @@ const getUserProfile = (req, res) => {
         return res.status(404).json({ error: "User not found" });
     }
    //return the user profile
-    res.json(user);
+   // res.json(user);
+     const { password: userPassword, ...userWithoutPassword } = user;
+     res.json(userWithoutPassword);
 };
+
+
 
 //register a new user, return the created user profile
 const registerUser = (req, res) => {
     //get the user details from the request body
-    const { username, password, address } = req.body;
+    const { username, password, realname, phonenumber, mail, image, address } = req.body;
 
-    //error if username or password is null
-    if (!username || !password || !address) {
-        return res.status(400).json({ error: "Username ,password and address are required" });
+    // we will save the errors and sent them to the client if there are any
+    let errors = {};
+
+    if (!username) errors.username = "username is required";
+    if (!password) {
+        errors.password = "password is required";
+    } else if (password.length < 8) {
+    errors.password = "the password must contain at least 8 characters";
+} else {
+    
+    const chars = password.split('');
+
+    // search for letters and numbers in the password
+    const hasLetter = chars.some(c => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+    const hasNumber = chars.some(c => c >= '0' && c <= '9');
+
+    if (!hasLetter && !hasNumber) {
+        errors.password = "the password must include both letters and numbers";
+    } else if (!hasLetter) {
+        errors.password = "the password must include at least one English letter";
+    } else if (!hasNumber) {
+        errors.password = "the password must include at least one number";
+    }
+}
+    if (!realname) errors.realname = "realname is required";
+    if (!phonenumber) errors.phonenumber = "phonenumber is required";
+    if (!mail) errors.mail = "mail is required";
+    if (!image) errors.image = "image is required";
+    if (!address || !address.city || !address.street || !address.number){
+        errors.address = "full address is required";
     }
 
+    // ensure the username is unique in the system
+    if (username && !errors.username) {
+        const isUsernameexist = Array.from(dataRepository.users.values()).some(u => u.username === username);
+        if (isUsernameexist) {
+            errors.username = "username is already taken";
+        }
+    }
+
+
+    // sent the errors to the client if there are any
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors }); 
+    }
+
+    // create the user'a address object
+    const userAddress = new Address(address.city, address.street, address.number);
     //create and save the new user to the data repository
-    const newUser = new User(null, username, password, address);
+    const newUser = new User(null, username, password, realname, phonenumber, mail, image, userAddress);
+
     const savedUser = dataRepository.addUser(newUser);
     // send the new user to old server by POST
     sendCommand('post', savedUser.id, -1);
-    res.status(201).json(savedUser);
 
+    const { password: userPassword, ...userWithoutPassword } = savedUser;
+    res.status(201).json(userWithoutPassword);
 };
+
 
 //login user by his username and password
 const loginUser = (req, res) => {
@@ -46,10 +99,14 @@ const loginUser = (req, res) => {
 
     //error if the username or password is incorrect
     if (!user) {
-        return res.status(401).json({ error: "username or password is incorrect" });
+        return res.status(401).json({ error: "username and/or password is incorrect" });
     }
+    //create a JWT token for the user and return it
+    const data = { id: user.id, username: user.username }; 
+    const token = jwt.sign(data, key);
 
-    res.json(user);
+    // send the token to the client
+    res.status(200).json({ token });
 };
 
 //export the controller functions to be used in the routes

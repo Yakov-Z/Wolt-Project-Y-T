@@ -3,6 +3,7 @@ const dataRepository = require('../Models/DataRepository');
 const Product = require('../Models/Product');
 const Restaurant = require('../Models/Restaurant');
 const { sendCommand } = require('../Services/tcpClient');
+const { viewsSort } = require('../Helpers/sorters');
 
 //get all the restaurants, that save in the data repository, return the list of restaurants
 const getAllRestaurants = (req, res) => {
@@ -12,14 +13,40 @@ const getAllRestaurants = (req, res) => {
 //add a new restaurant, return the created restaurant profile
 const createRestaurant = (req, res) => {
     //get the restaurant details from the request body
-    const { name, address } = req.body;
+    
+    const { name, address, category, description, owner, kosher, image } = req.body;
+    // we will save the errors and sent them to the client if there are any
+    let errors = {};
 
-    if(!name || !address) {
-        return res.status(400).json({ error: "name and address are required" });
+    if(!name) {
+        errors.name = "name is required";
     }
- 
+    if(!description) {
+        errors.description = "description is required";
+    }
+    if(!owner) {
+        errors.owner = "owner is required";
+    }
+    if(!image) {
+        errors.image = "image is required";
+    }
+    if(!category) {
+        errors.category = "category is required";
+    }
+    if(kosher == null || kosher == undefined) {
+        errors.kosher = "kosher status is required";
+    }
+    if(!address || !address.city || !address.street || !address.number) {
+        errors.address = "complete address is required";
+     }
+
+     // sent the errors to the client if there are any
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors }); 
+    }
+
     //create and save the new restaurant to the data repository
-    const newRestaurant = new Restaurant(null, name, address);
+    const newRestaurant = new Restaurant(null, owner, description, name, address, category, image, kosher);
     const savedRestaurant = dataRepository.addRestaurant(newRestaurant);
     
     //return the restaurant profile
@@ -31,12 +58,30 @@ const getRestaurantById = (req, res) => {
      // ID is int in our implementation, so we convert it from string to number
     const id = Number(req.params.id);
     const restaurant = dataRepository.getRestaurant(id);
+    restaurant.views += 1;
     //error if the restaurant don't exist
     if (!restaurant) {
         return res.status(404).json({ error: "Restaurant not found" });
     }
     //return the restaurant profile
     res.json(restaurant);
+};
+
+//get restaurants by category, return the list of restaurants in the category
+const getRestaurantsByCategory = (req, res) => {
+
+    if (!req.params.category) {
+        return res.json([]);
+    }
+
+    const category = req.params.category.toLowerCase();
+    const allRestaurants = dataRepository.getAllRestaurants();
+    const restaurantsInCategory = allRestaurants.filter(restaurant => {
+        
+        const currentCategory = (restaurant.category || '').toLowerCase();
+        return currentCategory === category;
+    });
+    res.json(restaurantsInCategory);
 };
 
 //change restaurant details by its ID
@@ -53,7 +98,12 @@ const updateRestaurant = (req, res) => {
     //update the details that sent in the request body
     if (req.body.name) restaurant.name = req.body.name;
     if (req.body.address) restaurant.address = req.body.address;
-    
+    if (req.body.category) restaurant.category = req.body.category;
+    if (req.body.description) restaurant.description = req.body.description;
+    if (req.body.owner) restaurant.owner = req.body.owner;
+    if (req.body.kosher != null) restaurant.kosher = req.body.kosher;
+    if (req.body.image) restaurant.image = req.body.image;
+
     //return the new restaurant profile
     res.json(restaurant);
 };
@@ -70,10 +120,16 @@ const deleteRestaurant = (req, res) => {
         return res.status(404).json({ error: "Restaurant not found" });
     }
     // delete the restaurant's orders and products from the data repository
-     for(const product of dataRepository.products.values()) {
+    const productsToDelete = [];
+    for(const product of dataRepository.products.values()) {
         if(product.restaurantID == id) {
-            dataRepository.deleteProduct(product.id);
+            productsToDelete.push(product.id);
         }
+    }
+
+
+    for(const productId of productsToDelete) {
+        dataRepository.deleteProduct(productId);
     }
 
     
@@ -126,10 +182,25 @@ const addProductToMenu = (req, res) => {
     }
     
     //get the product details from the request body
-    const { name, price } = req.body;
+    const { name, price , category} = req.body;
 
-    if(!name || !price) {
-        return res.status(400).json({ error: "name and price are required" });
+    // we will save the errors and sent them to the client if there are any
+    let errors = {};
+        if(!name) {
+        errors.name = "name is required";
+    }
+    if(price == null || price == undefined) {
+        errors.price = "price is required";
+    } else if (typeof price !== 'number' || price < 0) {
+        errors.price = "price must be a non-negative number";
+    }
+    if(!category) {
+        errors.category = "category is required";
+    }
+
+    // sent the errors to the client if there are any
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors }); 
     }
     
     //create a new product object
@@ -162,6 +233,7 @@ const getProductById = (req, res) => {
     if (!product) {
         return res.status(404).json({ error: "Product not found" });
     }
+    product.views += 1;
     // If the user is logged in, send his product view to the recommendation server
     if(userId) {
         const user = dataRepository.getUser((Number(userId)));
@@ -221,6 +293,8 @@ const deleteProduct = (req, res) => {
         return res.status(404).json({ error: "Product not found" });
     }
 
+    const product = restaurant.menu[index];
+
     //delete the product from the data repository
     dataRepository.deleteProduct(productId);
     //delete the product from the restaurant menu
@@ -244,6 +318,7 @@ const deleteProduct = (req, res) => {
                 user.orders.forEach(order => {
                     if (order.productsIDs) {
                         order.productsIDs = order.productsIDs.filter(id => id !== productId);
+                        order.totalPrice -= product.price;
                     }
                 });
             }
@@ -261,6 +336,50 @@ const deleteProduct = (req, res) => {
     res.status(204).send();
 };
 
+const getPopularProducts = (req, res) => {
+    const id = Number(req.params.id);
+    const restaurant = dataRepository.getRestaurant(id);
+    
+    if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
+
+   
+    const topProducts = viewsSort(restaurant.menu).slice(0, 3);
+    res.json(topProducts);
+};
+
+
+
+const getPopularRestaurants = (req, res) => {
+    const allRestaurants = dataRepository.getAllRestaurants();
+    
+    
+    const popularRestaurants = viewsSort(allRestaurants).slice(0, 20);
+    res.json(popularRestaurants);
+};
+
+//get products by category, return the list of products in the category
+const getProductsByCategory = (req, res) => {
+
+    if (!req.params.category) {
+        return res.json([]);
+    }
+
+    const id = Number(req.params.id);
+    const restaurant = dataRepository.getRestaurant(id);
+    
+    if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
+
+    const category = req.params.category.toLowerCase();
+    const allProducts = restaurant.menu;
+    const productsInCategory = allProducts.filter(product => {
+        
+        const currentCategory = (product.category || '').toLowerCase();
+        return currentCategory === category;
+    });
+    res.json(productsInCategory);
+};
+
+
 module.exports = {
     getAllRestaurants,
     createRestaurant,
@@ -271,6 +390,8 @@ module.exports = {
     addProductToMenu,
     getProductById,
     updateProduct,
-    deleteProduct
-
+    deleteProduct,
+    getProductsByCategory,
+    getPopularProducts,
+    getPopularRestaurants
 };
