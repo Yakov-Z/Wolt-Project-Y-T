@@ -379,6 +379,20 @@ const getProductsByCategory = (req, res) => {
     res.json(productsInCategory);
 };
 
+const getExistingCategories = (req, res) => {
+    const allRestaurants = dataRepository.getAllRestaurants();
+    
+    const categories = [];
+    
+    allRestaurants.forEach(restaurant => {
+        if (restaurant.category && !categories.includes(restaurant.category.toLowerCase())) {
+            categories.push(restaurant.category.toLowerCase());
+        }
+    });
+    
+    res.json(categories);
+};
+
 
 module.exports = {
     getAllRestaurants,
@@ -393,5 +407,7 @@ module.exports = {
     deleteProduct,
     getProductsByCategory,
     getPopularProducts,
-    getPopularRestaurants
+    getPopularRestaurants,
+    getExistingCategories
+    
 };

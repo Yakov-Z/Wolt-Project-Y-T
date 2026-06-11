@@ -3,6 +3,11 @@ const dataRepository = require('../Models/DataRepository');
 
 //search for restaurants and products that match the search query
 const searchEntities = (req, res) => {
+
+    if (!req.params.query) {
+        return res.json({ restaurants: [], products: [] });
+    }
+    
     //get the search query and convert it to lowercase for convenient search
     const query = req.params.query.toLowerCase();
     
