@@ -9,7 +9,6 @@ const viewsSort = (arr) => {
         let swapped = false;
         
         for (let j = 0; j < n - i - 1; j++) {
-            /
             const viewsCurrent = sortedArray[j].views || 0;
             const viewsNext = sortedArray[j + 1].views || 0;
 

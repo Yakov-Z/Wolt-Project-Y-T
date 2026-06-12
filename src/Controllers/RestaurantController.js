@@ -3,7 +3,7 @@ const dataRepository = require('../Models/DataRepository');
 const Product = require('../Models/Product');
 const Restaurant = require('../Models/Restaurant');
 const { sendCommand } = require('../Services/tcpClient');
-const { viewsSort } = require('../Helpers/sorters');
+const { viewsSort } = require('../Helpers/viewsSort');
 
 //get all the restaurants, that save in the data repository, return the list of restaurants
 const getAllRestaurants = (req, res) => {
@@ -408,6 +408,6 @@ module.exports = {
     getProductsByCategory,
     getPopularProducts,
     getPopularRestaurants,
-    getExistingCategories
-    
+    getExistingCategories,
+    getRestaurantsByCategory
 };
