@@ -34,8 +34,8 @@ function App() {
       </div>
       <Routes>
         {/* Public routes - anyone can access these */}
-        <Route path="/tokens" element={<LoginPage/>} />
-        <Route path="users/" element={<RegisterPage/>} />
+        <Route path="/tokens" element={<LoginPage setUser={setUser} />} />
+        <Route path="/users/" element={<RegisterPage/>} />
         
         {/* Catch-all route for undefined URLs */}
         <Route path="*" element={<Navigate to="/" replace />} />
