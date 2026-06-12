@@ -1,5 +1,5 @@
 class Restaurant {
-    constructor(id, owner, description, name, address, category, image, kosher) {
+    constructor(id, owner, description, name, address, category, image, logo, kosher) {
         this.id = id;
         this.owner = owner;
         this.description = description;
@@ -7,6 +7,7 @@ class Restaurant {
         this.address = address;
         this.category = category;
         this.image = image;
+        this.logo = logo;
         this.kosher = kosher;
         this.menu = [];
         this.views = 0;

@@ -14,7 +14,7 @@ const getAllRestaurants = (req, res) => {
 const createRestaurant = (req, res) => {
     //get the restaurant details from the request body
     
-    const { name, address, category, description, owner, kosher, image } = req.body;
+    const { name, address, category, description, owner, kosher, image, logo } = req.body;
     // we will save the errors and sent them to the client if there are any
     let errors = {};
 
@@ -29,6 +29,9 @@ const createRestaurant = (req, res) => {
     }
     if(!image) {
         errors.image = "image is required";
+    }
+    if(!logo) {
+        errors.logo = "logo is required";
     }
     if(!category) {
         errors.category = "category is required";
@@ -46,7 +49,7 @@ const createRestaurant = (req, res) => {
     }
 
     //create and save the new restaurant to the data repository
-    const newRestaurant = new Restaurant(null, owner, description, name, address, category, image, kosher);
+    const newRestaurant = new Restaurant(null, owner, description, name, address, category, image, logo, kosher);
     const savedRestaurant = dataRepository.addRestaurant(newRestaurant);
     
     //return the restaurant profile
@@ -103,6 +106,7 @@ const updateRestaurant = (req, res) => {
     if (req.body.owner) restaurant.owner = req.body.owner;
     if (req.body.kosher != null) restaurant.kosher = req.body.kosher;
     if (req.body.image) restaurant.image = req.body.image;
+    if (req.body.logo) restaurant.logo = req.body.logo;
 
     //return the new restaurant profile
     res.json(restaurant);
