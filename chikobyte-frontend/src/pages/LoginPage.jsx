@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import InputBox from '../components/InputBox';
 import CustomButton from '../components/CustomButton';
+import { useNavigate } from 'react-router-dom';
+
 
 function LoginPage() {
     const [username, setUsername] = useState('');
@@ -9,6 +11,7 @@ function LoginPage() {
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
+    const navigate = useNavigate();
 
     const handleUsernameChange = (event) => {
         setUsername(event.target.value);
@@ -26,34 +29,68 @@ function LoginPage() {
         }
     };
 
-    const handleSubmit = () => {
-        console.log("try to login");
+    const handleSubmit = async () => {
+
+        try {
+            const response = await fetch('http://localhost:5000/api/tokens', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            // handle validation errors from the server (status 400)
+            if (!response.ok) {
+                if (data.error) {
+                    setPasswordError(data.error);
+                } else {
+                    console.error("General error:", data.message);
+                }
+                return; // stop execution if there are errors
+            }
+
+            console.log("Login successful!");
+                    
+            localStorage.setItem('token', data.token);
+                    
+            navigate('/');
+
+        } catch (error) {
+            console.error('Error during registration:', error);
+        }
     };
 
     return (
-        <div className="container mt-5" style={{ maxWidth: '400px' }}>
-            <h2 className="mb-4 text-center">"Login Page"</h2>
+        <div className="container mt-2" style={{ maxWidth: '400px' }}>
+            <div className="mx-auto" style={{ width: '60%' }}>
+            <h2 className="brand-name-big">Chikobyte</h2>
+            </div>
+            <h2 className="mb-4 text-center">התחבר ל-chikobyte כדי להתחיל לחגוג!</h2>
             
             <InputBox 
-                text="Username"
+                text="שם משתמש:"
                 inputValue={username}
                 onInputChange={handleUsernameChange}
                 size={2}
                 errorMessage={usernameError} 
             />
             <InputBox 
-                text="Password"
+                text="סיסמה:"
                 inputValue={password}
                 onInputChange={handlePasswordChange}
                 size={2}
-                errorMessage={usernameError} 
+                errorMessage={passwordError} 
             />
-            
+            <div className="mx-auto" style={{ width: '30%' }}>
             <CustomButton
-                text="Login"
+                text="התחבר"
                 colorId='1'
                 onClickHandler={handleSubmit}
             />
+            </div>
         </div>
     );
 }
