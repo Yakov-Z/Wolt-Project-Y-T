@@ -45,6 +45,14 @@
     letter-spacing: -0.5px;
 }
 
+.brand-name-big {
+    font-size: 50px;
+    font-weight: 800;
+    color: #199cd3; 
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
 /* עיצוב הכתובת */
 .address-badge {
     display: flex;

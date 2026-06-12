@@ -32,11 +32,11 @@ const registerUser = (req, res) => {
     // we will save the errors and sent them to the client if there are any
     let errors = {};
 
-    if (!username) errors.username = "username is required";
+    if (!username) errors.username = "Username is required";
     if (!password) {
-        errors.password = "password is required";
+        errors.password = "Password is required";
     } else if (password.length < 8) {
-    errors.password = "the password must contain at least 8 characters";
+    errors.password = "The password must contain at least 8 characters";
 } else {
     
     const chars = password.split('');
@@ -46,26 +46,26 @@ const registerUser = (req, res) => {
     const hasNumber = chars.some(c => c >= '0' && c <= '9');
 
     if (!hasLetter && !hasNumber) {
-        errors.password = "the password must include both letters and numbers";
+        errors.password = "The password must include both letters and numbers";
     } else if (!hasLetter) {
-        errors.password = "the password must include at least one English letter";
+        errors.password = "The password must include at least one English letter";
     } else if (!hasNumber) {
-        errors.password = "the password must include at least one number";
+        errors.password = "The password must include at least one number";
     }
 }
-    if (!realname) errors.realname = "realname is required";
-    if (!phonenumber) errors.phonenumber = "phonenumber is required";
-    if (!mail) errors.mail = "mail is required";
-    if (!image) errors.image = "image is required";
+    if (!realname) errors.realname = "Full name is required";
+    if (!phonenumber) errors.phonenumber = "Phone number is required";
+    if (!mail) errors.mail = "Mail is required";
+    if (!image) errors.image = "Image is required";
     if (!address || !address.city || !address.street || !address.number){
-        errors.address = "full address is required";
+        errors.address = "Full address is required";
     }
 
     // ensure the username is unique in the system
     if (username && !errors.username) {
         const isUsernameexist = Array.from(dataRepository.users.values()).some(u => u.username === username);
         if (isUsernameexist) {
-            errors.username = "username is already taken";
+            errors.username = "Username is already taken";
         }
     }
 
@@ -84,8 +84,17 @@ const registerUser = (req, res) => {
     // send the new user to old server by POST
     sendCommand('post', savedUser.id, -1);
 
+    const token = jwt.sign(
+        { id: savedUser.id, username: savedUser.username }, // payload: data encoded in the token
+        process.env.JWT_SECRET || 'מפתח-סופר-סודי', // secret key used to sign the token
+        { expiresIn: '1h' } // token expiration time
+    );
+
     const { password: userPassword, ...userWithoutPassword } = savedUser;
-    res.status(201).json(userWithoutPassword);
+    res.status(201).json({ 
+        user: userWithoutPassword, 
+        token: token 
+    });
 };
 
 
@@ -103,10 +112,15 @@ const loginUser = (req, res) => {
     }
     //create a JWT token for the user and return it
     const data = { id: user.id, username: user.username }; 
-    const token = jwt.sign(data, key);
+    const token = jwt.sign(data, process.env.JWT_SECRET || 'מפתח-סופר-סודי');
+// Remove the password before sending the user object back
+    const { password: userPassword, ...userWithoutPassword } = user;
 
-    // send the token to the client
-    res.status(200).json({ token });
+    // Send both token and the user details to the client
+    res.status(200).json({ 
+        token: token,
+        user: userWithoutPassword 
+    });
 };
 
 //export the controller functions to be used in the routes

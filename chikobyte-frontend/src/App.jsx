@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar/navbar'; 
 import FilterRestaurants from './components/FilterRestaurants/filterRestaurants';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -15,7 +17,7 @@ function App() {
   return (
     <BrowserRouter>
       <div style={{ 
-        minHeight: '100vh', 
+        minHeight: 'auto', 
         backgroundColor: isDarkMode ? '#121111' : '#ffffff',
         transition: 'background-color 0.3s ease'
       }}>
@@ -29,7 +31,15 @@ function App() {
         <FilterRestaurants isDarkMode={isDarkMode} />
         
       </div>
-    </BrowserRouter>
+      <Routes>
+        {/* Public routes - anyone can access these */}
+        <Route path="/tokens" element={<LoginPage setUser={setUser} />} />
+        <Route path="/users/" element={<RegisterPage/>} />
+        
+        {/* Catch-all route for undefined URLs */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>    
   );
 }
 
