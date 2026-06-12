@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import Navbar from './components/Navbar/navbar'; 
+import FilterRestaurants from './components/FilterRestaurants/filterRestaurants';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -25,9 +26,7 @@ function App() {
           toggleTheme={toggleTheme} 
         />
 
-        <h1 style={{ textAlign: 'center', marginTop: '50px', color: isDarkMode ? 'white' : '#353434' }}>
-         
-        </h1>
+        <FilterRestaurants isDarkMode={isDarkMode} />
         
       </div>
     </BrowserRouter>
