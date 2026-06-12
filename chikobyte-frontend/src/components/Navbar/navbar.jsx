@@ -28,14 +28,14 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
     if (!user) {
         userSection = (
             <div className="auth-links">
-                <Link to="/login" className="login-link">התחברות</Link>
-                <Link to="/register" className="register-btn">הרשמה</Link>
+                <Link to="/tokens" className="login-link">התחברות</Link>
+                <Link to="/users/" className="register-btn">הרשמה</Link>
             </div>
         );
     } else {
         userSection = (
             <div className="user-profile">
-                <span>היי, {user.name} 👋</span>
+                <span>היי, {user.realname} 👋</span>
             </div>
         );
     }

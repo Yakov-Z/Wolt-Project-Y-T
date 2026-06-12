@@ -14,6 +14,9 @@ const OrderRoute = require('./Routes/OrderRoutes');
 // Middleware to parse JSON bodies automatically
 app.use(express.json());
 
+const cors = require('cors');
+app.use(cors()); // Allows your React client to make API requests
+
 // Prefix all article routes with /api/articles
 app.use('/api/users', UserRoutes);
 app.use('/api/restaurants', RestaurantRoutes);

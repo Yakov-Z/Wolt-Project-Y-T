@@ -14,8 +14,8 @@ services:
       context: .
       dockerfile: Dockerfile.web_server
     ports:
-      # Map host port 3000 to container port 3000
-      - "3000:3000"
+      # Map host port 3000 to container port 5000
+      - "5000:3000"
     depends_on:
       - server_app
     environment:
