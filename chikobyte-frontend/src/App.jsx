@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar/navbar'; 
+import LoginPage from './pages/LoginPage';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -30,7 +30,14 @@ function App() {
         </h1>
         
       </div>
-    </BrowserRouter>
+      <Routes>
+        {/* Public routes - anyone can access these */}
+        <Route path="/tokens" element={<LoginPage/>} />
+        
+        {/* Catch-all route for undefined URLs */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>    
   );
 }
 
