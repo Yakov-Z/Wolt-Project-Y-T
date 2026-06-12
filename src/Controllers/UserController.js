@@ -113,9 +113,14 @@ const loginUser = (req, res) => {
     //create a JWT token for the user and return it
     const data = { id: user.id, username: user.username }; 
     const token = jwt.sign(data, process.env.JWT_SECRET || 'מפתח-סופר-סודי');
+// Remove the password before sending the user object back
+    const { password: userPassword, ...userWithoutPassword } = user;
 
-    // send the token to the client
-    res.status(200).json({ token });
+    // Send both token and the user details to the client
+    res.status(200).json({ 
+        token: token,
+        user: userWithoutPassword 
+    });
 };
 
 //export the controller functions to be used in the routes

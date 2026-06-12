@@ -4,7 +4,7 @@ import CustomButton from '../components/CustomButton';
 import { useNavigate } from 'react-router-dom';
 
 
-function LoginPage() {
+function LoginPage({ setUser }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -55,7 +55,10 @@ function LoginPage() {
             console.log("Login successful!");
                     
             localStorage.setItem('token', data.token);
-                    
+
+            setUser(data.user); // set the user state to the logged in user
+            localStorage.setItem('user', JSON.stringify(data.user));
+
             navigate('/');
 
         } catch (error) {

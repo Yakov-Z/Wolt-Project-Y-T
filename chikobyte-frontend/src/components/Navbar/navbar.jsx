@@ -35,7 +35,7 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
     } else {
         userSection = (
             <div className="user-profile">
-                <span>היי, {user.realName} 👋</span>
+                <span>היי, {user.realname} 👋</span>
             </div>
         );
     }
