@@ -130,6 +130,27 @@ function RegisterPage() {
                 size={2}
                 errorMessage={errors.mail} 
             />
+           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
+    <input 
+        type="checkbox" 
+        name="isadmin" 
+        checked={formData.isadmin || false} 
+        onChange={(e) => handleChange({ 
+            target: { 
+                name: 'isadmin', 
+                value: e.target.checked 
+            } 
+        })} 
+        style={{ width: '18px', height: '18px', marginLeft: '10px' }}
+    />
+    <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדנ/ית?</label>
+</div>
+
+{errors.isadmin && (
+    <div style={{ color: 'red', fontSize: '0.85rem', marginTop: '-10px', marginBottom: '10px' }}>
+        {errors.isadmin}
+    </div>
+)}
             <InputBox 
                 name="image"
                 text="תמונה:"
@@ -158,6 +179,22 @@ function RegisterPage() {
             <InputBox 
                 name="number"
                 text="מספר בית:"
+                inputValue={formData.number}
+                onInputChange={handleChange}
+                size={2}
+                errorMessage={errors.address} 
+            />
+             <InputBox 
+                name="longitude"
+                text="קו אורך:"
+                inputValue={formData.number}
+                onInputChange={handleChange}
+                size={2}
+                errorMessage={errors.address} 
+            />
+            <InputBox 
+                name="latitude"
+                text="קו רוחב:"
                 inputValue={formData.number}
                 onInputChange={handleChange}
                 size={2}

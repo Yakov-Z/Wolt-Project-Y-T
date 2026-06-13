@@ -15,11 +15,9 @@ router.route('/')
 router.get('/category', controller.getExistingCategories);
 
 
-router.get('/category/:category', controller.getRestaurantsByCategory);
-
-
 router.get('/popular', controller.getPopularRestaurants);
 
+router.get('/nearby', controller.getNearbyRestaurants);
 
 router.route('/:id')
     .get(controller.getRestaurantById)

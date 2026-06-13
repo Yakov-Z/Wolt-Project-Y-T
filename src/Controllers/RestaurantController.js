@@ -3,7 +3,7 @@ const dataRepository = require('../Models/DataRepository');
 const Product = require('../Models/Product');
 const Restaurant = require('../Models/Restaurant');
 const { sendCommand } = require('../Services/tcpClient');
-const { viewsSort } = require('../Helpers/viewsSort');
+const { genericBubbleSort } = require('../Helpers/GenericBubbleSort');
 
 //get all the restaurants, that save in the data repository, return the list of restaurants
 const getAllRestaurants = (req, res) => {
@@ -39,7 +39,7 @@ const createRestaurant = (req, res) => {
     if(kosher == null || kosher == undefined) {
         errors.kosher = "kosher status is required";
     }
-    if(!address || !address.city || !address.street || !address.number) {
+    if(!address || !address.city || !address.street || !address.number || address.latitude == null || address.longitude == null) {
         errors.address = "complete address is required";
      }
 
@@ -70,22 +70,6 @@ const getRestaurantById = (req, res) => {
     res.json(restaurant);
 };
 
-//get restaurants by category, return the list of restaurants in the category
-const getRestaurantsByCategory = (req, res) => {
-
-    if (!req.params.category) {
-        return res.json([]);
-    }
-
-    const category = req.params.category.toLowerCase();
-    const allRestaurants = dataRepository.getAllRestaurants();
-    const restaurantsInCategory = allRestaurants.filter(restaurant => {
-        
-        const currentCategory = (restaurant.category || '').toLowerCase();
-        return currentCategory === category;
-    });
-    res.json(restaurantsInCategory);
-};
 
 //change restaurant details by its ID
 const updateRestaurant = (req, res) => {
@@ -100,7 +84,9 @@ const updateRestaurant = (req, res) => {
     
     //update the details that sent in the request body
     if (req.body.name) restaurant.name = req.body.name;
-    if (req.body.address) restaurant.address = req.body.address;
+    if (req.body.address) {
+    restaurant.address = { ...restaurant.address, ...req.body.address };
+        }
     if (req.body.category) restaurant.category = req.body.category;
     if (req.body.description) restaurant.description = req.body.description;
     if (req.body.owner) restaurant.owner = req.body.owner;
@@ -347,7 +333,7 @@ const getPopularProducts = (req, res) => {
     if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
 
    
-    const topProducts = viewsSort(restaurant.menu).slice(0, 3);
+    const topProducts = genericBubbleSort(restaurant.menu, 'views', true).slice(0, 3);
     res.json(topProducts);
 };
 
@@ -357,7 +343,7 @@ const getPopularRestaurants = (req, res) => {
     const allRestaurants = dataRepository.getAllRestaurants();
     
     
-    const popularRestaurants = viewsSort(allRestaurants).slice(0, 20);
+    const popularRestaurants = genericBubbleSort(allRestaurants, 'views', true).slice(0, 20);
     res.json(popularRestaurants);
 };
 
@@ -398,6 +384,51 @@ const getExistingCategories = (req, res) => {
 };
 
 
+const calculateSimpleDistance = (lat1, lon1, lat2, lon2) => {
+    const x = lat2 - lat1;
+    const y = lon2 - lon1;
+    
+    const flatDistance = Math.sqrt(x * x + y * y);
+    
+    return flatDistance * 111; 
+};
+
+const getNearbyRestaurants = (req, res) => {
+    const userId = Number(req.headers['userid']);
+    const user = dataRepository.getUser(userId);
+
+    if (!user) {
+        return res.json(dataRepository.getAllRestaurants().slice(0, 20));
+    }
+
+    const allRestaurants = dataRepository.getAllRestaurants();
+
+    
+    let calculatedRestaurants = allRestaurants.map(restaurant => {
+        
+        const calculatedDistance = calculateSimpleDistance(
+            user.address.latitude,   
+            user.address.longitude,  
+            restaurant.address.latitude, 
+            restaurant.address.longitude
+        );
+
+        return {
+            ...restaurant,
+            distanceFromUser: Number(calculatedDistance.toFixed(1))
+        };
+    });
+
+   
+    calculatedRestaurants = genericBubbleSort(calculatedRestaurants, 'distanceFromUser', false);
+
+    const top20Closest = calculatedRestaurants.slice(0, 20);
+
+
+    res.json(top20Closest);
+   
+};
+
 module.exports = {
     getAllRestaurants,
     createRestaurant,
@@ -413,5 +444,7 @@ module.exports = {
     getPopularProducts,
     getPopularRestaurants,
     getExistingCategories,
-    getRestaurantsByCategory
+    getNearbyRestaurants,
+    calculateSimpleDistance
+
 };

@@ -32,7 +32,7 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
 
     let displayAddress;
     if (user) {
-        displayAddress = user.address.city;
+        displayAddress = user.address.street + ' ' + user.address.number;
     } else {
         displayAddress = 'Earth 🌍';
     }
@@ -50,11 +50,11 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
     let userSection;
     if (!user) {
         userSection = (
-            <div className="auth-links">
-                <Link to="/tokens" className="login-link">התחברות</Link>
-                <Link to="/users/" className="register-btn">הרשמה</Link>
-            </div>
-        );
+    <div className="auth-links">
+        <Link to="/login" className="login-link">התחברות</Link>
+        <Link to="/register" className="register-btn">הרשמה</Link>
+    </div>
+    );
     } else {
         userSection = (
             <div className="user-profile">
@@ -71,7 +71,7 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
             <div className="navbar-content">
                 
                 <div className="navbar-right">
-                    <Link to="/" className="brand-name">chikobyte</Link>
+                    <Link to="/" className="brand-name">chikobite</Link>
                     
                     <div className="address-badge">
                         <span className="icon">📍</span>
