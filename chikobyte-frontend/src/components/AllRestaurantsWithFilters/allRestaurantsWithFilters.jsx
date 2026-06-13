@@ -46,13 +46,12 @@ export default function AllRestaurants() {
     let kosherButtonClass;
      
      if (isKosher) {
-        kosherButtonClass = "kosher-btn active";
         kosherButtonText = "כל המסעדות";
     }
     else {
-        kosherButtonClass = "kosher-btn";
         kosherButtonText = "צדיק! תלחץ בשביל מסעדות כשרות";
     }
+    kosherButtonClass = "kosher-btn";
 
     return (
         <div className="all-restaurants-page">
