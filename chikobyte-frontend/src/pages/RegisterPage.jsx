@@ -15,7 +15,9 @@ function RegisterPage() {
         image: '',
         city: '',
         street: '',
-        number: ''
+        number: '',
+        latitude: '',
+        longitude: ''
     });
 
     // state to hold errors returned from the server
@@ -48,7 +50,10 @@ function RegisterPage() {
                 address: {
                     city: formData.city,
                     street: formData.street,
-                    number: formData.number
+                    number: formData.number,
+                    latitude: formData.latitude,
+                    longitude: formData.longitude
+                    
                 }
             };
 
@@ -182,20 +187,20 @@ function RegisterPage() {
                 inputValue={formData.number}
                 onInputChange={handleChange}
                 size={2}
-                errorMessage={errors.address} 
+                
             />
              <InputBox 
                 name="longitude"
                 text="קו אורך:"
-                inputValue={formData.number}
+                inputValue={formData.longitude}
                 onInputChange={handleChange}
                 size={2}
-                errorMessage={errors.address} 
+                
             />
             <InputBox 
                 name="latitude"
                 text="קו רוחב:"
-                inputValue={formData.number}
+                inputValue={formData.latitude}
                 onInputChange={handleChange}
                 size={2}
                 errorMessage={errors.address} 

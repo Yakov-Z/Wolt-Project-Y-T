@@ -60,10 +60,7 @@ const registerUser = (req, res) => {
     if (!address || !address.city || !address.street || !address.number || !address.latitude || !address.longitude){
         errors.address = "Full address is required";
     }
-    if(isadmin == null || isadmin == undefined) {
-        errors.isadmin = "status is required";
-    }
-
+   
     // ensure the username is unique in the system
     if (username && !errors.username) {
         const isUsernameexist = Array.from(dataRepository.users.values()).some(u => u.username === username);

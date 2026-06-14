@@ -10,7 +10,7 @@ export default function FilterRestaurants({ isDarkMode, user }) {
     useEffect(() => {
         const fetchPopularRestaurants = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/restaurants/popular');
+                const response = await fetch('http://localhost:5000/api/restaurants/popular');
                 if (response.ok) {
                     const data = await response.json();
                     setPopularRestaurants(data);
@@ -28,7 +28,7 @@ export default function FilterRestaurants({ isDarkMode, user }) {
                     headers['userid'] = user.id;
                 }
                 
-                const response = await fetch('http://localhost:8080/api/restaurants/nearby', { headers });
+                const response = await fetch('http://localhost:5000/api/restaurants/nearby', { headers });
                 if (response.ok) {
                     const data = await response.json();
                     setNearbyRestaurants(data);

@@ -10,8 +10,8 @@ export default function AllRestaurants() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const restaurants = await fetch('http://localhost:8080/api/restaurants');
-            const categories = await fetch('http://localhost:8080/api/restaurants/category');
+            const restaurants = await fetch('http://localhost:5000/api/restaurants');
+            const categories = await fetch('http://localhost:5000/api/restaurants/category');
             
             const restaurantsData = await restaurants.json();
             const categoriesData = await categories.json();
