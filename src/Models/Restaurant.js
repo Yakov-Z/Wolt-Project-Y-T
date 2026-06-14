@@ -11,6 +11,7 @@ class Restaurant {
         this.kosher = kosher;
         this.menu = [];
         this.views = 0;
+        this.distanceFromUser = 0;
     }
 
    //add a product to the restaurant menu

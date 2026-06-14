@@ -27,7 +27,7 @@ const getUserProfile = (req, res) => {
 //register a new user, return the created user profile
 const registerUser = (req, res) => {
     //get the user details from the request body
-    const { username, password, realname, phonenumber, mail, image, address } = req.body;
+    const { username, password, realname, phonenumber, mail, image, address, isadmin } = req.body;
 
     // we will save the errors and sent them to the client if there are any
     let errors = {};
@@ -57,10 +57,10 @@ const registerUser = (req, res) => {
     if (!phonenumber) errors.phonenumber = "Phone number is required";
     if (!mail) errors.mail = "Mail is required";
     if (!image) errors.image = "Image is required";
-    if (!address || !address.city || !address.street || !address.number){
+    if (!address || !address.city || !address.street || !address.number || !address.latitude || !address.longitude){
         errors.address = "Full address is required";
     }
-
+   
     // ensure the username is unique in the system
     if (username && !errors.username) {
         const isUsernameexist = Array.from(dataRepository.users.values()).some(u => u.username === username);
@@ -76,9 +76,9 @@ const registerUser = (req, res) => {
     }
 
     // create the user'a address object
-    const userAddress = new Address(address.city, address.street, address.number);
+    const userAddress = new Address(address.city, address.street, address.number, address.latitude, address.longitude);
     //create and save the new user to the data repository
-    const newUser = new User(null, username, password, realname, phonenumber, mail, image, userAddress);
+    const newUser = new User(null, username, password, realname, phonenumber, mail, image, userAddress, isadmin);
 
     const savedUser = dataRepository.addUser(newUser);
     // send the new user to old server by POST

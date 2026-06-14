@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar/navbar'; 
+import FilterRestaurants from './components/FilterRestaurants/filterRestaurants';
+import AllRestaurantsWithFilters from './components/AllRestaurantsWithFilters/allRestaurantsWithFilters';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+
 
 
 function App() {
@@ -16,7 +19,7 @@ function App() {
   return (
     <BrowserRouter>
       <div style={{ 
-        minHeight: 'auto', 
+        minHeight: '100vh', 
         backgroundColor: isDarkMode ? '#121111' : '#ffffff',
         transition: 'background-color 0.3s ease'
       }}>
@@ -27,19 +30,18 @@ function App() {
           toggleTheme={toggleTheme} 
         />
 
-        <h1 style={{ textAlign: 'center', marginTop: '50px', color: isDarkMode ? 'white' : '#353434' }}>
-         
-        </h1>
         
-      </div>
       <Routes>
+        <Route path="/" element={<FilterRestaurants isDarkMode={isDarkMode} user={user} />} />
         {/* Public routes - anyone can access these */}
-        <Route path="/tokens" element={<LoginPage setUser={setUser} />} />
-        <Route path="/users/" element={<RegisterPage/>} />
+        <Route path="/all-restaurants" element={<AllRestaurantsWithFilters />} />
+        <Route path="/login" element={<LoginPage setUser={setUser} />} />
+        <Route path="/register" element={<RegisterPage/>} />
         
         {/* Catch-all route for undefined URLs */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </div>
     </BrowserRouter>    
   );
 }

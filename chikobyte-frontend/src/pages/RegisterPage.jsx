@@ -15,7 +15,9 @@ function RegisterPage() {
         image: '',
         city: '',
         street: '',
-        number: ''
+        number: '',
+        latitude: '',
+        longitude: ''
     });
 
     // state to hold errors returned from the server
@@ -48,7 +50,10 @@ function RegisterPage() {
                 address: {
                     city: formData.city,
                     street: formData.street,
-                    number: formData.number
+                    number: formData.number,
+                    latitude: formData.latitude,
+                    longitude: formData.longitude
+                    
                 }
             };
 
@@ -130,6 +135,27 @@ function RegisterPage() {
                 size={2}
                 errorMessage={errors.mail} 
             />
+           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
+    <input 
+        type="checkbox" 
+        name="isadmin" 
+        checked={formData.isadmin || false} 
+        onChange={(e) => handleChange({ 
+            target: { 
+                name: 'isadmin', 
+                value: e.target.checked 
+            } 
+        })} 
+        style={{ width: '18px', height: '18px', marginLeft: '10px' }}
+    />
+    <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדנ/ית?</label>
+</div>
+
+{errors.isadmin && (
+    <div style={{ color: 'red', fontSize: '0.85rem', marginTop: '-10px', marginBottom: '10px' }}>
+        {errors.isadmin}
+    </div>
+)}
             <InputBox 
                 name="image"
                 text="תמונה:"
@@ -159,6 +185,22 @@ function RegisterPage() {
                 name="number"
                 text="מספר בית:"
                 inputValue={formData.number}
+                onInputChange={handleChange}
+                size={2}
+                
+            />
+             <InputBox 
+                name="longitude"
+                text="קו אורך:"
+                inputValue={formData.longitude}
+                onInputChange={handleChange}
+                size={2}
+                
+            />
+            <InputBox 
+                name="latitude"
+                text="קו רוחב:"
+                inputValue={formData.latitude}
                 onInputChange={handleChange}
                 size={2}
                 errorMessage={errors.address} 

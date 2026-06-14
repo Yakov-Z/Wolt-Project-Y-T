@@ -1,5 +1,5 @@
 class User {
-    constructor(id, username, password, realname, phonenumber, mail, image, address) {
+    constructor(id, username, password, realname, phonenumber, mail, image, address, isadmin) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -8,6 +8,7 @@ class User {
         this.mail = mail;
         this.image = image;
         this.address = address;
+        this.isadmin = isadmin;
         this.orders = []; 
         this.userview = [];
     }

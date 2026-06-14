@@ -1,0 +1,49 @@
+
+.all-restaurants-page {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+
+.filters-bar button {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: transparent;
+    color: #199cd3;
+    border: 2px solid #199cd3;
+    font-family: inherit;
+}
+
+.filters-bar button:hover {
+    background-color: #f0f8ff;
+    transform: translateY(-2px);
+}
+
+
+.filters-bar button.active {
+    background-color: #199cd3;
+    color: white;
+}
+
+
+.all-restaurants-page .restaurants-scroll-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    overflow-x: visible; 
+    padding-bottom: 0;
+}

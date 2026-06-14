@@ -1,0 +1,245 @@
+
+.filter-restaurants-container {
+    padding: 15px 40px;
+    min-height: calc(100vh - 80px); 
+
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+.dark-mode.filter-restaurants-container {
+    background-color: #121111;
+    color: #f1f1f1;
+}
+
+
+.restaurants-section {
+    margin-bottom: 10px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+.section-header h2 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.see-all-btn {
+    background: none;
+    border: none;
+    color: #199cd3;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+
+.restaurants-scroll-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    scrollbar-width: none; 
+}
+
+.restaurants-scroll-container::-webkit-scrollbar {
+    display: none; 
+}
+
+
+.restaurant-card {
+    min-width: 280px;
+    max-width: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.restaurant-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.dark-mode .restaurant-card {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+
+.card-image-container {
+    position: relative;
+    height: 140px;
+}
+
+.restaurant-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.restaurant-logo {
+    position: absolute;
+    bottom: -20px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background-color: #fff;
+    object-fit: contain;
+}
+
+.dark-mode .restaurant-logo {
+    border-color: #1e1e1e;
+    background-color: #1e1e1e;
+}
+
+
+.card-content {
+    padding: 25px 15px 15px 15px;
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.card-title-row h3 {
+    margin: 0;
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+.category-text {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 12px 0;
+}
+
+.dark-mode .category-text {
+    color: #aaa;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #888;
+}
+
+.placeholder-card {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.02);
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    color: #888;
+}
+
+.dark-mode .placeholder-card {
+    background-color: rgba(255,255,255,0.02);
+    border-color: #444;
+}
+
+.placeholder-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px 10px;
+    text-align: center;
+    color: #666;
+}
+
+.dark-mode .empty-state {
+    color: #aaa;
+}
+
+.add-restaurant-btn {
+    margin-top: 15px;
+    background-color: #0498d7;
+    color: white;
+    text-decoration: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.add-restaurant-btn:hover {
+    background-color: #047eb6;
+    transform: translateY(-2px); 
+}
+.bottom-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 0px;
+    padding-bottom: 20px;
+}
+
+.action-btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+.primary-btn {
+    background-color: #0498d7;
+    color: white;
+    border: 2px solid #0498d7;
+}
+
+.primary-btn:hover {
+    background-color: #047eb6;
+    border-color: #047eb6;
+    transform: translateY(-2px);
+}
+
+
+.outline-btn {
+    background-color: transparent;
+    color: #199cd3;
+    border: 2px solid #199cd3;
+}
+
+.outline-btn:hover {
+    background-color: #f0f8ff;
+    transform: translateY(-2px);
+}
+
+
+.dark-mode .outline-btn:hover {
+    background-color: rgba(25, 156, 211, 0.1);
+}
