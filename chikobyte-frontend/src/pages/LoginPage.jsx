@@ -55,9 +55,15 @@ function LoginPage({ setUser }) {
             console.log("Login successful!");
                     
             localStorage.setItem('token', data.token);
-
-            setUser(data.user); // set the user state to the logged in user
-            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            const userWithOnlyVitalDetails = {
+                id: data.user.id,
+                realname: data.user.realname,
+                address: data.user.address,
+                isadmin: data.user.isadmin
+            };
+            setUser(userWithOnlyVitalDetails); // set the user state to the logged in user
+            localStorage.setItem('user', JSON.stringify(userWithOnlyVitalDetails));
 
             navigate('/');
 

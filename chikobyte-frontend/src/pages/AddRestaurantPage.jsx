@@ -5,21 +5,22 @@ import '../components/Navbar/navbar.css';
 import { useNavigate } from 'react-router-dom';
 
 
-function RegisterPage() {
+function AddRestaurantPage() {
     const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-        realname: '',
-        phonenumber: '',
-        mail: '',
-        isadmin: false,
+        name: '',
+        description: '',
+        owner: '',
         city: '',
         street: '',
         number: '',
         latitude: '',
-        longitude: ''
+        longitude: '',
+        category: '',
+        kosher: false
     });
     const [imageText, setImageText] = useState('');
+    const [logoText, setLogoText] = useState('');
+
 
     // state to hold errors returned from the server
     const [errors, setErrors] = useState({});
@@ -63,27 +64,50 @@ function RegisterPage() {
         }
     };
 
+    const handleLogoChange = (event) => {
+        // Line 1: Get the first file that the user selected from their computer
+        const file = event.target.files[0];
+
+        if (file) {
+            // Line 2: Create a built-in browser object designed to read files
+            const reader = new FileReader();
+
+            // Line 3: Define what happens asynchronousely WHEN the browser finishes reading the file
+            reader.onloadend = () => {
+                // Line 4: Save the long text string (the result) into our state
+                setLogoText(reader.result);
+            };
+
+            // Line 5: Tell the reader to start reading the file and convert it to a text URL (Base64)
+            reader.readAsDataURL(file);
+
+            if (errors.logo) {
+                setErrors(prev => ({ ...prev, logo: null }));
+            }
+        }
+    };
+
     const handleSubmit = async () => {
         const payload = {
-                username: formData.username,
-                password: formData.password,
-                realname: formData.realname,
-                phonenumber: formData.phonenumber,
-                mail: formData.mail,
+                name: formData.name,
+                description: formData.description,
                 image: imageText,
-                isadmin: formData.isadmin,
+                logo: logoText,
+                owner: JSON.parse(localStorage.getItem('user')),
                 address: {
                     city: formData.city,
                     street: formData.street,
                     number: formData.number,
                     latitude: formData.latitude,
                     longitude: formData.longitude
-                    
-                }
+                },
+                category: formData.category,
+                logo: logoText,
+                kosher: formData.kosher
             };
 
     try {
-        const response = await fetch('http://localhost:5000/api/users/', {
+        const response = await fetch('http://localhost:5000/api/restaurants/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,9 +128,9 @@ function RegisterPage() {
             return; // stop execution if there are errors
         }
 
-        navigate('/'); // redirect to home page after successful registration        
+        navigate('/'); // redirect to home page after successful creation       
     } catch (error) {
-        console.error('Error during registration:', error);
+        console.error('Error during creation:', error);
         }
     };
 
@@ -115,65 +139,68 @@ function RegisterPage() {
             <div className="mx-auto" style={{ width: '60%' }}>
             <h2 className="brand-name-big">Chikobyte</h2>
             </div>
-            <h2 className="mb-4 text-center">פתח חשבון חדש ב-Chikobyte</h2>
+            <h2 className="mb-4 text-center">זה הזמן שלך לכבוש את הארץ! הוסף את המסעדה החדשה שלך:</h2>
             
             <InputBox 
-                name="username"
-                text="שם משתמש:"
-                inputValue={formData.username}
+                name="name"
+                text="שם מסעדה:"
+                inputValue={formData.name}
                 onInputChange={handleChange}
                 size={2}
-                errorMessage={errors.username} 
+                errorMessage={errors.name} 
             />
             <InputBox 
-                name="password"
-                text="סיסמה:"
-                inputValue={formData.password}
+                name="description"
+                text="תיאור מסעדה:"
+                inputValue={formData.description}
                 onInputChange={handleChange}
                 size={2}
-                errorMessage={errors.password} 
+                errorMessage={errors.description} 
             />
 
-            <InputBox 
-                name="realname"
-                text="שם מלא:"
-                inputValue={formData.realname}
-                onInputChange={handleChange}
-                size={2}
-                errorMessage={errors.realname} 
-            />
-            <InputBox 
-                name="phonenumber"
-                text="מספר טלפון:"
-                inputValue={formData.phonenumber}
-                onInputChange={handleChange}
-                size={2}
-                errorMessage={errors.phonenumber} 
-            />
-            <InputBox 
-                name="mail"
-                text="דואר אלקטרוני:" 
-                inputValue={formData.mail}
-                onInputChange={handleChange}
-                size={2}
-                errorMessage={errors.mail} 
-            />
+            <div className="mb-3">
+    {/* The Input Group to match the gray label box style */}
+    <div style={{ display: 'flex', direction: 'rtl', border: '1px solid #ced4da', borderRadius: '0.375rem', overflow: 'hidden' }}>
+        <div style={{ 
+            backgroundColor: '#f8f9fa', 
+            padding: '0.375rem 0.75rem', 
+            borderLeft: '1px solid #ced4da',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '30%', // Match the width of your other labels
+            color: '#495057'
+        }}>
+            לוגו:
+        </div>
+        <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleLogoChange} 
+            style={{ 
+                flex: 1, 
+                padding: '0.375rem 0.75rem',
+                border: 'none',
+                outline: 'none',
+                direction: 'ltr' // Keeps the "Choose File" text looking standard
+            }} 
+        />
+    </div>
 
-           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
-            <input 
-                type="checkbox" 
-                name="isadmin" 
-                checked={formData.isadmin || false} 
-                onChange={(e) => handleChange({ 
-                    target: { 
-                        name: 'isadmin', 
-                        value: e.target.checked 
-                    } 
-                })} 
-                style={{ width: '18px', height: '18px', marginLeft: '10px' }}
-            />
-            <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדנ/ית?</label>
-            </div>
+    {errors.logo && (
+        <div style={{
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '10px',
+            borderRadius: '0.375rem',
+            textAlign: 'center',
+            marginTop: '10px',
+            border: '1px solid #f5c2c7'
+        }}>
+            {errors.logo}
+        </div>
+    )}
+</div>
 
 <div className="mb-3">
     {/* The Input Group to match the gray label box style */}
@@ -218,6 +245,30 @@ function RegisterPage() {
         </div>
     )}
 </div>
+            <InputBox 
+                name="category"
+                text="קטגוריה:"
+                inputValue={formData.category}
+                onInputChange={handleChange}
+                size={2}
+                errorMessage={errors.category} 
+            />
+
+           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
+            <input 
+                type="checkbox" 
+                name="kosher" 
+                checked={formData.kosher || false} 
+                onChange={(e) => handleChange({ 
+                    target: { 
+                        name: 'kosher', 
+                        value: e.target.checked 
+                    } 
+                })} 
+                style={{ width: '18px', height: '18px', marginLeft: '10px' }}
+            />
+            <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדה כשרה?</label>
+            </div>
 
             <h7 className="text-right">כתובת:</h7>
 
@@ -262,7 +313,7 @@ function RegisterPage() {
 
             <div className="mx-auto" style={{ width: '30%' }}>
             <CustomButton
-                text="הרשם"
+                text="צור מסעדה"
                 colorId='1'
                 onClickHandler={handleSubmit}
             />
@@ -271,4 +322,4 @@ function RegisterPage() {
     );
 }
 
-export default RegisterPage;
+export default AddRestaurantPage;

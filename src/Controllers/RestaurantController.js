@@ -81,7 +81,11 @@ const updateRestaurant = (req, res) => {
     if (!restaurant) {
         return res.status(404).json({ error: "Restaurant not found" });
     }
-    
+
+    if(restaurant.owner.id != req.body.owner.id) {
+        return res.status(403).json({ error: "You are not the owner of this restaurant" });
+    }
+
     //update the details that sent in the request body
     if (req.body.name) restaurant.name = req.body.name;
     if (req.body.address) {
@@ -108,6 +112,9 @@ const deleteRestaurant = (req, res) => {
     //error if the restaurant don't exist
     if (!isDeleted) {
         return res.status(404).json({ error: "Restaurant not found" });
+    }
+    if(restaurant.owner.id != req.body.owner.id) {
+        return res.status(403).json({ error: "You are not the owner of this restaurant" });
     }
     // delete the restaurant's orders and products from the data repository
     const productsToDelete = [];

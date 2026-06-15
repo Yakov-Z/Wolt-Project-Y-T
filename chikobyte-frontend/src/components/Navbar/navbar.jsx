@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './navbar.css';
+import CustomButton from '../CustomButton';
 
-export default function Navbar({ user, isDarkMode, toggleTheme }) {
+export default function Navbar({ user, isDarkMode, toggleTheme, setUser }) {
     
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState({ restaurants: [], products: [] });
+
+    const navigate = useNavigate(); 
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+
+        setUser(null);
+
+        navigate('/');
+    };
+
+    const handleProfileClick = () => {
+        navigate('/profile');
+    };
+
 
     useEffect(() => {
         if (searchTerm.trim() === '') {
@@ -15,7 +32,7 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
 
         const fetchResults = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/search/${searchTerm}`);
+                const response = await fetch(`http://localhost:5000/api/search/${searchTerm}`);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -58,7 +75,15 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
     } else {
         userSection = (
             <div className="user-profile">
-                <span>היי, {user.realname} 👋</span>
+                <span>היי, {user.realname}</span>
+                <button onClick={handleLogout} className="logout-btn" style={{ marginLeft: '15px', padding: '5px 10px', cursor: 'pointer' }}>
+                    התנתק
+                </button>
+                <CustomButton
+                 text="איזור אישי"
+                 colorId="2"
+                 onClickHandler={handleProfileClick}
+                />
             </div>
         );
     }
@@ -71,12 +96,13 @@ export default function Navbar({ user, isDarkMode, toggleTheme }) {
             <div className="navbar-content">
                 
                 <div className="navbar-right">
-                    <Link to="/" className="brand-name">chikobite</Link>
+                    <Link to="/" className="brand-name">Chikobyte</Link>
                     
                     <div className="address-badge">
                         <span className="icon">📍</span>
                         <span>{displayAddress}</span>
                     </div>
+
                 </div>
 
                 <div className="navbar-center" style={{ position: 'relative' }}>
