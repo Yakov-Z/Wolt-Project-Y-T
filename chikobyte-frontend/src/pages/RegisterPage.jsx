@@ -12,13 +12,14 @@ function RegisterPage() {
         realname: '',
         phonenumber: '',
         mail: '',
-        image: '',
+        isadmin: false,
         city: '',
         street: '',
         number: '',
         latitude: '',
         longitude: ''
     });
+    const [imageText, setImageText] = useState('');
 
     // state to hold errors returned from the server
     const [errors, setErrors] = useState({});
@@ -39,6 +40,29 @@ function RegisterPage() {
         }
     };
 
+    const handleFileChange = (event) => {
+        // Line 1: Get the first file that the user selected from their computer
+        const file = event.target.files[0];
+
+        if (file) {
+            // Line 2: Create a built-in browser object designed to read files
+            const reader = new FileReader();
+
+            // Line 3: Define what happens asynchronousely WHEN the browser finishes reading the file
+            reader.onloadend = () => {
+                // Line 4: Save the long text string (the result) into our state
+                setImageText(reader.result);
+            };
+
+            // Line 5: Tell the reader to start reading the file and convert it to a text URL (Base64)
+            reader.readAsDataURL(file);
+
+            if (errors.image) {
+                setErrors(prev => ({ ...prev, image: null }));
+            }
+        }
+    };
+
     const handleSubmit = async () => {
         const payload = {
                 username: formData.username,
@@ -46,7 +70,8 @@ function RegisterPage() {
                 realname: formData.realname,
                 phonenumber: formData.phonenumber,
                 mail: formData.mail,
-                image: formData.image,
+                image: imageText,
+                isadmin: formData.isadmin,
                 address: {
                     city: formData.city,
                     street: formData.street,
@@ -78,8 +103,6 @@ function RegisterPage() {
             }
             return; // stop execution if there are errors
         }
-
-        localStorage.setItem('token', data.token);
 
         navigate('/'); // redirect to home page after successful registration        
     } catch (error) {
@@ -135,35 +158,66 @@ function RegisterPage() {
                 size={2}
                 errorMessage={errors.mail} 
             />
-           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
-    <input 
-        type="checkbox" 
-        name="isadmin" 
-        checked={formData.isadmin || false} 
-        onChange={(e) => handleChange({ 
-            target: { 
-                name: 'isadmin', 
-                value: e.target.checked 
-            } 
-        })} 
-        style={{ width: '18px', height: '18px', marginLeft: '10px' }}
-    />
-    <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדנ/ית?</label>
-</div>
 
-{errors.isadmin && (
-    <div style={{ color: 'red', fontSize: '0.85rem', marginTop: '-10px', marginBottom: '10px' }}>
-        {errors.isadmin}
-    </div>
-)}
-            <InputBox 
-                name="image"
-                text="תמונה:"
-                inputValue={formData.image}
-                onInputChange={handleChange}
-                size={2}
-                errorMessage={errors.image} 
+           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
+            <input 
+                type="checkbox" 
+                name="isadmin" 
+                checked={formData.isadmin || false} 
+                onChange={(e) => handleChange({ 
+                    target: { 
+                        name: 'isadmin', 
+                        value: e.target.checked 
+                    } 
+                })} 
+                style={{ width: '18px', height: '18px', marginLeft: '10px' }}
             />
+            <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדנ/ית?</label>
+            </div>
+
+<div className="mb-3">
+    {/* The Input Group to match the gray label box style */}
+    <div style={{ display: 'flex', direction: 'rtl', border: '1px solid #ced4da', borderRadius: '0.375rem', overflow: 'hidden' }}>
+        <div style={{ 
+            backgroundColor: '#f8f9fa', 
+            padding: '0.375rem 0.75rem', 
+            borderLeft: '1px solid #ced4da',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '30%', // Match the width of your other labels
+            color: '#495057'
+        }}>
+            תמונה:
+        </div>
+        <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleFileChange} 
+            style={{ 
+                flex: 1, 
+                padding: '0.375rem 0.75rem',
+                border: 'none',
+                outline: 'none',
+                direction: 'ltr' // Keeps the "Choose File" text looking standard
+            }} 
+        />
+    </div>
+
+    {errors.image && (
+        <div style={{
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '10px',
+            borderRadius: '0.375rem',
+            textAlign: 'center',
+            marginTop: '10px',
+            border: '1px solid #f5c2c7'
+        }}>
+            {errors.image}
+        </div>
+    )}
+</div>
 
             <h7 className="text-right">כתובת:</h7>
 
