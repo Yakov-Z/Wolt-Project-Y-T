@@ -7,9 +7,12 @@ const jwt = require("jsonwebtoken");
 const key = "like in targilon 8";
 
 //get user by his ID, return the user profile
-const getUserProfile = (req, res) => {
+const getUserProfile = (req, res) => {    
     // ID is int in our implementation, so we convert it from string to number
     const userId = Number(req.params.id);
+    if(req.user.id !== userId) {
+        return res.status(403).json({ error: "You are not authorized to view this profile" });
+    }
     const user = dataRepository.getUser(userId);
 
     //error if the user don't exist
