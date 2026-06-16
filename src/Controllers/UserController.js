@@ -10,7 +10,7 @@ const key = "like in targilon 8";
 const getUserProfile = (req, res) => {    
     // ID is int in our implementation, so we convert it from string to number
     const userId = Number(req.params.id);
-    if(req.user.id !== userId) {
+    if(Number(req.user.id) !== userId) {
         return res.status(403).json({ error: "You are not authorized to view this profile" });
     }
     const user = dataRepository.getUser(userId);

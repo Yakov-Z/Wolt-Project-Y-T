@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './allRestaurantsWithFilters.css';
+import { Link } from 'react-router-dom';
 
 export default function AllRestaurants() {
     const [restaurants, setRestaurants] = useState([]);
@@ -82,30 +83,35 @@ export default function AllRestaurants() {
             </div>
 
             <div className="restaurants-scroll-container">
-                {filteredRestaurants.map(restaurant => (
-                    <div key={restaurant.id} className="restaurant-card">
-                        <div className="card-image-container">
-                            <img 
-                                src={restaurant.image} 
-                                alt={restaurant.name} 
-                                className="restaurant-image"
-                            />
-                            <img 
-                                src={restaurant.logo} 
-                                alt="logo" 
-                                className="restaurant-logo" 
-                            />
-                        </div>
-                        
-                        <div className="card-content">
-                            <div className="card-title-row">
-                                <h3>{restaurant.name}</h3>
-                            </div>
-                            <p className="category-text">{restaurant.category}</p>
-                        </div>
+            {filteredRestaurants.map(restaurant => (
+                <Link 
+                    to={`/restaurant/${restaurant.id}`} 
+                    key={restaurant.id} 
+                    className="restaurant-card"
+                    style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+                >
+                <div className="card-image-container">
+                    <img 
+                        src={restaurant.image} 
+                        alt={restaurant.name} 
+                        className="restaurant-image"
+                    />
+                    <img 
+                        src={restaurant.logo} 
+                        alt="logo" 
+                        className="restaurant-logo" 
+                    />
+                </div>
+            
+                <div className="card-content">
+                    <div className="card-title-row">
+                        <h3>{restaurant.name}</h3>
                     </div>
-                ))}
-            </div>
+                    <p className="category-text">{restaurant.category}</p>
+                </div>
+                </Link>
+    ))}
+</div>
         </div>
     );
 }

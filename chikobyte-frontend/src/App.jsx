@@ -9,32 +9,35 @@ import AddRestaurantPage from './pages/AddRestaurantPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import IsUserLoggedProtect from './components/IsUserLoggedProtect';
 import ProfilePage from './pages/ProfilePage';
-
+import RestaurantPage from './pages/RestaurantPage';
+import UpdateRestaurantPage from './pages/UpdateRestaurantPage';
 
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => { const token = localStorage.getItem('token');
+  const savedUserString = localStorage.getItem('user');
+
+    if (token && savedUserString) {
+      try {
+        return JSON.parse(savedUserString);
+      } catch (error) {
+        console.error("Error parsing user data from local storage", error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        return null;
+      }
+    }
+    return null; // Return null if no valid token/user is found
+  });
+  
+
+ 
+
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const savedUserString = localStorage.getItem('user');
-
-    if (token && savedUserString) {
-      try {
-        const parsedUser = JSON.parse(savedUserString);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error("Error parsing user data from local storage", error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
-    }
-  }, []);
 
   return (
     <BrowserRouter>
@@ -79,7 +82,13 @@ function App() {
             <ProfilePage user={user} />
           </ProtectedRoute>} 
         />
-        
+        <Route path="/restaurant/:id" element={<RestaurantPage user={user} />} />
+        <Route path="/restaurant/update/:id"
+         element={
+          <ProtectedRoute user={user} isAdminRoute={true}>
+            <UpdateRestaurantPage user={user} />
+          </ProtectedRoute>} 
+        />
         {/* Catch-all route for undefined URLs */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

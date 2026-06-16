@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const controller = require('../Controllers/RestaurantController');
+const verifyToken = require('../Middlewares/verifytoken');
 
 router.route('/')
     .get(controller.getRestaurantMenu)
-    .post(controller.addProductToMenu);
+    .post(verifyToken, controller.addProductToMenu);
 
 router.route('/:pId')
     .get(controller.getProductById)
-    .patch(controller.updateProduct)
-    .delete(controller.deleteProduct);
+    .patch(verifyToken, controller.updateProduct)
+    .delete(verifyToken, controller.deleteProduct);
 
 module.exports = router;
