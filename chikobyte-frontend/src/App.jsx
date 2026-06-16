@@ -9,8 +9,8 @@ import AddRestaurantPage from './pages/AddRestaurantPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import IsUserLoggedProtect from './components/IsUserLoggedProtect';
 import ProfilePage from './pages/ProfilePage';
-
-
+import RestaurantPage from './pages/RestaurantPage';
+import UpdateRestaurantPage from './pages/UpdateRestaurantPage';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -79,7 +79,13 @@ function App() {
             <ProfilePage user={user} />
           </ProtectedRoute>} 
         />
-        
+        <Route path="/restaurant/:id" element={<RestaurantPage user={user} />} />
+        <Route path="/restaurant/update/:id"
+         element={
+          <ProtectedRoute user={user} isAdminRoute={true}>
+            <UpdateRestaurantPage user={user} />
+          </ProtectedRoute>} 
+        />
         {/* Catch-all route for undefined URLs */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

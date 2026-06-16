@@ -105,12 +105,19 @@ function AddRestaurantPage() {
                 logo: logoText,
                 kosher: formData.kosher
             };
+            const token = localStorage.getItem('token');
 
-    try {
-        const response = await fetch('http://localhost:5000/api/restaurants/', {
+        // If there's no token, we can't fetch protected data
+        if (!token) {
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:5000/api/restaurants/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(payload),
         });
