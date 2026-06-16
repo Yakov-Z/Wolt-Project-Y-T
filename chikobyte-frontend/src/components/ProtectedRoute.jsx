@@ -7,7 +7,7 @@ function ProtectedRoute({ user, isAdminRoute, children }) {
         return <Navigate to="/" replace />;
     }
 
-    if (isAdminRoute && user.isadmin === false) {
+    if (isAdminRoute === true && user.isadmin === false) {
         // User is logged in, but doesn't have the right permissions
         return <Navigate to="/" replace />; 
     }
