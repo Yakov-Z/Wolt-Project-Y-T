@@ -3,11 +3,12 @@ const router = express.Router();
 const controller = require('../Controllers/RestaurantController');
 const searchController = require('../Controllers/searchController');
 const ProductsRoutes = require('./ProductsRoutes');
+const verifyToken = require('../Middlewares/verifytoken');
 
 
 router.route('/')
     .get(controller.getAllRestaurants)
-    .post(controller.createRestaurant);
+    .post(verifyToken, controller.createRestaurant);
 
     router.get('/search/:query', searchController.searchEntities);
 
@@ -21,8 +22,8 @@ router.get('/nearby', controller.getNearbyRestaurants);
 
 router.route('/:id')
     .get(controller.getRestaurantById)
-    .patch(controller.updateRestaurant)
-    .delete(controller.deleteRestaurant);
+    .patch(verifyToken, controller.updateRestaurant)
+    .delete(verifyToken, controller.deleteRestaurant);
 
 
 router.use('/:id/products', ProductsRoutes);

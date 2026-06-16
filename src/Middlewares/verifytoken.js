@@ -17,7 +17,7 @@ const verifyToken = (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'מפתח-סופר-סודי');
         
         // Attach the decoded user data (like id and isadmin) to the request object
-        req.user = decoded; 
+        req.user = decoded;
         
         // Move to the next function (the actual controller)
         next();

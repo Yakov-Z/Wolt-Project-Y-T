@@ -82,7 +82,7 @@ const updateRestaurant = (req, res) => {
         return res.status(404).json({ error: "Restaurant not found" });
     }
 
-    if(restaurant.owner.id != req.body.owner.id) {
+    if(restaurant.owner.id != req.user.id) {
         return res.status(403).json({ error: "You are not the owner of this restaurant" });
     }
 
@@ -107,15 +107,17 @@ const deleteRestaurant = (req, res) => {
     // ID is int in our implementation, so we convert it from string to number
     const id = Number(req.params.id);
     //delete the restaurant from the data repository
+    const restaurant = dataRepository.getRestaurant(id);
+    if(restaurant.owner.id != Number(req.user.id)) {
+        return res.status(403).json({ error: "You are not the owner of this restaurant" });
+    }
     const isDeleted = dataRepository.deleteRestaurant(id); 
     
     //error if the restaurant don't exist
     if (!isDeleted) {
         return res.status(404).json({ error: "Restaurant not found" });
     }
-    if(restaurant.owner.id != req.body.owner.id) {
-        return res.status(403).json({ error: "You are not the owner of this restaurant" });
-    }
+    
     // delete the restaurant's orders and products from the data repository
     const productsToDelete = [];
     for(const product of dataRepository.products.values()) {
