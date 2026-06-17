@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import UserDetailItem from '../components/DetailsItem'; 
+import UserDetailItem from '../components/DetailsItem';
+import { useNavigate } from 'react-router-dom';
+import OrdersHistoryPage from './OrderHistoryPage';
+import CustomButton from '../components/CustomButton';
 
 export default function ProfilePage({ user }) {
     // State to hold the fresh data from the server
@@ -9,7 +12,7 @@ export default function ProfilePage({ user }) {
     const [isLoading, setIsLoading] = useState(true);
     // State for error handling
     const [error, setError] = useState(null);
-    
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -119,6 +122,13 @@ export default function ProfilePage({ user }) {
                         value={`${fullUserData.address.street} ${fullUserData.address.number}, ${fullUserData.address.city}`} 
                     />
                 )}
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                    <CustomButton 
+                        text="היסטוריית הזמנות" 
+                        colorId={2} 
+                        onClickHandler={() => navigate('/orders/history')} 
+                    />
+                </div>
             </div>
         </div>
     );

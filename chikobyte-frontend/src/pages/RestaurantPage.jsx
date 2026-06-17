@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom'; 
 import RestaurantDetailItem from '../components/DetailsItem'; 
 import CustomButton from '../components/CustomButton';
+import { useCart } from './Context/CartContext';
 
 export default function RestaurantPage({ user }) {
     const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function RestaurantPage({ user }) {
     const [fullRestaurantData, setFullRestaurantData] = useState(null);  
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { addToCart } = useCart();
     
     const handleDeleteRestaurant = async () => {
         if (!window.confirm("האם אתה בטוח שברצונך למחוק מסעדה זו? פעולה זו אינה ניתנת לביטול.")) {
@@ -178,8 +180,10 @@ export default function RestaurantPage({ user }) {
                                     borderRadius: '5px',
                                     fontWeight: 'bold',
                                     cursor: 'pointer'
-                                }}>
-                                    הוסף
+                                }} 
+                                onClick={() => addToCart(product, fullRestaurantData)}
+                                >
+                                    הוסף לעגלה
                                 </button>
                             </div>
                         </div>
