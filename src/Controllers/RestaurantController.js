@@ -61,11 +61,16 @@ const getRestaurantById = (req, res) => {
      // ID is int in our implementation, so we convert it from string to number
     const id = Number(req.params.id);
     const restaurant = dataRepository.getRestaurant(id);
-    restaurant.views += 1;
-    //error if the restaurant don't exist
     if (!restaurant) {
         return res.status(404).json({ error: "Restaurant not found" });
     }
+
+    if (restaurant.views === undefined || restaurant.views === null) {
+        restaurant.views = 0;
+    }
+
+    // 3. NOW it's safe to increment
+    restaurant.views += 1;
     //return the restaurant profile
     res.json(restaurant);
 };
@@ -108,6 +113,9 @@ const deleteRestaurant = (req, res) => {
     const id = Number(req.params.id);
     //delete the restaurant from the data repository
     const restaurant = dataRepository.getRestaurant(id);
+    if (!restaurant) {
+        return res.status(404).json({ error: "Restaurant not found" });
+    }
     if(restaurant.owner.id != Number(req.user.id)) {
         return res.status(403).json({ error: "You are not the owner of this restaurant" });
     }
@@ -181,7 +189,8 @@ const addProductToMenu = (req, res) => {
     }
     
     //get the product details from the request body
-    const { name, price , category} = req.body;
+    const { name, description, price, category, image } = req.body;
+    const numericPrice = Number(price);
 
     // we will save the errors and sent them to the client if there are any
     let errors = {};
@@ -190,11 +199,14 @@ const addProductToMenu = (req, res) => {
     }
     if(price == null || price == undefined) {
         errors.price = "price is required";
-    } else if (typeof price !== 'number' || price < 0) {
+    } else if (isNaN(numericPrice) || numericPrice < 0) {
         errors.price = "price must be a non-negative number";
     }
     if(!category) {
         errors.category = "category is required";
+    }
+    if(!image) {
+        errors.image = "image is required";
     }
 
     // sent the errors to the client if there are any
@@ -203,7 +215,7 @@ const addProductToMenu = (req, res) => {
     }
     
     //create a new product object
-    const newProduct = new Product(null, name, price, restaurant.id);
+    const newProduct = new Product(null, name, description, category, numericPrice, image, restaurant.id);
     
     //add the product to the restaurant menu
     const savedProduct = restaurant.addProduct(newProduct);
@@ -231,6 +243,9 @@ const getProductById = (req, res) => {
     //error if the product don't exist
     if (!product) {
         return res.status(404).json({ error: "Product not found" });
+    }
+    if (product.views === undefined || product.views === null) {
+        product.views = 0;
     }
     product.views += 1;
     // If the user is logged in, send his product view to the recommendation server
@@ -266,6 +281,7 @@ const updateProduct = (req, res) => {
     //update the product details that sent in the request body
     if (req.body.name) product.name = req.body.name;
     if (req.body.price) product.price = req.body.price;
+    if (req.body.image) product.image = req.body.image;
     
     //return the updated product details
     res.json(product);
@@ -406,14 +422,21 @@ const getNearbyRestaurants = (req, res) => {
     const userId = Number(req.headers['userid']);
     const user = dataRepository.getUser(userId);
 
-    if (!user) {
+    // Make sure the user has a valid address before trying to calculate
+    if (!user || !user.address || user.address.latitude == null || user.address.longitude == null) {
         return res.json(dataRepository.getAllRestaurants().slice(0, 20));
     }
 
     const allRestaurants = dataRepository.getAllRestaurants();
 
-    
     let calculatedRestaurants = allRestaurants.map(restaurant => {
+        // Protect against missing restaurant addresses
+        if (!restaurant.address || restaurant.address.latitude == null || restaurant.address.longitude == null) {
+            return {
+                ...restaurant,
+                distanceFromUser: Infinity // Push to the end of the sorted list
+            };
+        }
         
         const calculatedDistance = calculateSimpleDistance(
             user.address.latitude,   
@@ -428,14 +451,10 @@ const getNearbyRestaurants = (req, res) => {
         };
     });
 
-   
     calculatedRestaurants = genericBubbleSort(calculatedRestaurants, 'distanceFromUser', false);
-
     const top20Closest = calculatedRestaurants.slice(0, 20);
 
-
     res.json(top20Closest);
-   
 };
 
 module.exports = {

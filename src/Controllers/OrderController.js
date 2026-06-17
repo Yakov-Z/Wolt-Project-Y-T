@@ -7,6 +7,11 @@ const { sendCommand } = require('../Services/tcpClient');
 const createOrder = (req, res) => {
     //get the user object from the request
     const user = req.user;
+    const userId = req.user.id;
+    const realUser = dataRepository.getUser(userId);
+    if (!realUser) {
+        return res.status(404).json({ error: "User not found" });
+    }
 
     //get the order details from the request body
     const { products, restaurant } = req.body;
@@ -31,7 +36,10 @@ const createOrder = (req, res) => {
 
     //save the order to the data repository
     const savedOrder = dataRepository.addOrder(newOrder);
-    user.orders.push(newOrder);
+    if (!realUser.orders) {
+        realUser.orders = [];
+    }
+    realUser.orders.push(newOrder);
 
     // If there are products, send to the old server
     if (products && Array.isArray(products) && products.length > 0) {
@@ -74,7 +82,9 @@ const getOrderById = (req, res) => {
      if (order.userID !== user.id) {
         return res.status(403).json({ error: "no permission" });
     }
-
+    if (!order.productsIDs) {
+        order.productsIDs = [];
+    }
     //return the order details
     res.status(200).json(order);
 };
@@ -83,6 +93,12 @@ const getOrderById = (req, res) => {
 const deleteOrder = (req, res) => {
     //get the user object from the request
     const user = req.user;
+    
+    // FIX: Get the REAL user from the database to update their orders array
+    const realUser = dataRepository.getUser(user.id);
+    if (!realUser) {
+        return res.status(404).json({ error: "User not found" });
+    }
     
     // ID is int in our implementation, so we convert it from string to number
     const id = Number(req.params.id);
@@ -99,17 +115,20 @@ const deleteOrder = (req, res) => {
     const productIds = order.productsIDs;
 
     if (productIds && productIds.length > 0) {      
-        sendCommand('delete', user.id, ...productIds);        
+        sendCommand('delete', realUser.id, ...productIds);        
     }
  
     //delete the order from the data repository
     const isDeleted = dataRepository.deleteOrder(id);
-    const newOrders = user.orders.filter(ord => ord.id !== order.id);
-    user.orders = newOrders;
     
     //error if the order don't exist
     if (!isDeleted) {
         return res.status(404).json({ error: "Order not found" });
+    }
+    
+    // FIX: Safely filter the orders from the REAL user
+    if (realUser.orders) {
+        realUser.orders = realUser.orders.filter(ord => ord.id !== order.id);
     }
     
     res.status(204).send();
@@ -137,7 +156,7 @@ const updateOrder = (req, res) => {
     if (!products && !restaurant) {
         return res.status(400).json({ error: "No data provided for update" });
     }
-
+    
     const targetRestaurantId = (restaurant && restaurant.id) ? restaurant.id : order.restaurantID;
 
     if (products !== undefined) {
