@@ -11,11 +11,12 @@ const SearchRoute = require('./Routes/SearchRoutes');
 const OrderRoute = require('./Routes/OrderRoutes');
 
 
-// Middleware to parse JSON bodies automatically
-app.use(express.json());
-
 const cors = require('cors');
-app.use(cors()); // Allows your React client to make API requests
+
+app.use(cors()); 
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Prefix all article routes with /api/articles
 app.use('/api/users', UserRoutes);
