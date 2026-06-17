@@ -103,6 +103,12 @@ export default function Navbar({ user, isDarkMode, toggleTheme, setUser }) {
                         <span>{displayAddress}</span>
                     </div>
 
+                    <div>
+                        <Link to="/orders/cart" className="cart-link">
+                            🛒 עגלת קניות
+                        </Link>
+                    </div>
+
                 </div>
 
                 <div className="navbar-center" style={{ position: 'relative' }}>
