@@ -4,11 +4,11 @@ import CustomButton from '../components/CustomButton';
 import '../components/Navbar/navbar.css';
 import { useNavigate } from 'react-router-dom';
 
-
 function RegisterPage() {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
+        confirmPassword: '', 
         realname: '',
         phonenumber: '',
         mail: '',
@@ -21,12 +21,12 @@ function RegisterPage() {
     });
     const [imageText, setImageText] = useState('');
 
-    // state to hold errors returned from the server
+    // State to hold errors returned from the server or local validation
     const [errors, setErrors] = useState({});
 
     const navigate = useNavigate();
 
-    // update the relevant field in the state when the user types
+    // Update the relevant field in the state when the user types
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -34,27 +34,27 @@ function RegisterPage() {
             [name]: value
         }));
         
-        // clear the specific error when the user starts typing again
+        // Clear the specific error when the user starts typing again
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
         }
     };
 
     const handleFileChange = (event) => {
-        // Line 1: Get the first file that the user selected from their computer
+        // Get the first file that the user selected from their computer
         const file = event.target.files[0];
 
         if (file) {
-            // Line 2: Create a built-in browser object designed to read files
+            // Create a built-in browser object designed to read files
             const reader = new FileReader();
 
-            // Line 3: Define what happens asynchronousely WHEN the browser finishes reading the file
+            // Define what happens asynchronously WHEN the browser finishes reading the file
             reader.onloadend = () => {
-                // Line 4: Save the long text string (the result) into our state
+                // Save the long text string (the result) into our state
                 setImageText(reader.result);
             };
 
-            // Line 5: Tell the reader to start reading the file and convert it to a text URL (Base64)
+            // Tell the reader to start reading the file and convert it to a text URL (Base64)
             reader.readAsDataURL(file);
 
             if (errors.image) {
@@ -64,56 +64,65 @@ function RegisterPage() {
     };
 
     const handleSubmit = async () => {
-        const payload = {
-                username: formData.username,
-                password: formData.password,
-                realname: formData.realname,
-                phonenumber: formData.phonenumber,
-                mail: formData.mail,
-                image: imageText,
-                isadmin: formData.isadmin,
-                address: {
-                    city: formData.city,
-                    street: formData.street,
-                    number: formData.number,
-                    latitude: formData.latitude,
-                    longitude: formData.longitude
-                    
-                }
-            };
-
-    try {
-        const response = await fetch('http://localhost:5000/api/users/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
-
-        const data = await response.json();
-
-        // handle validation errors from the server (status 400)
-        if (!response.ok) {
-            if (data.errors) {
-                // map the server errors to our local state to display under the inputs
-                setErrors(data.errors);
-            } else {
-                console.error("General error:", data.message);
-            }
-            return; // stop execution if there are errors
+        // Local validation: Check if passwords match before sending to the server
+        if (formData.password !== formData.confirmPassword) {
+            setErrors(prev => ({
+                ...prev,
+                confirmPassword: 'הסיסמאות אינן תואמות'
+            }));
+            return; // Stop execution if passwords do not match
         }
 
-        navigate('/'); // redirect to home page after successful registration        
-    } catch (error) {
-        console.error('Error during registration:', error);
+        // Prepare the payload (omitting confirmPassword as the server doesn't need it)
+        const payload = {
+            username: formData.username,
+            password: formData.password,
+            realname: formData.realname,
+            phonenumber: formData.phonenumber,
+            mail: formData.mail,
+            image: imageText,
+            isadmin: formData.isadmin,
+            address: {
+                city: formData.city,
+                street: formData.street,
+                number: formData.number,
+                latitude: formData.latitude,
+                longitude: formData.longitude
+            }
+        };
+
+        try {
+            const response = await fetch('http://localhost:5000/api/users/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+
+            // Handle validation errors from the server (status 400)
+            if (!response.ok) {
+                if (data.errors) {
+                    // Map the server errors to our local state to display under the inputs
+                    setErrors(data.errors);
+                } else {
+                    console.error("General error:", data.message);
+                }
+                return; // Stop execution if there are errors
+            }
+
+            navigate('/'); // Redirect to home page after successful registration        
+        } catch (error) {
+            console.error('Error during registration:', error);
         }
     };
 
     return (
         <div className="container mt-2" style={{ maxWidth: '400px' }}>
             <div className="mx-auto" style={{ width: '60%' }}>
-            <h2 className="brand-name-big">Chikobyte</h2>
+                <h2 className="brand-name-big">Chikobyte</h2>
             </div>
             <h2 className="mb-4 text-center">פתח חשבון חדש ב-Chikobyte</h2>
             
@@ -132,6 +141,15 @@ function RegisterPage() {
                 onInputChange={handleChange}
                 size={2}
                 errorMessage={errors.password} 
+            />
+            {/* New Confirm Password InputBox */}
+            <InputBox 
+                name="confirmPassword"
+                text="וידוא סיסמה:"
+                inputValue={formData.confirmPassword}
+                onInputChange={handleChange}
+                size={2}
+                errorMessage={errors.confirmPassword} 
             />
 
             <InputBox 
@@ -159,65 +177,65 @@ function RegisterPage() {
                 errorMessage={errors.mail} 
             />
 
-           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
-            <input 
-                type="checkbox" 
-                name="isadmin" 
-                checked={formData.isadmin || false} 
-                onChange={(e) => handleChange({ 
-                    target: { 
-                        name: 'isadmin', 
-                        value: e.target.checked 
-                    } 
-                })} 
-                style={{ width: '18px', height: '18px', marginLeft: '10px' }}
-            />
-            <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדנ/ית?</label>
+            <div className="mb-3" style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
+                <input 
+                    type="checkbox" 
+                    name="isadmin" 
+                    checked={formData.isadmin || false} 
+                    onChange={(e) => handleChange({ 
+                        target: { 
+                            name: 'isadmin', 
+                            value: e.target.checked 
+                        } 
+                    })} 
+                    style={{ width: '18px', height: '18px', marginLeft: '10px' }}
+                />
+                <label style={{ margin: 0, fontWeight: 'bold' }}>מסעדנ/ית?</label>
             </div>
 
-<div className="mb-3">
-    {/* The Input Group to match the gray label box style */}
-    <div style={{ display: 'flex', direction: 'rtl', border: '1px solid #ced4da', borderRadius: '0.375rem', overflow: 'hidden' }}>
-        <div style={{ 
-            backgroundColor: '#f8f9fa', 
-            padding: '0.375rem 0.75rem', 
-            borderLeft: '1px solid #ced4da',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '30%', // Match the width of your other labels
-            color: '#495057'
-        }}>
-            תמונה:
-        </div>
-        <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleFileChange} 
-            style={{ 
-                flex: 1, 
-                padding: '0.375rem 0.75rem',
-                border: 'none',
-                outline: 'none',
-                direction: 'ltr' // Keeps the "Choose File" text looking standard
-            }} 
-        />
-    </div>
+            <div className="mb-3">
+                {/* The Input Group to match the gray label box style */}
+                <div style={{ display: 'flex', direction: 'rtl', border: '1px solid #ced4da', borderRadius: '0.375rem', overflow: 'hidden' }}>
+                    <div style={{ 
+                        backgroundColor: '#f8f9fa', 
+                        padding: '0.375rem 0.75rem', 
+                        borderLeft: '1px solid #ced4da',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '30%', // Match the width of your other labels
+                        color: '#495057'
+                    }}>
+                        תמונה:
+                    </div>
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileChange} 
+                        style={{ 
+                            flex: 1, 
+                            padding: '0.375rem 0.75rem',
+                            border: 'none',
+                            outline: 'none',
+                            direction: 'ltr' // Keeps the "Choose File" text looking standard
+                        }} 
+                    />
+                </div>
 
-    {errors.image && (
-        <div style={{
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            padding: '10px',
-            borderRadius: '0.375rem',
-            textAlign: 'center',
-            marginTop: '10px',
-            border: '1px solid #f5c2c7'
-        }}>
-            {errors.image}
-        </div>
-    )}
-</div>
+                {errors.image && (
+                    <div style={{
+                        backgroundColor: '#f8d7da',
+                        color: '#721c24',
+                        padding: '10px',
+                        borderRadius: '0.375rem',
+                        textAlign: 'center',
+                        marginTop: '10px',
+                        border: '1px solid #f5c2c7'
+                    }}>
+                        {errors.image}
+                    </div>
+                )}
+            </div>
 
             <h7 className="text-right">כתובת:</h7>
 
@@ -241,15 +259,13 @@ function RegisterPage() {
                 inputValue={formData.number}
                 onInputChange={handleChange}
                 size={2}
-                
             />
-             <InputBox 
+            <InputBox 
                 name="longitude"
                 text="קו אורך:"
                 inputValue={formData.longitude}
                 onInputChange={handleChange}
                 size={2}
-                
             />
             <InputBox 
                 name="latitude"
@@ -261,11 +277,11 @@ function RegisterPage() {
             />
 
             <div className="mx-auto" style={{ width: '30%' }}>
-            <CustomButton
-                text="הרשם"
-                colorId='1'
-                onClickHandler={handleSubmit}
-            />
+                <CustomButton
+                    text="הרשם"
+                    colorId='1'
+                    onClickHandler={handleSubmit}
+                />
             </div>
         </div>
     );
