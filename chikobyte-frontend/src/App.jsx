@@ -15,6 +15,8 @@ import OrderPage from './pages/OrderPage';
 import OrdersHistoryPage from './pages/OrderHistoryPage';
 import { CartProvider } from './pages/Context/CartContext';
 import CheckoutPage from './pages/CheckoutPage';
+import AddProductPage from './pages/AddProductPage';
+import UpdateProductPage from './pages/UpdateProductPage';
 
 
 function App() {
@@ -84,6 +86,22 @@ function App() {
             <AddRestaurantPage/>
           </ProtectedRoute>} 
         />
+
+        <Route path="/restaurant/:id/add-product"
+      element={
+       <ProtectedRoute user={user} isAdminRoute={true}>
+        <AddProductPage user={user} />
+         </ProtectedRoute>
+      } 
+      />
+
+      <Route path="/restaurant/:id/update-product/:productId" 
+     element={
+    <ProtectedRoute user={user} isAdminRoute={true}>
+      <UpdateProductPage user={user} />
+      </ProtectedRoute>
+    } 
+    />
 
         <Route path="/profile"
          element={

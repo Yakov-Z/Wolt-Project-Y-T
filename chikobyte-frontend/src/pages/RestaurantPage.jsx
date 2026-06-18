@@ -47,6 +47,42 @@ export default function RestaurantPage({ user }) {
         }
     };
 
+        const handleDeleteProduct = async (productId) => {
+        if (!window.confirm("האם אתה בטוח שברצונך למחוק מנה זו מהתפריט?")) {
+            return;
+        }
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            alert('שגיאה: אינך מחובר למערכת.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/restaurants/${id}/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+               
+                setFullRestaurantData(prev => ({
+                    ...prev,
+                    menu: prev.menu.filter(product => product.id !== productId)
+                }));
+            } else {
+                const data = await response.json();
+                alert(`שגיאה במחיקה: ${data.error || 'Failed to delete product'}`);
+            }
+        } catch (err) {
+            console.error("Error deleting product:", err);
+            alert("אירעה שגיאת תקשורת בעת המחיקה.");
+        }
+    };
+
     useEffect(() => {
         const fetchRestaurantDetails = async () => {
             try {
@@ -139,9 +175,19 @@ export default function RestaurantPage({ user }) {
                 )}
             </div>
 
-            <h2 style={{ marginBottom: '20px', color: '#333', borderBottom: '2px solid #007bff', display: 'inline-block', paddingBottom: '5px' }}>
-                תפריט המסעדה
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '2px solid #007bff', paddingBottom: '10px' }}>
+            <h2 style={{ margin: 0, color: '#333' }}>
+             תפריט המסעדה
             </h2>
+    
+            {user && user.isadmin && user.id === fullRestaurantData.owner?.id && (
+                <CustomButton 
+                 text="הוסף מנה +" 
+                 colorId="1" 
+                onClickHandler={() => navigate(`/restaurant/${id}/add-product`)}
+            />
+                )}
+            </div>
 
             {!fullRestaurantData.menu || fullRestaurantData.menu.length === 0 ? (
                 <p style={{ textAlign: 'center', color: '#777', marginTop: '20px' }}>אין כרגע מנות בתפריט.</p>
@@ -149,7 +195,8 @@ export default function RestaurantPage({ user }) {
                 <div style={{ 
                     display: 'grid', 
                     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-                    gap: '20px' 
+                    gap: '20px',
+                    marginBottom: '20px'
                 }}>
                     {fullRestaurantData.menu.map((product, index) => (
                         <div key={index} style={{ 
@@ -161,30 +208,49 @@ export default function RestaurantPage({ user }) {
                             flexDirection: 'column',
                             justifyContent: 'space-between',
                             transition: 'transform 0.2s',
-                            cursor: 'pointer'
                         }}>
                             <div>
+                                {product.image && <img src={product.image} alt={product.name} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '10px' }} />}
                                 <h3 style={{ margin: '0 0 10px 0', fontSize: '1.3rem', color: '#222' }}>{product.productName || product.name}</h3>
                                 <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{product.description}</p>
                             </div>
                             
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#333' }}>
-                                    ₪{product.price}
-                                </span>
-                                <button style={{ 
-                                    backgroundColor: '#28a745', 
-                                    color: 'white', 
-                                    border: 'none', 
-                                    padding: '8px 15px', 
-                                    borderRadius: '5px',
-                                    fontWeight: 'bold',
-                                    cursor: 'pointer'
-                                }} 
-                                onClick={() => addToCart(product, fullRestaurantData)}
-                                >
-                                    הוסף לעגלה
-                                </button>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#333' }}>
+                                        ₪{product.price}
+                                    </span>
+                                    <button style={{ 
+                                        backgroundColor: '#28a745', 
+                                        color: 'white', 
+                                        border: 'none', 
+                                        padding: '8px 15px', 
+                                        borderRadius: '5px',
+                                        fontWeight: 'bold',
+                                        cursor: 'pointer' 
+                                    }} 
+                                    onClick={() => addToCart(product, fullRestaurantData)}
+                                    >
+                                        הוסף לעגלה
+                                    </button>
+                                </div>
+
+                                {user && user.isadmin && user.id === fullRestaurantData.owner?.id && (
+                                    <div style={{ display: 'flex', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '10px' }}>
+                                        <button 
+                                            type="button"
+                                            onClick={() => navigate(`/restaurant/${id}/update-product/${product.id}`)}
+                                            style={{ flex: 1, backgroundColor: '#007bff', color: 'white', border: 'none', padding: '6px', borderRadius: '5px', cursor: 'pointer' }}>
+                                            עדכן מנה
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => handleDeleteProduct(product.id)}
+                                            style={{ flex: 1, backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '6px', borderRadius: '5px', cursor: 'pointer' }}>
+                                            מחק מנה
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
