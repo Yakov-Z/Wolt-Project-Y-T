@@ -86,21 +86,19 @@ export const CartProvider = ({ children }) => {
 
     // Remove item from cart by its index
     const removeFromCart = (indexToRemove) => {
-        setCart((prevCart) => {
-            const productToRemove = prevCart[indexToRemove];
+            const productToRemove = cart[indexToRemove];
             const itemPrice = Number(productToRemove.price) || 0;
             
+            const newCart = cart.filter((_, index) => index !== indexToRemove);
+            setCart(newCart);
+
             // Safely subtract the price
             setFullPrice((prevPrice) => Math.max(0, prevPrice - itemPrice));
-            
-            const newCart = prevCart.filter((_, index) => index !== indexToRemove);
-            
+                       
             // Clear restaurant lock if cart is empty, so they can switch easily
             if (newCart.length === 0) {
                 setCartRestaurant(null);
             }
-            return newCart;
-        });
     };
 
     // Load an existing order into the cart for editing
