@@ -36,7 +36,7 @@ We use Docker and Docker Compose to containerize the environments, ensuring seam
 3. Wait for the containers to initialize. You should see logs indicating the C++ server and Node.js server are listening.
 4. Open your web browser and navigate to: **`http://localhost:5000`**
 
-📸 *[INSERT SCREENSHOT HERE: Terminal showing a successful `docker-compose up --build` execution with containers running]*
+![הרצת קונטיינרים מוצלחת](./screenshots/1.png)
 
 ---
 
@@ -47,30 +47,43 @@ To interact with the platform, users must authenticate.
 * **Registration:** New users can sign up by providing their details, including a profile picture and a secure password (enforced by strict validation).
 * **Login:** Returning users log in to receive a JWT token, which is securely used for all subsequent API calls.
 
-📸 *[INSERT SCREENSHOT HERE: The Registration/Login screen showing validation errors (e.g., "Password too short")]*
+![הרשמה לא מוצלחת](./screenshots/2.png)
+![התחברות לא מוצלחת](./screenshots/3.png)
 
 ### 2. Home Page & Discovery
 Once logged in, the user lands on the main dashboard. 
 * Here, users can browse available restaurants fetched dynamically from the server.
 * **Theme Toggle:** Users can switch between Light and Dark modes using the toggle in the top navigation bar.
 
-📸 *[INSERT SCREENSHOT HERE: Home page displaying restaurants in Dark Mode]*
+![מסך הבית](./screenshots/4.png)
 
-### 3. Placing an Order
+### 3. Restaurant Owner Panel (Admin Exclusives)
+Users registered as Restaurant Owners gain access to dedicated management features:
+* **Create Restaurant:** Owners can open a new restaurant, defining its name, category, and address details.
+* **Edit Restaurant:** Owners can dynamically update their existing restaurant's information.
+* **Menu Management:** * **Add Products:** Owners can add new dishes to their restaurant's menu, specifying the price, description, and an image.
+  * **Edit Products:** Modify existing product details (such as updating prices or descriptions).
+  * **Delete Products:** Permanently remove items from the menu.
+
+![מסך הבית](./screenshots/5.png)
+![עריכת מסעדה ומוצרים](./screenshots/6.png)
+
+### 4. Placing an Order
 * Click on a restaurant to view its full menu.
 * Add items to your cart. The system prevents adding items from multiple restaurants simultaneously.
 * Navigate to the Checkout page to review the total price and place the order.
 
-📸 *[INSERT SCREENSHOT HERE: The Checkout page showing the cart contents and total price]*
+![צ'קאאוט](./screenshots/7.png)
 
-### 4. Order History & Editing
+### 5. Order History & Editing
 Users can view their past and active orders through the Order History page. 
 * **Edit Flow:** We implemented a seamless editing experience. By clicking "Edit Order", the original items are loaded back into the active cart, and the user is navigated back to the restaurant's menu. 
 * Users can add new items, or remove existing ones directly from the checkout cart.
 * Submitting the edited cart updates the existing order in the database via a `PATCH` request.
 
-📸 *[INSERT SCREENSHOT HERE: The Order History page]*
-📸 *[INSERT SCREENSHOT HERE: An alert/confirmation dialog showing the user entering "Edit Mode"]*
+![היסטוריית הזמנות](./screenshots/8.png)
+![עריכת הזמנה](./screenshots/9.png)
+
 
 ---
 **Developed for Advanced System Programming - Exercise 4**
