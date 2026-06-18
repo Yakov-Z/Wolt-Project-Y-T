@@ -59,7 +59,7 @@ Once logged in, the user lands on the main dashboard.
 
 ### 3. Restaurant Owner Panel (Admin Exclusives)
 Users registered as Restaurant Owners gain access to dedicated management features:
-* **Create Restaurant:** Owners can open a new restaurant, defining its name, category, and address details.
+* **Create Restaurant:** Owners can open a new restaurant by clicking in a specified button in the home page, defining its name, category, and address details.
 * **Edit Restaurant:** Owners can dynamically update their existing restaurant's information.
 * **Menu Management:** * **Add Products:** Owners can add new dishes to their restaurant's menu, specifying the price, description, and an image.
   * **Edit Products:** Modify existing product details (such as updating prices or descriptions).

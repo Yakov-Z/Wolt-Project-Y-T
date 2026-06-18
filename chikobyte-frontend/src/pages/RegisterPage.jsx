@@ -8,7 +8,7 @@ function RegisterPage() {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
-        confirmPassword: '', // Added confirm password field
+        confirmPassword: '', 
         realname: '',
         phonenumber: '',
         mail: '',
