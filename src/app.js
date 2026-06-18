@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 
 // Initialize the TCP socket connection to the legacy C++ server
 require('./Services/tcpClient');
@@ -24,6 +25,14 @@ app.use('/api/restaurants', RestaurantRoutes);
 app.use('/api/tokens', TokenRoute);
 app.use('/api/orders', OrderRoute);
 app.use('/api/search', SearchRoute);
+
+// Serve the static files from the React app
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Catch-all handler: any request that doesn't match an API route will be sent to the React app
+app.get(/(.*)/, (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'index.html'));
+});
 
 // Start server on port 3000
 app.listen(3000);
