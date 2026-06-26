@@ -1,70 +1,41 @@
-import { SymbolView } from 'expo-symbols';
-import { Link, Tabs } from 'expo-router';
-import { Platform, Pressable } from 'react-native';
+import { Tabs, useRouter } from 'expo-router'; 
+import { View, Text, Image, TouchableOpacity } from 'react-native'; 
+import { SafeAreaView } from 'react-native-safe-area-context'; 
+import { styles } from '../../styles/tabs._layout.styles'; 
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+export default function TabsLayout() { 
+  const router = useRouter();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: 'chevron.left.forwardslash.chevron.right',
-                android: 'code',
-                web: 'code',
-              }}
-              tintColor={color}
-              size={28}
-            />
+  return ( 
+    <View style={styles.wrapper}> 
+      <SafeAreaView style={styles.headerContainer} edges={['top']}> 
+        <View style={styles.headerContent}> 
+          <Text style={styles.logoText}>Chikobyte</Text> 
+          <TouchableOpacity onPress={() => router.push('/menu')}>
+            <Text style={{ fontSize: 24, paddingHorizontal: 10 }}>☰</Text>
+          </TouchableOpacity>
+        </View> 
+      </SafeAreaView> 
+      <Tabs screenOptions={{ headerShown: false }}> 
+        <Tabs.Screen name="index" options={{ 
+          tabBarLabel: 'Restaurants', 
+          tabBarIcon: ({ color, size }) => ( 
+            <Image 
+              source={require('../../assets/images/restaurant-icon.png')} 
+              style={{ width: size, height: size, tintColor: color }} 
+            /> 
+          ), 
+        }} /> 
+        <Tabs.Screen name="cart" options={{ 
+          tabBarLabel: 'Cart', 
+          tabBarIcon: ({ color, size }) => ( 
+            <Image 
+              source={require('../../assets/images/cart-icon.png')} 
+              style={{ width: size, height: size, tintColor: color }} 
+            /> 
           ),
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable style={{ marginRight: 15 }}>
-                {({ pressed }) => (
-                  <SymbolView
-                    name={{ ios: 'info.circle', android: 'info', web: 'info' }}
-                    size={25}
-                    tintColor={Colors[colorScheme].text}
-                    style={{ opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: 'chevron.left.forwardslash.chevron.right',
-                android: 'code',
-                web: 'code',
-              }}
-              tintColor={color}
-              size={28}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+        }} />
+      </Tabs> 
+    </View>
   );
 }
