@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Platform
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter,Stack } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { styles } from '../styles/profile.styles';
 import UserDetailItem from '../components/UserDetailItem';
@@ -86,6 +86,13 @@ export default function ProfileScreen() {
   // Render the actual profile using the fresh data
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+      <Stack.Screen 
+          options={{ 
+            title: 'פרופיל',
+            headerTitleAlign: 'center',
+            headerTintColor: '#00c2e8',
+          }} 
+        />
       <Text style={styles.title}>הפרופיל שלי</Text>
       
       {/* Centered Image Container */}

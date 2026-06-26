@@ -7,7 +7,7 @@ import {
   Platform,
   Alert
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import CustomInputBox from '../components/CustomInputBox';
 import { styles } from '../styles/register.styles';
 import { useAuth } from '../context/AuthContext';
@@ -79,6 +79,13 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={[styles.scrollContent, { justifyContent: 'center', flex: 1 }]}>
+        <Stack.Screen 
+          options={{ 
+            title: 'התחברות',
+            headerTitleAlign: 'center',
+            headerTintColor: '#00c2e8',
+          }} 
+        />
         
         <Text style={styles.brandName}>Chikobyte</Text>
         <Text style={styles.title}>התחבר ל-Chikobyte כדי להתחיל לחגוג!</Text>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 // Import the separated styles file
 import { styles } from '../styles/menu.styles';
 import { useAuth } from '../context/AuthContext';
@@ -18,6 +18,13 @@ export default function MenuScreen() {
   
   return (
     <View style={styles.container}>
+      <Stack.Screen 
+          options={{ 
+            title: 'תפריט אפשרויות',
+            headerTitleAlign: 'center',
+            headerTintColor: '#00c2e8',
+          }} 
+        />
         
         {user ? (
         <View style={styles.profileSection}>
@@ -47,6 +54,7 @@ export default function MenuScreen() {
             <TouchableOpacity style={styles.optionButton} onPress={() => router.push('/login')}>
               <Text style={styles.optionText}>התחבר</Text>
             </TouchableOpacity>
+            <View style={styles.divider} />
             <TouchableOpacity style={styles.optionButton} onPress={() => router.push('/register')}>
               <Text style={styles.optionText}>הירשם</Text>
             </TouchableOpacity>

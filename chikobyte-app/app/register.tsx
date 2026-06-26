@@ -9,7 +9,7 @@ import {
   Platform, 
   Image 
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { styles } from '../styles/register.styles';
 import CustomInputBox from '../components/CustomInputBox';
@@ -137,6 +137,13 @@ export default function RegisterScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Stack.Screen 
+          options={{ 
+            title: 'הרשמה',
+            headerTitleAlign: 'center',
+            headerTintColor: '#00c2e8',
+          }} 
+        />
         
         <Text style={styles.brandName}>Chikobyte</Text>
         <Text style={styles.title}>פתח חשבון חדש ב-Chikobyte</Text>
