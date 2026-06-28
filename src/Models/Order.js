@@ -1,11 +1,28 @@
-class Order {
-    constructor(id, userID, productsIDs, restaurantID, totalPrice) {
-        this.id = id;
-        this.userID = userID;
-        this.productsIDs = productsIDs;
-        this.restaurantID = restaurantID; 
-        this.totalPrice = totalPrice; 
-    }
-}
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-module.exports = Order;
+const OrderSchema = new Schema({
+   
+    userID: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'User',
+        required: true 
+    },
+
+    productsIDs: [{ 
+        type: Schema.Types.ObjectId, 
+        ref: 'Product' 
+    }],
+
+    restaurantID: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'Restaurant',
+        required: true 
+    },
+    totalPrice: { 
+        type: Number 
+        
+    }
+});
+
+module.exports = mongoose.model('Order', OrderSchema);

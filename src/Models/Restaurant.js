@@ -1,24 +1,47 @@
-class Restaurant {
-    constructor(id, owner, description, name, address, category, image, logo, kosher) {
-        this.id = id;
-        this.owner = owner;
-        this.description = description;
-        this.name = name;
-        this.address = address;
-        this.category = category;
-        this.image = image;
-        this.logo = logo;
-        this.kosher = kosher;
-        this.menu = [];
-        this.views = 0;
-        this.distanceFromUser = 0;
-    }
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const AddressData = require('./Address'); 
 
-   //add a product to the restaurant menu
-    addProduct(product) { 
-        this.menu.push(product);
-        return product;
+const RestaurantSchema = new Schema({
+    owner: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'User', 
+        required: true 
+    },
+    name: { 
+        type: String, 
+        required: true 
+    },
+    description: { 
+        type: String, 
+        required: true 
+    },
+    address: AddressData, 
+    category: { 
+        type: String, 
+        required: true 
+    },
+    image: { 
+        type: String, 
+        required: true 
+    },
+    logo: { 
+        type: String, 
+        required: true 
+    },
+    kosher: { 
+        type: Boolean, 
+        required: true 
+    },
+    menu: [{ 
+        type: Schema.Types.ObjectId, 
+        ref: 'Product' 
+    }],
+    views: { 
+        type: Number, 
+        default: 0 
     }
-}
+   
+});
 
-module.exports = Restaurant;
+module.exports = mongoose.model('Restaurant', RestaurantSchema);
