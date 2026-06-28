@@ -1,34 +1,44 @@
-//connect to the data repository to get and manipulate user data
-const dataRepository = require('../Models/DataRepository');
+
+
 const User = require('../Models/User');
 const Address = require('../Models/address');
+const userService = require('../Services/userService');
+const mongoose = require('mongoose');
 const { sendCommand } = require('../Services/tcpClient');
 const jwt = require("jsonwebtoken");
 const key = "like in targilon 8";
 
 //get user by his ID, return the user profile
-const getUserProfile = (req, res) => {    
+const getUserProfile = async (req, res) => {    
     // ID is int in our implementation, so we convert it from string to number
-    const userId = Number(req.params.id);
-    if(Number(req.user.id) !== userId) {
+    const userId = req.params.id;
+    if(req.user.id !== userId) {
         return res.status(403).json({ error: "You are not authorized to view this profile" });
     }
-    const user = dataRepository.getUser(userId);
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ error: "Invalid user ID format" });
+    }
+
+    try {
+    const user = await userService.getUserById(userId);
 
     //error if the user don't exist
     if (!user) {
         return res.status(404).json({ error: "User not found" });
     }
    //return the user profile
-   // res.json(user);
-     const { password: userPassword, ...userWithoutPassword } = user;
+   const usercheck = user.toObject();
+     const { password: userPassword, ...userWithoutPassword } = usercheck;
      res.json(userWithoutPassword);
+     } catch (err) {
+        res.status(500).json({ error: "DB error" });
+    }
 };
 
 
-
 //register a new user, return the created user profile
-const registerUser = (req, res) => {
+const registerUser = async (req, res) => {
     //get the user details from the request body
     const { username, password, realname, phonenumber, mail, image, address, isadmin } = req.body;
 
@@ -66,9 +76,15 @@ const registerUser = (req, res) => {
    
     // ensure the username is unique in the system
     if (username && !errors.username) {
-        const isUsernameexist = Array.from(dataRepository.users.values()).some(u => u.username === username);
-        if (isUsernameexist) {
+        if (await userService.isUsernameTaken(username)) {
             errors.username = "Username is already taken";
+        }
+    }
+
+    // ensure the mail is unique in the system
+    if (mail && !errors.mail) {
+        if (await userService.isMailTaken(mail)) {
+            errors.mail = "Mail is already taken";
         }
     }
 
@@ -78,17 +94,26 @@ const registerUser = (req, res) => {
         return res.status(400).json({ errors }); 
     }
 
-    // create the user'a address object
-    const userAddress = new Address(address.city, address.street, address.number, address.latitude, address.longitude);
-    //create and save the new user to the data repository
-    const newUser = new User(null, username, password, realname, phonenumber, mail, image, userAddress, isadmin);
+    try {
+       
+        const newUser = await userService.register({
+            username,
+            password,
+            realname,
+            phonenumber,
+            mail,
+            image,
+            address,
+            isadmin
+        });
 
-    const savedUser = dataRepository.addUser(newUser);
+
+    const savedUser = newUser.toObject();
     // send the new user to old server by POST
-    sendCommand('post', savedUser.id, -1);
+    sendCommand('post', String(savedUser._id), -1);
 
     const token = jwt.sign(
-        { id: savedUser.id, username: savedUser.username }, // payload: data encoded in the token
+        { id: savedUser._id, username: savedUser.username }, // payload: data encoded in the token
         process.env.JWT_SECRET || 'מפתח-סופר-סודי', // secret key used to sign the token
         { expiresIn: '1h' } // token expiration time
     );
@@ -98,32 +123,43 @@ const registerUser = (req, res) => {
         user: userWithoutPassword, 
         token: token 
     });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "DB error" });
+    }
 };
 
 
 //login user by his username and password
-const loginUser = (req, res) => {
+const loginUser = async (req, res) => {
     
     //get the username and password from the request body
     const { username, password } = req.body;
     //check if the username and password are correct
-    const user = dataRepository.getUserByDetails(username, password);
+    try{
+    const user = await userService.getUserByDetails(username, password);
 
     //error if the username or password is incorrect
     if (!user) {
         return res.status(401).json({ error: "username and/or password is incorrect" });
     }
     //create a JWT token for the user and return it
-    const data = { id: user.id, username: user.username }; 
+    const data = { id: user._id, username: user.username }; 
     const token = jwt.sign(data, process.env.JWT_SECRET || 'מפתח-סופר-סודי');
 // Remove the password before sending the user object back
-    const { password: userPassword, ...userWithoutPassword } = user;
+    const userlogin = user.toObject();
+    const { password: userPassword, ...userWithoutPassword } = userlogin;
 
     // Send both token and the user details to the client
     res.status(200).json({ 
         token: token,
         user: userWithoutPassword 
     });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "DB error" });
+    }
 };
 
 //export the controller functions to be used in the routes

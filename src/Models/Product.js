@@ -1,15 +1,37 @@
-class Product {
-    constructor(id, name, description, category, price, image, restaurantID) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.category = category;
-        this.price = price;
-        this.image = image;
-        this.restaurantID = restaurantID;
-        this.views = 0;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const ProductSchema = new Schema({
+    name: { 
+        type: String, 
+        required: true 
+    },
+    description: { 
+        type: String, 
+        required: true 
+    },
+    category: { 
+        type: String, 
+        required: true 
+    },
+    price: { 
+        type: Number, 
+        required: true,
+        min: 0 
+    },
+    image: { 
+        type: String, 
+        required: true 
+    },
+    restaurantID: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'Restaurant',
+        required: true 
+    },
+    views: { 
+        type: Number, 
+        default: 0 
     }
-}
+});
 
-
-module.exports = Product;
+module.exports = mongoose.model('Product', ProductSchema);

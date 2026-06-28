@@ -1,8 +1,8 @@
-//connect to the data repository to get restaurant and product data
-const dataRepository = require('../Models/DataRepository');
+
+const Restaurant = require('../Models/Restaurant');
 
 //search for restaurants and products that match the search query
-const searchEntities = (req, res) => {
+const searchEntities = async (req, res) => {
 
     if (!req.params.query) {
         return res.json({ restaurants: [], products: [] });
@@ -11,8 +11,9 @@ const searchEntities = (req, res) => {
     //get the search query and convert it to lowercase for convenient search
     const query = req.params.query.toLowerCase();
     
+    try {
     //get all the restaurants from the data repository
-    const allRestaurants = dataRepository.getAllRestaurants();
+    const allRestaurants = await Restaurant.find();
     
     //create an object to store the search results for restaurants and products
     const searchResults = {
@@ -33,9 +34,9 @@ const searchEntities = (req, res) => {
             if (product.name.toLowerCase().includes(query)) {
                 //save the product details along with its restaurant
                 searchResults.products.push({
-                    restaurantId: restaurant.id,
+                    restaurantId: restaurant._id,
                     restaurantName: restaurant.name,
-                    productId: product.id,
+                    productId: product._id,
                     productName: product.name,
                     price: product.price
                 });
@@ -45,6 +46,9 @@ const searchEntities = (req, res) => {
 
     //return the search results
     res.json(searchResults);
+    } catch (err) {
+        res.status(500).json({ error: "Search error" });
+    }
 };
 
 module.exports = {

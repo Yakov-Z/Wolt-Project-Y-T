@@ -1,6 +1,14 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const mongoose = require('mongoose');
+
+require('custom-env').env(process.env.NODE_ENV, './config');
+
+mongoose.connect(process.env.CONNECTION_STRING,
+{
+useNewUrlParser: true,
+useUnifiedTopology: true });
 
 // Initialize the TCP socket connection to the legacy C++ server
 require('./Services/tcpClient');
