@@ -15,6 +15,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../context/AuthContext';
 import CustomInputBox from '../components/CustomInputBox';
 import { styles } from '../styles/createRestaurant.styles';
+import { BASE_URL } from '../config/apiConfig';
+
 
 // All the notes in the code should be in English
 export default function AddRestaurantScreen() {
@@ -80,7 +82,7 @@ export default function AddRestaurantScreen() {
       description: formData.description,
       image: imageText,
       logo: logoText,
-      owner: user, // Passed directly from the Context
+      owner: user.id,
       address: {
         city: formData.city,
         street: formData.street,
@@ -93,9 +95,8 @@ export default function AddRestaurantScreen() {
     };
 
     try {
-      const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
       
-      const response = await fetch(`${SERVER_URL}/api/restaurants/`, {
+      const response = await fetch(`${BASE_URL}/api/restaurants/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

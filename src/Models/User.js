@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const AddressData = require('./Address');
+const AddressData = require('./address');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -42,6 +42,13 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId, 
         ref: 'Product' 
     }]
+});
+UserSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        // Remove the internal version key
+        delete ret.__v;
+    }
 });
 
 module.exports = mongoose.model('User', UserSchema);

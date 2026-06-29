@@ -12,6 +12,7 @@ import { useRouter,Stack } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { styles } from '../styles/profile.styles';
 import UserDetailItem from '../components/UserDetailItem';
+import { BASE_URL } from '../config/apiConfig';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -32,10 +33,18 @@ export default function ProfileScreen() {
       }
 
       try {
-        // Handle localhost on Android Emulator vs iOS/Web
-        const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
+        const currentUserId = user.id || user._id;
         
-        const response = await fetch(`${SERVER_URL}/api/users/${user.id}`, {
+        // --- הוסף את ההדפסות האלה כאן ---
+        console.log("=== DEBUG INFO ===");
+        console.log("1. The User Object from Context:", user);
+        console.log("2. The Extracted ID:", currentUserId);
+        console.log("3. The Fetch URL:", `${BASE_URL}/api/users/${currentUserId}`);
+        console.log("4. Token exists?", !!token);
+        console.log("==================");
+        // ---------------------------------
+        // Handle localhost on Android Emulator vs iOS/Web        
+        const response = await fetch(`${BASE_URL}/api/users/${currentUserId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

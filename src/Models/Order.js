@@ -24,5 +24,12 @@ const OrderSchema = new Schema({
         
     }
 });
+OrderSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        // Remove the internal version key
+        delete ret.__v;
+    }
+});
 
 module.exports = mongoose.model('Order', OrderSchema);

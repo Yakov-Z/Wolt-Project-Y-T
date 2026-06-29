@@ -17,6 +17,7 @@ import { useAuth } from '../../../context/AuthContext';
 import CustomInputBox from '../../../components/CustomInputBox';
 // Reusing the exact same styles from the create screen since the form is identical!
 import { styles } from '../../../styles/createRestaurant.styles';
+import { BASE_URL } from '../../../config/apiConfig';
 
 // All the notes in the code should be in English
 export default function UpdateRestaurantScreen() {
@@ -47,8 +48,7 @@ export default function UpdateRestaurantScreen() {
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
-        const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-        const response = await fetch(`${SERVER_URL}/api/restaurants/${id}`);
+        const response = await fetch(`${BASE_URL}/api/restaurants/${id}`);
         
         if (response.ok) {
           const data = await response.json();
@@ -155,10 +155,8 @@ export default function UpdateRestaurantScreen() {
       }
     };
 
-    try {
-      const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-      
-      const response = await fetch(`${SERVER_URL}/api/restaurants/${id}`, {
+    try {      
+      const response = await fetch(`${BASE_URL}/api/restaurants/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
