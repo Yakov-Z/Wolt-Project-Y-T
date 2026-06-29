@@ -13,6 +13,7 @@ import { useRouter, Stack } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { styles } from '../styles/register.styles';
 import CustomInputBox from '../components/CustomInputBox';
+import { BASE_URL } from '../config/apiConfig';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -103,10 +104,8 @@ export default function RegisterScreen() {
       }
     };
 
-    try {
-      const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-      
-      const response = await fetch(`${SERVER_URL}/api/users/`, {
+    try {      
+      const response = await fetch(`${BASE_URL}/api/users/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

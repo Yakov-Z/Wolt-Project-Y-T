@@ -1,15 +1,16 @@
-
+const mongoose = require('mongoose');
 const Product = require('../Models/Product');
 const Restaurant = require('../Models/Restaurant');
-const Restaurant = require('../Models/Order');
-const Restaurant = require('../Models/User');
+const Order = require('../Models/Order');
+const User = require('../Models/User');
 const { sendCommand } = require('../Services/tcpClient');
 const { genericBubbleSort } = require('../Helpers/GenericBubbleSort');
 
-//get all the restaurants, return the list of restaurants
+// get all the restaurants, return the list of restaurants
 const getAllRestaurants = async (req, res) => {
     try {
-        const restaurants = await Restaurant.find();
+        // Populate the owner field with the user's realname, phonenumber, mail, and image
+        const restaurants = await Restaurant.find().populate('owner', 'realname phonenumber mail image');
         
         res.status(200).json(restaurants);
     } catch (err) {
@@ -17,49 +18,38 @@ const getAllRestaurants = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
-//add a new restaurant, return the created restaurant profile
+
+// add a new restaurant, return the created restaurant profile
 const createRestaurant = async (req, res) => {
-    //get the restaurant details from the request body
-    
+    // get the restaurant details from the request body
     const { name, address, category, description, owner, kosher, image, logo } = req.body;
+    
     // we will save the errors and sent them to the client if there are any
     let errors = {};
 
-    if(!name) {
-        errors.name = "name is required";
-    }
-    if(!description) {
-        errors.description = "description is required";
-    }
-    if(!owner) {
-        errors.owner = "owner is required";
-    }
-    if(!image) {
-        errors.image = "image is required";
-    }
-    if(!logo) {
-        errors.logo = "logo is required";
-    }
-    if(!category) {
-        errors.category = "category is required";
-    }
-    if(kosher == null || kosher == undefined) {
-        errors.kosher = "kosher status is required";
-    }
+    if(!name) errors.name = "name is required";
+    if(!description) errors.description = "description is required";
+    if(!owner) errors.owner = "owner is required";
+    if(!image) errors.image = "image is required";
+    if(!logo) errors.logo = "logo is required";
+    if(!category) errors.category = "category is required";
+    if(kosher == null || kosher == undefined) errors.kosher = "kosher status is required";
     if(!address || !address.city || !address.street || !address.number || address.latitude == null || address.longitude == null) {
         errors.address = "complete address is required";
-     }
+    }
 
-     // sent the errors to the client if there are any
+    // sent the errors to the client if there are any
     if (Object.keys(errors).length > 0) {
         return res.status(400).json({ errors }); 
     }
 
     try {
+        // Bulletproof check: Extract just the ID if the frontend accidentally sent the whole user object
+        const ownerId = typeof owner === 'object' ? (owner.id || owner._id) : owner;
 
-    //create and save the new restaurant to the data repository
-   const newRestaurant = new Restaurant({
-            owner: owner, 
+        // create and save the new restaurant to the data repository
+        const newRestaurant = new Restaurant({
+            owner: ownerId, // Use the extracted ID safely
             name: name,
             description: description,
             address: address,
@@ -68,10 +58,10 @@ const createRestaurant = async (req, res) => {
             logo: logo,
             kosher: kosher
         });
-    const savedRestaurant = await newRestaurant.save();
-    
-    //return the restaurant profile
-    res.status(201).json(savedRestaurant);
+        const savedRestaurant = await newRestaurant.save();
+        
+        // return the restaurant profile
+        res.status(201).json(savedRestaurant);
 
     } catch (err) {
         console.error(err);
@@ -79,117 +69,117 @@ const createRestaurant = async (req, res) => {
     }
 };
 
-//get restaurant by its ID, return the restaurant profile
+// get restaurant by its ID, return the restaurant profile
 const getRestaurantById = async (req, res) => {
-    try{
-     
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid restaurant ID format" });
         }
 
-    const restaurant = await Restaurant.findById(id);
-    if (!restaurant) {
-        return res.status(404).json({ error: "Restaurant not found" });
-    }
+        // Populate the owner field so the client gets the full user details
+        const restaurant = await Restaurant.findById(id).populate('owner', 'realname phonenumber mail image');
+        if (!restaurant) {
+            return res.status(404).json({ error: "Restaurant not found" });
+        }
 
-    if (restaurant.views === undefined || restaurant.views === null) {
-        restaurant.views = 0;
-    }
+        if (restaurant.views === undefined || restaurant.views === null) {
+            restaurant.views = 0;
+        }
 
-    // 3. NOW it's safe to increment
-    restaurant.views += 1;
+        // increment views safely
+        restaurant.views += 1;
+        await restaurant.save();
 
-    await restaurant.save();
-
-    //return the restaurant profile
-    res.json(restaurant);
+        // return the restaurant profile
+        res.json(restaurant);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-
-//change restaurant details by its ID
+// change restaurant details by its ID
 const updateRestaurant = async (req, res) => {
     try {
-     
-    const id = req.params.id;
+        const id = req.params.id;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid restaurant ID format" });
         }
 
-    const restaurant = await Restaurant.findById(id);
-    
-    //error if the restaurant don't exist
-    if (!restaurant) {
-        return res.status(404).json({ error: "Restaurant not found" });
-    }
-
-    if(String(restaurant.owner) != String(req.user.id)) {
-        return res.status(403).json({ error: "You are not the owner of this restaurant" });
-    }
-
-    //update the details that sent in the request body
-    if (req.body.name) restaurant.name = req.body.name;
-    if (req.body.address) {
-    restaurant.address = { ...restaurant.address, ...req.body.address };
+        const restaurant = await Restaurant.findById(id);
+        
+        // error if the restaurant don't exist
+        if (!restaurant) {
+            return res.status(404).json({ error: "Restaurant not found" });
         }
-    if (req.body.category) restaurant.category = req.body.category;
-    if (req.body.description) restaurant.description = req.body.description;
-    if (req.body.owner) restaurant.owner = req.body.owner;
-    if (req.body.kosher != null) restaurant.kosher = req.body.kosher;
-    if (req.body.image) restaurant.image = req.body.image;
-    if (req.body.logo) restaurant.logo = req.body.logo;
 
-     await restaurant.save();
+        // Use toString() to ensure we compare strings, handling both _id and id properly
+        if(restaurant.owner.toString() !== String(req.user.id)) {
+            return res.status(403).json({ error: "You are not the owner of this restaurant" });
+        }
 
-    //return the new restaurant profile
-    res.json(restaurant);
-     } catch (err) {
+        // update the details that sent in the request body
+        if (req.body.name) restaurant.name = req.body.name;
+        if (req.body.address) {
+            restaurant.address = { ...restaurant.address, ...req.body.address };
+        }
+        if (req.body.category) restaurant.category = req.body.category;
+        if (req.body.description) restaurant.description = req.body.description;
+        
+        // Bulletproof check for owner update just in case
+        if (req.body.owner) {
+            restaurant.owner = typeof req.body.owner === 'object' ? (req.body.owner.id || req.body.owner._id) : req.body.owner;
+        }
+        
+        if (req.body.kosher != null) restaurant.kosher = req.body.kosher;
+        if (req.body.image) restaurant.image = req.body.image;
+        if (req.body.logo) restaurant.logo = req.body.logo;
+
+        await restaurant.save();
+
+        // return the new restaurant profile
+        res.json(restaurant);
+    } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-//delete restaurant by its ID
+// delete restaurant by its ID
 const deleteRestaurant = async (req, res) => {
     try {
-    const id = req.params.id;
+        const id = req.params.id;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid restaurant ID format" });
         }
 
-    //delete the restaurant from the data repository
-    const restaurant = await Restaurant.findById(id);
-    if (!restaurant) {
-        return res.status(404).json({ error: "Restaurant not found" });
-    }
-    if(String(restaurant.owner) != String(req.user.id)) {
-        return res.status(403).json({ error: "You are not the owner of this restaurant" });
-    }
-    
-    const ordersToDelete = await Order.find({ restaurantID: id });
+        // delete the restaurant from the data repository
+        const restaurant = await Restaurant.findById(id);
+        if (!restaurant) {
+            return res.status(404).json({ error: "Restaurant not found" });
+        }
+        if(restaurant.owner.toString() !== String(req.user.id)) {
+            return res.status(403).json({ error: "You are not the owner of this restaurant" });
+        }
+        
+        const ordersToDelete = await Order.find({ restaurantID: id });
         const orderIds = ordersToDelete.map(order => order._id);
 
         for (const order of ordersToDelete) {
             const productIds = order.productsIDs; 
             
             if (productIds && productIds.length > 0) {
-                
                 const productIdsFordel = productIds.map(pid => String(pid));
                 sendCommand('delete', String(order.userID), ...productIdsFordel);
             }
         }
 
-       
         await Order.deleteMany({ restaurantID: id });
 
-       
         if (orderIds.length > 0) {
             await User.updateMany(
                 { orders: { $in: orderIds } }, 
@@ -197,221 +187,205 @@ const deleteRestaurant = async (req, res) => {
             );
         }
 
-    
-    await Product.deleteMany({ restaurantID: id });
-   
-    await Restaurant.findByIdAndDelete(id);
+        await Product.deleteMany({ restaurantID: id });
+        await Restaurant.findByIdAndDelete(id);
 
-    res.status(204).send();
-     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Server error" });
-    }
-};
-
-//get the menu of a restaurant by its ID, and the menu array
-const getRestaurantMenu = async (req, res) => {
-    try {
-    const id = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ error: "Invalid restaurant ID format" });
-        }
-
-    const restaurant = await Restaurant.findById(id).populate('menu');
-    
-     //error if the restaurant don't exist
-    if (!restaurant) {
-        return res.status(404).json({ error: "Restaurant not found" });
-    }
-    
-    //return the menu array
-    res.json(restaurant.menu);
+        res.status(204).send();
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-const addProductToMenu = async (req, res) => {
-    try{
-    const id = req.params.id;
+// get the menu of a restaurant by its ID, and the menu array
+const getRestaurantMenu = async (req, res) => {
+    try {
+        const id = req.params.id;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid restaurant ID format" });
         }
 
-    const restaurant = await Restaurant.findById(id);
-    
-    //error if the restaurant don't exist
-    if (!restaurant) {
-        return res.status(404).json({ error: "Restaurant not found" });
+        const restaurant = await Restaurant.findById(id).populate('menu');
+        
+        // error if the restaurant don't exist
+        if (!restaurant) {
+            return res.status(404).json({ error: "Restaurant not found" });
+        }
+        
+        // return the menu array
+        res.json(restaurant.menu);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
     }
+};
 
-    if(String(restaurant.owner) !== String(req.user.id)) {
+// add a product to the restaurant menu
+const addProductToMenu = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid restaurant ID format" });
+        }
+
+        const restaurant = await Restaurant.findById(id);
+        
+        // error if the restaurant don't exist
+        if (!restaurant) {
+            return res.status(404).json({ error: "Restaurant not found" });
+        }
+
+        if(restaurant.owner.toString() !== String(req.user.id)) {
             return res.status(403).json({ error: "You are not the owner of this restaurant" });
         }
-    
-    //get the product details from the request body
-    const { name, description, price, category, image } = req.body;
-    const numericPrice = Number(price);
+        
+        // get the product details from the request body
+        const { name, description, price, category, image } = req.body;
+        const numericPrice = Number(price);
 
-    // we will save the errors and sent them to the client if there are any
-    let errors = {};
-        if(!name) {
-        errors.name = "name is required";
-    }
-    if(price == null || price == undefined) {
-        errors.price = "price is required";
-    } else if (isNaN(numericPrice) || numericPrice < 0) {
-        errors.price = "price must be a non-negative number";
-    }
-    if(!category) {
-        errors.category = "category is required";
-    }
-    if(!image) {
-        errors.image = "image is required";
-    }
+        // we will save the errors and sent them to the client if there are any
+        let errors = {};
+        if(!name) errors.name = "name is required";
+        if(price == null || price == undefined) {
+            errors.price = "price is required";
+        } else if (isNaN(numericPrice) || numericPrice < 0) {
+            errors.price = "price must be a non-negative number";
+        }
+        if(!category) errors.category = "category is required";
+        if(!image) errors.image = "image is required";
 
-    // sent the errors to the client if there are any
-    if (Object.keys(errors).length > 0) {
-        return res.status(400).json({ errors }); 
-    }
-    
-    //create a new product object
-    const newProduct = new Product(null, name, description, category, numericPrice, image, restaurant.id);
-    const newProduct = new Product({ 
+        // sent the errors to the client if there are any
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ errors }); 
+        }
+        
+        // create a new product object
+        const newProduct = new Product({ 
             name: name,
             description: description,
             category: category,
-            image: image,
+            price: numericPrice, // Make sure to save the numeric price
             image: image,
             restaurantID: restaurant._id
         });
         const savedProduct = await newProduct.save();
-    
-    //add the product to the restaurant menu
+        
+        // add the product to the restaurant menu
         restaurant.menu.push(savedProduct._id);
         await restaurant.save();
-    
-    //return the added product
-    res.status(201).json(savedProduct);
+        
+        // return the added product
+        res.status(201).json(savedProduct);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-//get a specific product from the restaurant menu by the restaurant ID and the product ID
+// get a specific product from the restaurant menu by the restaurant ID and the product ID
 const getProductById = async (req, res) => {
     try {
-    const id = req.params.id;
-    const productId = req.params.pId;
-    
-     if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(productId)) {
+        const id = req.params.id;
+        const productId = req.params.pId;
+        
+        if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ error: "Invalid restaurant or product ID format" });
         }
-    const restaurant = await Restaurant.findById(id);
-    // Extracting user ID from the headers
-    const userId = req.headers['userid'];
+        
+        const restaurant = await Restaurant.findById(id);
+        const userId = req.headers['userid'];
 
-   
-
-    //error if the restaurant don't exist
-    if (!restaurant) 
-        return res.status(404).json({ error: "Restaurant not found" });
-    
-    //get the product from the restaurant menu
-    const product = await Product.findById(productId);
-    //error if the product don't exist
-    if (!product) {
-        return res.status(404).json({ error: "Product not found" });
-    }
-    if (product.views === undefined || product.views === null) {
-        product.views = 0;
-    }
-    product.views += 1;
-    await product.save();
-
-    // If the user is logged in, send his product view to the recommendation server
-    if(userId) {
-        const user = await User.findById(userId);
-        if(user) {
-            sendCommand('patch', user.id, productId); 
-            user.userview.push(productId);
-            await user.save();
+        // error if the restaurant don't exist
+        if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
+        
+        // get the product from the restaurant menu
+        const product = await Product.findById(productId);
+        
+        // error if the product don't exist
+        if (!product) return res.status(404).json({ error: "Product not found" });
+        
+        if (product.views === undefined || product.views === null) {
+            product.views = 0;
         }
-    }
-    //return the product details
-    res.json(product);
+        product.views += 1;
+        await product.save();
+
+        // If the user is logged in, send his product view to the recommendation server
+        if(userId) {
+            const user = await User.findById(userId);
+            if(user) {
+                sendCommand('patch', user.id, productId); 
+                user.userview.push(productId);
+                await user.save();
+            }
+        }
+        // return the product details
+        res.json(product);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-//update a specific product from the restaurant menu by the restaurant ID and the product ID
+// update a specific product from the restaurant menu by the restaurant ID and the product ID
 const updateProduct = async (req, res) => {
-    try{
-    
-    const id = req.params.id;
-    const productId = req.params.pId;
+    try {
+        const id = req.params.id;
+        const productId = req.params.pId;
 
-    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(productId)) {
+        if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ error: "Invalid restaurant or product ID format" });
         }
 
-    
-    const restaurant = await Restaurant.findById(id);
-    //error if the restaurant don't exist
-    if (!restaurant)
-         return res.status(404).json({ error: "Restaurant not found" });
-    
-    if(String(restaurant.owner) !== String(req.user.id)) {
+        const restaurant = await Restaurant.findById(id);
+        
+        // error if the restaurant don't exist
+        if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
+        
+        if(restaurant.owner.toString() !== String(req.user.id)) {
             return res.status(403).json({ error: "You are not the owner of this restaurant" });
         }
 
-   //search for the product in the restaurant menu
-    const product = await Product.findById(productId);
+        // search for the product in the restaurant menu
+        const product = await Product.findById(productId);
 
-     //error if the product don't exist
-    if (!product)
-         return res.status(404).json({ error: "Product not found" });
-    
-    //update the product details that sent in the request body
-    if (req.body.name) product.name = req.body.name;
-    if (req.body.price) product.price = req.body.price;
-    if (req.body.image) product.image = req.body.image;
+        // error if the product don't exist
+        if (!product) return res.status(404).json({ error: "Product not found" });
+        
+        // update the product details that sent in the request body
+        if (req.body.name) product.name = req.body.name;
+        if (req.body.price) product.price = req.body.price;
+        if (req.body.image) product.image = req.body.image;
 
-    await product.save();
-    
-    //return the updated product details
-    res.json(product);
+        await product.save();
+        
+        // return the updated product details
+        res.json(product);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-//delete a specific product from the restaurant menu by the restaurant ID and the product ID
+// delete a specific product from the restaurant menu by the restaurant ID and the product ID
 const deleteProduct = async (req, res) => {
     try {
-    const id_restaurant = req.params.id;
-    const productId = req.params.pId;
+        const id_restaurant = req.params.id;
+        const productId = req.params.pId;
 
-    if (!mongoose.Types.ObjectId.isValid(id_restaurant) || !mongoose.Types.ObjectId.isValid(productId)) {
+        if (!mongoose.Types.ObjectId.isValid(id_restaurant) || !mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ error: "Invalid restaurant or product ID format" });
         }
-    
-    //get the restaurant from the data repository
-    const restaurant = await Restaurant.findById(id_restaurant);
+        
+        // get the restaurant from the data repository
+        const restaurant = await Restaurant.findById(id_restaurant);
 
-    //error if the restaurant don't exist
-    if (!restaurant) {
-         return res.status(404).json({ error: "Restaurant not found" });
-    }
+        // error if the restaurant don't exist
+        if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
 
-    if (String(restaurant.owner) !== String(req.user.id)) {
+        if (restaurant.owner.toString() !== String(req.user.id)) {
             return res.status(403).json({ error: "You are not the owner of this restaurant" });
         }
 
@@ -420,41 +394,35 @@ const deleteProduct = async (req, res) => {
             return res.status(404).json({ error: "Product not found" });
         }
 
-    const affectedOrders = await Order.find({ productsIDs: productId });
+        const affectedOrders = await Order.find({ productsIDs: productId });
 
-    for (const order of affectedOrders) {
-   
-        order.productsIDs = order.productsIDs.filter(id => String(id) !== String(productId));
-    
-    
-        order.totalPrice -= product.price;
-        if (order.totalPrice < 0) order.totalPrice = 0;
-    
-        await order.save();
-   
-        sendCommand('delete', String(order.userID), String(productId));
-}
+        for (const order of affectedOrders) {
+            order.productsIDs = order.productsIDs.filter(id => String(id) !== String(productId));
+            order.totalPrice -= product.price;
+            if (order.totalPrice < 0) order.totalPrice = 0;
+            
+            await order.save();
+            sendCommand('delete', String(order.userID), String(productId));
+        }
 
+        const usersWhoViewed = await User.find({ userview: productId });
 
-    const usersWhoViewed = await User.find({ userview: productId });
+        for (const user of usersWhoViewed) {
+            sendCommand('delete', String(user._id), String(productId));
+        }
 
-    for (const user of usersWhoViewed) {
-        sendCommand('delete', String(user._id), String(productId));
-    }
+        await User.updateMany(
+            { userview: productId },
+            { $pull: { userview: productId } }
+        );
 
+        restaurant.menu.pull(productId);
+        await restaurant.save();
 
-    await User.updateMany(
-        { userview: productId },
-        { $pull: { userview: productId } }
-    );
+        await Product.findByIdAndDelete(productId);
 
-    restaurant.menu.pull(productId);
-    await restaurant.save();
-
-    await Product.findByIdAndDelete(productId);
-
-    res.status(204).send();
-     } catch (err) {
+        res.status(204).send();
+    } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
@@ -462,33 +430,31 @@ const deleteProduct = async (req, res) => {
 
 const getPopularProducts = async (req, res) => {
     try {
-    const id = req.params.id;
+        const id = req.params.id;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid restaurant ID format" });
         }
 
-    const restaurant = await Restaurant.findById(id).populate('menu');
-    
-    if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
+        const restaurant = await Restaurant.findById(id).populate('menu');
+        
+        if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
 
-   
-    const topProducts = genericBubbleSort(restaurant.menu, 'views', true).slice(0, 3);
-    res.json(topProducts);
+        const topProducts = genericBubbleSort(restaurant.menu, 'views', true).slice(0, 3);
+        res.json(topProducts);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-
-
 const getPopularRestaurants = async (req, res) => {
     try {
-        
+        // Populate the owner field
         const popularRestaurants = await Restaurant.find()
             .sort({ views: -1 })
-            .limit(20);
+            .limit(20)
+            .populate('owner', 'realname phonenumber mail image');
 
         res.status(200).json(popularRestaurants);
     } catch (err) {
@@ -497,19 +463,15 @@ const getPopularRestaurants = async (req, res) => {
     }
 };
 
-
 const getExistingCategories = async (req, res) => {
     try {
-    
-    const categories = await Restaurant.distinct('category');
-    
-    res.json(categories);
+        const categories = await Restaurant.distinct('category');
+        res.json(categories);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
-
 
 const calculateSimpleDistance = (lat1, lon1, lat2, lon2) => {
     const x = lat2 - lat1;
@@ -522,44 +484,44 @@ const calculateSimpleDistance = (lat1, lon1, lat2, lon2) => {
 
 const getNearbyRestaurants = async (req, res) => {
     try {
-    const userId = req.headers['userid'];
-    const user = await User.findById(userId);
+        const userId = req.headers['userid'];
+        const user = await User.findById(userId);
 
-    const allRestaurants = await Restaurant.find({});
+        // Populate the owner field so nearby restaurants have full owner details
+        const allRestaurants = await Restaurant.find({}).populate('owner', 'realname phonenumber mail image');
 
-    // Make sure the user has a valid address before trying to calculate
-    if (!user || !user.address || user.address.latitude == null || user.address.longitude == null) {
-        return res.json(allRestaurants.slice(0, 20));
-    }
+        // Make sure the user has a valid address before trying to calculate
+        if (!user || !user.address || user.address.latitude == null || user.address.longitude == null) {
+            return res.json(allRestaurants.slice(0, 20));
+        }
 
+        let calculatedRestaurants = allRestaurants.map(restaurant => {
+            // Protect against missing restaurant addresses
+            if (!restaurant.address || restaurant.address.latitude == null || restaurant.address.longitude == null) {
+                return {
+                    ...restaurant.toObject(),
+                    distanceFromUser: Infinity // Push to the end of the sorted list
+                };
+            }
+            
+            const calculatedDistance = calculateSimpleDistance(
+                user.address.latitude,   
+                user.address.longitude,  
+                restaurant.address.latitude, 
+                restaurant.address.longitude
+            );
 
-    let calculatedRestaurants = allRestaurants.map(restaurant => {
-        // Protect against missing restaurant addresses
-        if (!restaurant.address || restaurant.address.latitude == null || restaurant.address.longitude == null) {
             return {
                 ...restaurant.toObject(),
-                distanceFromUser: Infinity // Push to the end of the sorted list
+                distanceFromUser: Number(calculatedDistance.toFixed(1))
             };
-        }
-        
-        const calculatedDistance = calculateSimpleDistance(
-            user.address.latitude,   
-            user.address.longitude,  
-            restaurant.address.latitude, 
-            restaurant.address.longitude
-        );
+        });
 
-        return {
-            ...restaurant.toObject(),
-            distanceFromUser: Number(calculatedDistance.toFixed(1))
-        };
-    });
+        calculatedRestaurants = genericBubbleSort(calculatedRestaurants, 'distanceFromUser', false);
+        const top20Closest = calculatedRestaurants.slice(0, 20);
 
-    calculatedRestaurants = genericBubbleSort(calculatedRestaurants, 'distanceFromUser', false);
-    const top20Closest = calculatedRestaurants.slice(0, 20);
-
-    res.json(top20Closest);
-     } catch (err) {
+        res.json(top20Closest);
+    } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error" });
     }
@@ -581,5 +543,4 @@ module.exports = {
     getExistingCategories,
     getNearbyRestaurants,
     calculateSimpleDistance
-
 };

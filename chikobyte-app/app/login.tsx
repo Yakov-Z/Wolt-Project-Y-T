@@ -11,6 +11,7 @@ import { useRouter, Stack } from 'expo-router';
 import CustomInputBox from '../components/CustomInputBox';
 import { styles } from '../styles/register.styles';
 import { useAuth } from '../context/AuthContext';
+import { BASE_URL } from '../config/apiConfig';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -34,9 +35,8 @@ export default function LoginScreen() {
 
   const handleSubmit = async () => {
     try {
-      const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
       
-      const response = await fetch(`${SERVER_URL}/api/tokens`, {
+      const response = await fetch(`${BASE_URL}/api/tokens`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -56,7 +56,7 @@ export default function LoginScreen() {
       console.log("Login successful!");
 
       const userWithOnlyVitalDetails = {
-        id: data.user.id,
+        id: data.user._id || data.user.id,
         realname: data.user.realname,
         address: data.user.address,
         isadmin: data.user.isadmin,

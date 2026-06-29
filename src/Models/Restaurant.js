@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const AddressData = require('./Address'); 
+const AddressData = require('./address'); 
 
 const RestaurantSchema = new Schema({
     owner: { 
@@ -42,6 +42,13 @@ const RestaurantSchema = new Schema({
         default: 0 
     }
    
+});
+RestaurantSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        // Remove the internal version key
+        delete ret.__v;
+    }
 });
 
 module.exports = mongoose.model('Restaurant', RestaurantSchema);

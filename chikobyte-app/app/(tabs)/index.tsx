@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { BASE_URL } from '../../config/apiConfig';
 
 // Internal component for displaying a single restaurant
 const RestaurantCard = ({ restaurant }: { restaurant: any }) => { 
@@ -10,7 +11,7 @@ const RestaurantCard = ({ restaurant }: { restaurant: any }) => {
   return ( 
     // Navigate to the dynamic restaurant route when the card is pressed
     // Placeholder route until the final routing is implemented
-    <TouchableOpacity onPress={() => router.push(`/restaurants/${restaurant.id}` as any)}> 
+    <TouchableOpacity onPress={() => router.push(`/restaurants/${restaurant._id || restaurant.id}` as any)}>
       
       {/* Display restaurant image if available */}
       {restaurant.image && <Image source={{ uri: restaurant.image }} />} 
@@ -44,9 +45,8 @@ export default function RestaurantMockScreen() {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
         
-        const response = await fetch(`${SERVER_URL}/api/restaurants/`);
+        const response = await fetch(`${BASE_URL}/api/restaurants/`);
         const data = await response.json();
           
         setRestaurants(data);
