@@ -79,7 +79,9 @@ const getRestaurantById = async (req, res) => {
         }
 
         // Populate the owner field so the client gets the full user details
-        const restaurant = await Restaurant.findById(id).populate('owner', 'realname phonenumber mail image');
+        const restaurant = await Restaurant.findById(id)
+            .populate('owner', 'realname phonenumber mail image')
+            .populate('menu');
         if (!restaurant) {
             return res.status(404).json({ error: "Restaurant not found" });
         }
@@ -248,11 +250,17 @@ const addProductToMenu = async (req, res) => {
         // we will save the errors and sent them to the client if there are any
         let errors = {};
         if(!name) errors.name = "name is required";
-        if(price == null || price == undefined) {
+        
+        // added validation for description
+        if(!description) errors.description = "description is required";
+        
+        // checking if price is valid and strictly greater than 0
+        if(price === null || price === undefined || price === "") {
             errors.price = "price is required";
-        } else if (isNaN(numericPrice) || numericPrice < 0) {
-            errors.price = "price must be a non-negative number";
+        } else if (isNaN(numericPrice) || numericPrice <= 0) { 
+            errors.price = "price must be a number greater than 0";
         }
+        
         if(!category) errors.category = "category is required";
         if(!image) errors.image = "image is required";
 
@@ -356,6 +364,7 @@ const updateProduct = async (req, res) => {
         
         // update the product details that sent in the request body
         if (req.body.name) product.name = req.body.name;
+        if (req.body.description) product.description = req.body.description;
         if (req.body.price) product.price = req.body.price;
         if (req.body.image) product.image = req.body.image;
 
