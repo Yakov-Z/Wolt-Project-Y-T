@@ -23,6 +23,7 @@ export default function RestaurantScreen() {
   
   // Pull current user and token from Context
   const { user, token } = useAuth();
+  console.log(user);
   // const { addToCart } = useCart();
   
   const [fullRestaurantData, setFullRestaurantData] = useState<any>(null);  
@@ -148,8 +149,7 @@ export default function RestaurantScreen() {
   console.log("2. Restaurant Owner Data (from Server):", fullRestaurantData?.owner);
   console.log("-----------------------");
   // Helper check to verify if the current user is the owner
-  const isOwner = user && user.isadmin && user.id === fullRestaurantData?.owner?.id;
-
+  const isOwner = user && user.isadmin && Number(user.id) === Number(fullRestaurantData?.owner);
   if (isLoading) {
     return (
       <View style={styles.centerState}>

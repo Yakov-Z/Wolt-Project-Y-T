@@ -21,14 +21,14 @@ export default function HomeScreen() {
     const { user } = useAuth();
     const router = useRouter();
     const colorScheme = useColorScheme();
-    const isDarkMode = colorScheme === 'dark';
+    const isDarkMode = colorScheme === 'light';
 
     const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
 
     useEffect(() => {
         const fetchPopularRestaurants = async () => {
             try {
-                const response = await fetch(`${SERVER_URL}/api/restaurants/popular`);
+                const response = await fetch(`${BASE_URL}/api/restaurants/popular`);
                 if (response.ok) {
                     const data = await response.json();
                     setPopularRestaurants(data);
@@ -39,21 +39,27 @@ export default function HomeScreen() {
         };
 
         const fetchNearbyRestaurants = async () => {
-            try {
-                const headers = {};
-                if (user && user.id) {
-                    headers['userid'] = user.id;
-                }
-                
-                const response = await fetch(`${SERVER_URL}/api/restaurants/nearby`, { headers });
-                if (response.ok) {
-                    const data = await response.json();
-                    setNearbyRestaurants(data);
-                }
-            } catch (error) {
-                console.error("Error: Please try again later", error);
-            }
-        };
+    try {
+        
+        const requestHeaders = new Headers();
+        if (user && user.id) {
+            requestHeaders.append('userid', user.id);
+        }
+        
+        
+        const response = await fetch(`${BASE_URL}/api/restaurants/nearby`, { 
+            method: 'GET',
+            headers: requestHeaders 
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            setNearbyRestaurants(data);
+        }
+    } catch (error) {
+        console.error("Error fetching nearby:", error);
+    }
+};
         
         fetchPopularRestaurants();
         fetchNearbyRestaurants();
@@ -66,7 +72,7 @@ export default function HomeScreen() {
     const renderRestaurantCard = ({ item: restaurant }) => (
         <TouchableOpacity 
             style={[styles.restaurantCard, themeStyles.cardBackground]}
-            onPress={() => router.push(`/restaurant/${restaurant.id || restaurant._id}`)}
+            onPress={() => router.push(`/restaurants/${restaurant.id || restaurant._id}`)}
             activeOpacity={0.9}
         >
             <View style={styles.cardImageContainer}>
@@ -139,7 +145,7 @@ export default function HomeScreen() {
                         {user && user.isadmin && (
                             <View style={styles.adminPrompt}>
                                 <Text style={themeStyles.text}>רוצה לשווק את המסעדה המטורפת שלך?</Text>
-                                <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/add-restaurant')}>
+                                <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/createRestaurant')}>
                                     <Text style={styles.primaryBtnText}>לחץ כאן להוספת הלהיט הבא</Text>
                                 </TouchableOpacity>
                             </View>
@@ -169,7 +175,7 @@ export default function HomeScreen() {
                 {user && user.isadmin ? (
                     <TouchableOpacity 
                         style={styles.primaryBtn}
-                        onPress={() => router.push('/add-restaurant')}
+                        onPress={() => router.push('/createRestaurant')}
                     >
                         <Text style={styles.primaryBtnText}>בעל מסעדה? רוצה לכבוש את המדינה? לחץ כאן!</Text>
                     </TouchableOpacity>

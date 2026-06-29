@@ -1,0 +1,12 @@
+{"_e":"root:init","_t":1782734051388,"format":"v0-jsonl","version":"56.1.16"}
+{"_e":"env:mode","_t":1782734051390,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1782734051393,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1782734051892,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1782734053047,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1782734060166,"atlas":false,"workers":8,"host":"::","port":8081}
+{"_e":"root:init","_t":1782734454606,"format":"v0-jsonl","version":"56.1.16"}
+{"_e":"env:mode","_t":1782734454607,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1782734454610,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1782734454844,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1782734455214,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1782734460343,"atlas":false,"workers":8,"host":"::","port":8081}

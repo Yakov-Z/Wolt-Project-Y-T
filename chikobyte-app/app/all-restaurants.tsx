@@ -9,7 +9,9 @@ import {
     Platform,
     ScrollView
 } from 'react-native';
+
 import { useRouter } from 'expo-router';
+import { BASE_URL } from '../config/apiConfig';
 
 export default function AllRestaurants() {
     const [restaurants, setRestaurants] = useState([]);
@@ -25,8 +27,8 @@ export default function AllRestaurants() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const restaurantsRes = await fetch(`${SERVER_URL}/api/restaurants`);
-                const categoriesRes = await fetch(`${SERVER_URL}/api/restaurants/category`);
+                const restaurantsRes = await fetch(`${BASE_URL}/api/restaurants`);
+                const categoriesRes = await fetch(`${BASE_URL}/api/restaurants/category`);
                 
                 const restaurantsData = await restaurantsRes.json();
                 const categoriesData = await categoriesRes.json();
@@ -66,7 +68,7 @@ export default function AllRestaurants() {
     const renderRestaurant = ({ item: restaurant }) => (
         <TouchableOpacity 
             style={styles.restaurantCard}
-            onPress={() => router.push(`/restaurant/${restaurant.id || restaurant._id}`)}
+            onPress={() => router.push(`/restaurants/${restaurant.id || restaurant._id}`)}
             activeOpacity={0.9}
         >
             <View style={styles.cardImageContainer}>
