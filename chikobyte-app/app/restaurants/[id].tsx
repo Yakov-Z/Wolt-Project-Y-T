@@ -116,8 +116,7 @@ export default function RestaurantScreen() {
             }
 
             try {
-              const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-              const response = await fetch(`${SERVER_URL}/api/restaurants/${id}/products/${productId}`, {
+              const response = await fetch(`${BASE_URL}/api/restaurants/${id}/products/${productId}`, {
                 method: 'DELETE',
                 headers: {
                   'Content-Type': 'application/json',
@@ -263,7 +262,7 @@ export default function RestaurantScreen() {
                       Alert.alert("הוסף לעגלה", "פונקציונליות זו בבנייה");
                     }}
                   >
-                    <Text style={styles.addToCartText}>הוסף לעגלה</Text>
+                    <Text style={styles.addToCartText}>קנה</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -273,13 +272,13 @@ export default function RestaurantScreen() {
                       style={styles.adminUpdateBtn}
                       onPress={() => router.push(`/restaurants/${id}/updateProduct/${product.id || product._id}` as any)}
                     >
-                      <Text style={styles.adminBtnText}>עדכן מנה</Text>
+                      <Text style={styles.adminBtnText}>עדכן</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
                       style={styles.adminDeleteBtn}
                       onPress={() => handleDeleteProduct(product.id || product._id)}
                     >
-                      <Text style={styles.adminBtnText}>מחק מנה</Text>
+                      <Text style={styles.adminBtnText}>מחק</Text>
                     </TouchableOpacity>
                   </View>
                 )}
