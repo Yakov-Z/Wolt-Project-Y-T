@@ -53,7 +53,7 @@ export default function UpdateRestaurantScreen() {
         if (response.ok) {
           const data = await response.json();
           
-          const ownerId = data.owner;
+          const ownerId = data.owner.id;
           const currentUserId = user?.id
 
           if (String(ownerId) !== String(currentUserId)) {

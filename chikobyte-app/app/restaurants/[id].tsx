@@ -149,7 +149,8 @@ export default function RestaurantScreen() {
   console.log("2. Restaurant Owner Data (from Server):", fullRestaurantData?.owner);
   console.log("-----------------------");
   // Helper check to verify if the current user is the owner
-  const isOwner = user && user.isadmin && Number(user.id) === Number(fullRestaurantData?.owner);
+  const isOwner = user && user.isadmin && user.id === fullRestaurantData?.owner.id;
+  console.log(isOwner);
   if (isLoading) {
     return (
       <View style={styles.centerState}>

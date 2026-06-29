@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 // Update this IP address to match your machine's current network IP (from ipconfig)
-const CURRENT_NETWORK_IP = '10.51.67.46';
+const CURRENT_NETWORK_IP = '10.51.67.236';
 
 // Base URL configuration for all backend API fetch requests
 // Toggle the comments below depending on whether you are using a Physical Device or an Emulator
