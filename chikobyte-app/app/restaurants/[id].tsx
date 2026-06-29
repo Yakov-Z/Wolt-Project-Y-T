@@ -14,6 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 // import { useCart } from '../../context/CartContext'; 
 import UserDetailItem from '../../components/UserDetailItem'; // Reusing the detail row component
 import { styles } from '../../styles/restaurant.styles';
+import { BASE_URL } from '../../config/apiConfig';
 
 export default function RestaurantScreen() {
   const router = useRouter();
@@ -31,8 +32,7 @@ export default function RestaurantScreen() {
   useEffect(() => {
     const fetchRestaurantDetails = async () => {
       try {
-        const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-        const response = await fetch(`${SERVER_URL}/api/restaurants/${id}`, {
+        const response = await fetch(`${BASE_URL}/api/restaurants/${id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -72,8 +72,7 @@ export default function RestaurantScreen() {
             }
 
             try {
-              const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-              const response = await fetch(`${SERVER_URL}/api/restaurants/${id}`, {
+              const response = await fetch(`${BASE_URL}/api/restaurants/${id}`, {
                 method: 'DELETE',
                 headers: {
                   'Content-Type': 'application/json',

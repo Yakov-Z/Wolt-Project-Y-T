@@ -24,6 +24,7 @@
   "dependencies": {
     "bootstrap": "^5.3.8",
     "cors": "^2.8.6",
+    "custom-env": "^2.0.6",
     "expo-image-picker": "~56.0.18",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",

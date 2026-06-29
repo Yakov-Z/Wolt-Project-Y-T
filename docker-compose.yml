@@ -1,4 +1,11 @@
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: chikobyte_mongo
+    ports:
+      - "27017:27017" 
+    volumes:
+      - mongo_data:/data/db
   server_app:
     build: 
       context: .
@@ -9,21 +16,26 @@ services:
     command: ["./build/RecommenderApp", "8080"]
     stdin_open: true
     tty: true
+
   web_server:
     build:
       context: .
       dockerfile: Dockerfile.web_server
     ports:
-      # Map host port 3000 to container port 5000
+      # Map host port 5000 to container port 3000
       - "5000:3000"
     depends_on:
       - server_app
+      - mongodb
     environment:
       # This environment variable tells Node where the C++ server is
       - TCP_HOST=server_app
       - TCP_PORT=8080
+      - CONNECTION_STRING=mongodb://mongodb:27017/chikobyte
+      - NODE_ENV=development
     stdin_open: true
     tty: true
+
   tests:
     build: 
       context: .
@@ -33,6 +45,7 @@ services:
       - testing
     volumes:
       - ./data:/app/data
+
   # client_app:
   #   build: 
   #     context: .
@@ -43,3 +56,6 @@ services:
   #     - server_app
   #   stdin_open: true
   #   tty: true
+
+volumes:
+  mongo_data:

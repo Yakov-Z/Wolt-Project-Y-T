@@ -13,10 +13,10 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        // Verify the token using your secret key (make sure it matches the one used in login)
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'מפתח-סופר-סודי');
+        // Verify the token using the environment variable, with a consistent fallback
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'chikobyte-super-secret-key');
         
-        // Attach the decoded user data (like id and isadmin) to the request object
+        // Attach the decoded user data (like id and username) to the request object
         req.user = decoded;
         
         // Move to the next function (the actual controller)

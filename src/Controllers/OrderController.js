@@ -3,10 +3,10 @@ const User = require('../Models/User');
 const userService = require('../Services/userService');
 const { sendCommand } = require('../Services/tcpClient');
 
-//create a new order for the connected user
+// create a new order for the connected user
 const createOrder = async (req, res) => {
     try {
-        //get the user object from the request
+        // get the user object from the request
         const user = req.user;
         const userId = req.user.id;
         const realUser = await User.findById(userId);
@@ -14,7 +14,7 @@ const createOrder = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        //get the order details from the request body
+        // get the order details from the request body
         const { products, restaurant } = req.body;
         let totalPrice = 0;
 
@@ -23,7 +23,6 @@ const createOrder = async (req, res) => {
         }
 
         for(const product of products) {
-            
             const productRestaurantId = product.restaurantID || product.restaurantId;
             const restaurantId = restaurant._id || restaurant.id;
 
@@ -33,8 +32,7 @@ const createOrder = async (req, res) => {
             totalPrice += product.price;
         }
 
-        //create a new order object using the user ID from the user object
-        
+        // create a new order object using the user ID from the user object
         const productIDs = products.map(p => p._id || p.id);
         const restaurantID = restaurant._id || restaurant.id; 
 
@@ -45,7 +43,7 @@ const createOrder = async (req, res) => {
             totalPrice: totalPrice
         });
 
-        //save the order to the data repository
+        // save the order to the data repository
         const savedOrder = await newOrder.save();
         realUser.orders.push(savedOrder._id);
         await realUser.save();
@@ -55,23 +53,33 @@ const createOrder = async (req, res) => {
             sendCommand('patch', String(realUser._id), ...productIDs);     
         }
 
-        //return the created order with 201(created) status
+        // Populate the specific fields so the client receives the full object immediately
+        await savedOrder.populate([
+            { path: 'restaurantID', select: 'name image address' },
+            { path: 'productsIDs', select: 'name price image category' }
+        ]);
+
+        // return the created order with 201(created) status
         res.status(201).json(savedOrder);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
 
-//get all orders for the connected user
+// get all orders for the connected user
 const getUserOrders = async (req, res) => {
     try {
-        //get the user ID from the request
+        // get the user ID from the request
         const userId = req.user.id;
 
-        //get the user's orders from the DB
-        const userOrders = await userService.getUserOrders(userId);
+        // Instead of just relying on the userService, we fetch from the Order model directly 
+        // to easily chain the populate methods and return full details.
+        const userOrders = await Order.find({ userID: userId })
+            .populate('restaurantID', 'name image address')
+            .populate('productsIDs', 'name price image category');
 
-        //return the orders
+        // return the orders
         res.status(200).json(userOrders);
     } catch (err) {
         console.error(err);
@@ -79,16 +87,18 @@ const getUserOrders = async (req, res) => {
     }
 };
 
-//get a specific order by its ID
+// get a specific order by its ID
 const getOrderById = async (req, res) => {
     try {
         const user = req.user;
         const id = req.params.id;
 
-        //get the order from the DB
-        const order = await Order.findById(id);
+        // get the order from the DB and populate the related documents
+        const order = await Order.findById(id)
+            .populate('restaurantID', 'name image address')
+            .populate('productsIDs', 'name price image category');
 
-        //error if the order don't exist
+        // error if the order don't exist
         if (!order) {
             return res.status(404).json({ error: "Order not found" });
         }
@@ -97,7 +107,7 @@ const getOrderById = async (req, res) => {
             return res.status(403).json({ error: "no permission" });
         }
         
-        //return the order details
+        // return the order details
         res.status(200).json(order);
     } catch (err) {
         console.error(err);
@@ -105,10 +115,10 @@ const getOrderById = async (req, res) => {
     }
 }; 
 
-//delete order by its ID
+// delete order by its ID
 const deleteOrder = async (req, res) => {
     try {
-        //get the user object from the request
+        // get the user object from the request
         const user = req.user;
         
         const realUser = await User.findById(user.id);
@@ -130,11 +140,10 @@ const deleteOrder = async (req, res) => {
         const productIds = order.productsIDs;
 
         if (productIds && productIds.length > 0) {      
-            
             sendCommand('delete', String(realUser._id), ...productIds);        
         }
  
-        //delete the order from the DB
+        // delete the order from the DB
         await Order.findByIdAndDelete(id);
         
         realUser.orders.pull(id);
@@ -147,21 +156,20 @@ const deleteOrder = async (req, res) => {
     }
 };
 
-//update a specific order by the order ID
+// update a specific order by the order ID
 const updateOrder = async (req, res) => {
     try {
-        //get the user object from the request
+        // get the user object from the request
         const user = req.user;
 
         const id = req.params.id;
 
-        //get the order from the data repository
+        // get the order from the data repository
         const order = await Order.findById(id);
-        //error if the order don't exist
+        // error if the order don't exist
         if (!order)
              return res.status(404).json({ error: "Order not found" });
 
-        
         if (String(order.userID) !== String(user.id)) {
             return res.status(403).json({ error: "no permission" });
         }
@@ -172,12 +180,10 @@ const updateOrder = async (req, res) => {
             return res.status(400).json({ error: "No data provided for update" });
         }
         
-        
         const inputRestaurantId = restaurant ? (restaurant._id || restaurant.id) : null;
         const targetRestaurantId = inputRestaurantId ? inputRestaurantId : order.restaurantID;
 
         if (products !== undefined) {
-            
             if (!Array.isArray(products)) {
                 return res.status(400).json({ error: "products must be an array" });
             }
@@ -185,7 +191,6 @@ const updateOrder = async (req, res) => {
             let totalPrice = 0;
             
             for (const product of products) {
-                
                 const productRestId = product.restaurantID || product.restaurantId;
 
                 if(String(productRestId) !== String(targetRestaurantId)) {
@@ -193,7 +198,6 @@ const updateOrder = async (req, res) => {
                 }
                 totalPrice += product.price;
             }
-            
 
             order.productsIDs = products.map(p => p._id || p.id);
             order.totalPrice = totalPrice;
@@ -211,9 +215,16 @@ const updateOrder = async (req, res) => {
 
         await order.save();
         
-        //return the updated order details
+        // Populate before returning so the client sees the updated full objects
+        await order.populate([
+            { path: 'restaurantID', select: 'name image address' },
+            { path: 'productsIDs', select: 'name price image category' }
+        ]);
+
+        // return the updated order details
         res.status(200).json(order);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: "Server error" });
     }
 };
