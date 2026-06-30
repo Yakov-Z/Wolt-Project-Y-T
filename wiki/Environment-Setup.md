@@ -64,4 +64,6 @@ With the backend running, we can now launch the frontend.
 1. Ensure the app loads in the emulator without any network errors.
 2. Verify that the initial seeded restaurants ("Chiko Burger" and "Sushi Ninja") are visible on the home screen, confirming that the frontend is successfully communicating with the Dockerized backend and MongoDB database.
 
-![Succesful run](../screenshots/12.png)
+<p align="center">
+<td><img src="../screenshots/12.png" width="200" /></td>
+</p>
