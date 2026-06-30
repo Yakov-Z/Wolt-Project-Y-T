@@ -35,7 +35,10 @@ export default function MenuScreen() {
           <Text style={styles.userName}>שלום, {user.realname}!</Text>
         </View>
       ) : null}
-
+      <TouchableOpacity style={styles.optionButton} onPress={() => router.replace('/(tabs)')}>
+              <Text style={styles.optionText}>דף הבית</Text>
+            </TouchableOpacity>
+            <View style={styles.divider} />
       <View style={styles.optionsContainer}>
         {user ? (
           <>

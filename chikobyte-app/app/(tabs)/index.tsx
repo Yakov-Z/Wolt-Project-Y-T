@@ -20,8 +20,8 @@ export default function HomeScreen() {
     
     const { user } = useAuth();
     const router = useRouter();
-    const colorScheme = useColorScheme();
-    const isDarkMode = colorScheme === 'light';
+    const systemTheme = useColorScheme();
+    const [isDarkMode, setIsDarkMode] = useState(systemTheme === 'dark');
 
     const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
 
@@ -98,7 +98,14 @@ export default function HomeScreen() {
 
     return (
         <ScrollView style={[styles.container, themeStyles.container]} showsVerticalScrollIndicator={false}>
-            
+            <View style={styles.themeToggleContainer}>
+                <TouchableOpacity 
+                    style={[styles.themeBtn, themeStyles.cardBackground]} 
+                    onPress={() => setIsDarkMode(!isDarkMode)}
+                >
+                    <Text style={{ fontSize: 24 }}>{isDarkMode ? '☀️' : '🌙'}</Text>
+                </TouchableOpacity>
+            </View>
            
             <View style={styles.section}>
                 <View style={styles.sectionHeader}>
@@ -207,9 +214,9 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     sectionTitle: {
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: 'bold',
-        textAlign: 'left',
+        textAlign: 'right',
     },
     horizontalList: {
         paddingHorizontal: 20,
@@ -313,6 +320,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
+        textAlign: 'center',
     },
     outlineBtn: {
         backgroundColor: 'transparent',
@@ -328,6 +336,23 @@ const styles = StyleSheet.create({
         color: '#199cd3',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    themeToggleContainer: {
+        paddingHorizontal: 20,
+        marginBottom: 10,
+        alignItems: 'flex-start',
+    },
+    themeBtn: {
+        width: 45,
+        height: 45,
+        borderRadius: 22.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
 });
 
