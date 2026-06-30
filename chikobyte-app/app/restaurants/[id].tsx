@@ -15,16 +15,18 @@ import { useAuth } from '../../context/AuthContext';
 import UserDetailItem from '../../components/UserDetailItem'; // Reusing the detail row component
 import { styles } from '../../styles/restaurant.styles';
 import { BASE_URL } from '../../config/apiConfig';
+import { useCart } from '../../context/CartContext';
+
 
 export default function RestaurantScreen() {
   const router = useRouter();
   // Extract the dynamic ID from the URL path
   const { id } = useLocalSearchParams();
+  const { addToCart } = useCart();
   
   // Pull current user and token from Context
   const { user, token } = useAuth();
   console.log(user);
-  // const { addToCart } = useCart();
   
   const [fullRestaurantData, setFullRestaurantData] = useState<any>(null);  
   const [isLoading, setIsLoading] = useState(true);
@@ -149,6 +151,7 @@ export default function RestaurantScreen() {
   console.log("-----------------------");
   // Helper check to verify if the current user is the owner
   const isOwner = user && user.isadmin && user.id === fullRestaurantData?.owner.id;
+  const isLogged = user !== null;
   console.log(isOwner);
   if (isLoading) {
     return (
@@ -253,18 +256,18 @@ export default function RestaurantScreen() {
               </View>
               
               <View>
-                <View style={styles.productPriceRow}>
+                {isLogged && (<View style={styles.productPriceRow}>
                   <Text style={styles.productPrice}>₪{product.price}</Text>
                   <TouchableOpacity 
                     style={styles.addToCartButton}
-                    onPress={() => {
-                      // addToCart(product, fullRestaurantData)
-                      Alert.alert("הוסף לעגלה", "פונקציונליות זו בבנייה");
+                    onPress={() => {/*  */
+                      addToCart(product, fullRestaurantData)
+                      Alert.alert("הוסף לעגלה", "מוצר נוסף בהצלחה!");
                     }}
                   >
                     <Text style={styles.addToCartText}>קנה</Text>
                   </TouchableOpacity>
-                </View>
+                </View>)}
 
                 {isOwner && (
                   <View style={styles.adminButtonsRow}>
@@ -287,7 +290,13 @@ export default function RestaurantScreen() {
           ))}
         </View>
       )}
-
+      {isLogged && (<TouchableOpacity 
+            style={[styles.cartBadge, { alignItems: 'center', paddingVertical: 12 }]}
+            onPress={() => router.push(`/(tabs)/cart` as any)}
+          >
+            <Text style={[styles.badgeText, { fontSize: 16 }]}>עבור לעגלת הקניות</Text>
+          </TouchableOpacity>)}
+      
       {/* Admin Action Buttons */}
       {isOwner && (
         <View style={{ marginTop: 20, marginBottom: 40, gap: 10 }}>
