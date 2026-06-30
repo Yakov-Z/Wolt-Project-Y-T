@@ -8,7 +8,8 @@ import {
     StyleSheet, 
     Platform,
     ScrollView,
-    useColorScheme
+    useColorScheme,
+    TextInput
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
@@ -24,6 +25,36 @@ export default function HomeScreen() {
     const [isDarkMode, setIsDarkMode] = useState(systemTheme === 'dark');
 
     const SERVER_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState({ restaurants: [], products: [] });
+    const [isSearching, setIsSearching] = useState(false);
+
+        useEffect(() => {
+        if (searchTerm.trim() === '') {
+            setSearchResults({ restaurants: [], products: [] });
+            return;
+        }
+
+        setIsSearching(true);
+
+        const delayDebounceFn = setTimeout(async () => {
+            try {
+                const response = await fetch(`${BASE_URL}/api/search/${searchTerm}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setSearchResults(data); 
+                }
+            } catch (error) {
+                console.error("Error fetching search results:", error);
+            } finally {
+                setIsSearching(false);
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm]);
+
+    const hasResults = searchResults.restaurants.length > 0 || searchResults.products.length > 0;
 
     useEffect(() => {
         const fetchPopularRestaurants = async () => {
@@ -106,7 +137,59 @@ export default function HomeScreen() {
                     <Text style={{ fontSize: 24 }}>{isDarkMode ? '☀️' : '🌙'}</Text>
                 </TouchableOpacity>
             </View>
-           
+           {/* --- אזור החיפוש --- */}
+            <View style={styles.searchContainer}>
+                <TextInput 
+                    style={[styles.searchInput, themeStyles.cardBackground, themeStyles.text]}
+                    placeholder="מה אוכלים היום? 🔍"
+                    placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
+                    value={searchTerm}
+                    onChangeText={setSearchTerm}
+                />
+
+                {/* תצוגת תוצאות חיפוש */}
+                {hasResults && (
+                    <View style={[styles.searchResultsContainer, themeStyles.cardBackground]}>
+                        
+                        {/* מסעדות */}
+                        {searchResults.restaurants.length > 0 && (
+                            <View style={styles.searchSection}>
+                                <Text style={styles.searchSectionTitle}>מסעדות:</Text>
+                                {searchResults.restaurants.map((rest: any, index: number) => (
+                                    <TouchableOpacity 
+                                        key={`rest-${index}`} 
+                                        style={styles.searchItem}
+                                        onPress={() => router.push(`/restaurants/${rest.id || rest._id}`)}
+                                    >
+                                        <Text style={themeStyles.text}>🍽️ {rest.name}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        )}
+
+                        {/* מנות */}
+                        {searchResults.products.length > 0 && (
+                            <View style={styles.searchSection}>
+                                <Text style={styles.searchSectionTitle}>מנות:</Text>
+                                {searchResults.products.map((prod: any, index: number) => (
+                                    <TouchableOpacity 
+                                        key={`prod-${index}`} 
+                                        style={[styles.searchItem, { flexDirection: 'row-reverse', justifyContent: 'space-between' }]}
+                                        onPress={() => router.push(`/restaurants/${prod.restaurantId}`)}
+                                    >
+                                        <Text style={themeStyles.text}>{prod.productName || prod.name} - {prod.restaurantName}</Text>
+                                        <Text style={{ fontWeight: 'bold', color: '#0498d7' }}>₪{prod.price}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        )}
+                    </View>
+                )}
+                
+                {isSearching && (
+                    <Text style={[themeStyles.subText, { textAlign: 'center', marginTop: 5 }]}>מחפש...</Text>
+                )}
+            </View>
             <View style={styles.section}>
                 <View style={styles.sectionHeader}>
                     <Text style={[styles.sectionTitle, themeStyles.text]}>מסעדות קרובות אליך:</Text>
@@ -353,6 +436,50 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+    },
+    searchContainer: {
+        paddingHorizontal: 20,
+        marginBottom: 20,
+        zIndex: 10, // גורם לתוצאות להופיע מעל אלמנטים אחרים
+    },
+    searchInput: {
+        height: 50,
+        borderRadius: 25,
+        paddingHorizontal: 20,
+        fontSize: 16,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        textAlign: 'right', // כי אנחנו בעברית
+    },
+    searchResultsContainer: {
+        marginTop: 10,
+        borderRadius: 15,
+        padding: 10,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 5,
+    },
+    searchSection: {
+        marginBottom: 10,
+    },
+    searchSectionTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#888',
+        marginBottom: 5,
+        textAlign: 'right',
+        paddingHorizontal: 10,
+    },
+    searchItem: {
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
 });
 
