@@ -57,6 +57,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 20,
   },
+  cartBadge: {
+    backgroundColor: '#ffa600',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
   kosherBadge: {
     backgroundColor: '#28a745',
     paddingVertical: 5,

@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "styles/createRestaurant.styles.js", "styles/product.styles.js"  ]
+, "styles/createRestaurant.styles.js", "styles/product.styles.js", "styles/orders.styles.js"  ]
 }
