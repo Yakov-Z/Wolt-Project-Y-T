@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
+import { Alert } from 'react-native';
 
 interface CartContextType {
     cart: any[];
@@ -27,6 +28,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCartRestaurant(restaurant);
         setCart(prev => [...prev, product]);
         setFullPrice(prev => prev + Number(product.price));
+        Alert.alert("הוסף לעגלה", "מוצר נוסף בהצלחה!");
     };
 
     const removeFromCart = (index: number) => {
