@@ -3,9 +3,20 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 
+const seedDatabase = require('./seed');
+
 require('custom-env').env(process.env.NODE_ENV, path.join(__dirname, 'config'));
 
-mongoose.connect(process.env.CONNECTION_STRING);
+mongoose.connect(process.env.CONNECTION_STRING)
+    .then(() => {
+        console.log("Connected to MongoDB successfully");
+        
+        // Execute the seed script right after successful connection
+        seedDatabase(); 
+    })
+    .catch((err) => {
+        console.error("Failed to connect to MongoDB", err);
+    });
 
 // Initialize the TCP socket connection to the legacy C++ server
 require('./Services/tcpClient');

@@ -256,13 +256,12 @@ export default function RestaurantScreen() {
               </View>
               
               <View>
+                <Text style={styles.productPrice}>₪{product.price}</Text>
                 {isLogged && (<View style={styles.productPriceRow}>
-                  <Text style={styles.productPrice}>₪{product.price}</Text>
                   <TouchableOpacity 
                     style={styles.addToCartButton}
                     onPress={() => {/*  */
                       addToCart(product, fullRestaurantData)
-                      Alert.alert("הוסף לעגלה", "מוצר נוסף בהצלחה!");
                     }}
                   >
                     <Text style={styles.addToCartText}>קנה</Text>
