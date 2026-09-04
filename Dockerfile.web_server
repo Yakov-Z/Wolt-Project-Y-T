@@ -1,37 +1,14 @@
-# # Stage 1: Build the React frontend
-# FROM node:18 AS client-builder
-# WORKDIR /app/client
+# Stage 1: Build the React frontend
+FROM node:18 AS client-builder
+WORKDIR /app/client
 
-# # Copy package.json and install frontend dependencies
-# COPY ./chikobyte-frontend/package*.json ./
-# RUN npm install
+# Copy package.json and install frontend dependencies
+COPY ./chikobyte-frontend/package*.json ./
+RUN npm install
 
-# # Copy the rest of the React code and build the application
-# COPY ./chikobyte-frontend/ ./
-# RUN npm run build
-
-# # Use an official Node.js runtime as a parent image
-# FROM node:20-alpine
-
-# # Set the working directory in the container
-# WORKDIR /app/server
-
-# # Copy package.json and package-lock.json first (for better cacheing)
-# COPY package*.json ./
-# # Install project dependencies
-# RUN npm install
-
-# # Copy the rest of the application code
-# COPY . .
-
-# # Copy the built React static files from Stage 1 into a 'public' folder in the server
-# COPY --from=client-builder /app/client/build ./public
-
-# # Expose port 3000 (the port our Node server runs on)
-# EXPOSE 3000
-
-# # Start the Node.js application
-# CMD ["node", "src/app.js"]
+# Copy the rest of the React code and build the application
+COPY ./chikobyte-frontend/ ./
+RUN npm run build
 
 # Use an official Node.js runtime as a parent image
 FROM node:20-alpine
@@ -41,15 +18,38 @@ WORKDIR /app/server
 
 # Copy package.json and package-lock.json first (for better cacheing)
 COPY package*.json ./
-
 # Install project dependencies
 RUN npm install
 
 # Copy the rest of the application code
 COPY . .
 
-# Expose port 3000 (the port our Node server runs on internally)
+# Copy the built React static files from Stage 1 into a 'public' folder in the server
+COPY --from=client-builder /app/client/build ./public
+
+# Expose port 3000 (the port our Node server runs on)
 EXPOSE 3000
 
 # Start the Node.js application
 CMD ["node", "src/app.js"]
+
+# # Use an official Node.js runtime as a parent image
+# FROM node:20-alpine
+
+# # Set the working directory in the container
+# WORKDIR /app/server
+
+# # Copy package.json and package-lock.json first (for better cacheing)
+# COPY package*.json ./
+
+# # Install project dependencies
+# RUN npm install
+
+# # Copy the rest of the application code
+# COPY . .
+
+# # Expose port 3000 (the port our Node server runs on internally)
+# EXPOSE 3000
+
+# # Start the Node.js application
+# CMD ["node", "src/app.js"]

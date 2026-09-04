@@ -43,12 +43,20 @@ const UserSchema = new Schema({
         ref: 'Product' 
     }]
 });
-UserSchema.set('toJSON', {
+const transformOptions = {
     virtuals: true,
     transform: (doc, ret) => {
+        // Map the internal MongoDB _id to standard id
+        ret.id = ret._id;
+        
+        // Remove the internal MongoDB _id
+        delete ret._id;
+        
         // Remove the internal version key
         delete ret.__v;
     }
-});
+};
+UserSchema.set('toJSON', transformOptions);
+UserSchema.set('toObject', transformOptions);
 
 module.exports = mongoose.model('User', UserSchema);

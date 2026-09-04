@@ -36,7 +36,7 @@ function UpdateProductPage({ user }) {
                     }
                     
                     
-                    const productToUpdate = data.menu.find(p => p.id === Number(productId));
+                    const productToUpdate = data.menu.find(p => p.id === productId);
                     
                     if (productToUpdate) {
                         setFormData({

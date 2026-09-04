@@ -53,7 +53,7 @@ function LoginPage({ setUser }) {
             }
 
             console.log("Login successful!");
-                    
+            console.log("Data from server:", data);
             localStorage.setItem('token', data.token);
             
             const userWithOnlyVitalDetails = {
