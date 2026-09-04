@@ -26,11 +26,10 @@ export default function OrderPage({ user }) {
             navigate('/'); // Navigate to home to pick a new restaurant
         } else {
             // User stays in the same restaurant: load existing products
-            const productList = RestaurantData.menu || [];
-            
-            const fullProductsToEdit = (OrderData.productsIDs || [])
-                .map(productId => productList.find(p => p.id === productId))
-                .filter(p => p !== undefined);
+            const fullProductsToEdit = (OrderData.productsIDs || []).map(product => ({
+                ...product,
+                restaurantID: RestaurantData.id
+            }));
 
             loadOrderToCart(OrderData.id, fullProductsToEdit, RestaurantData, OrderData.totalPrice);
             
@@ -109,16 +108,15 @@ export default function OrderPage({ user }) {
                 }
 
                 setOrderData(orderResult);
-
+                const actualRestaurantId = orderResult.restaurantID?._id || orderResult.restaurantID?.id || orderResult.restaurantID;
                 // 2. Fetch the restaurant
-                const restaurantResponse = await fetch(`http://localhost:5000/api/restaurants/${orderResult.restaurantID}`, {
+                const restaurantResponse = await fetch(`http://localhost:5000/api/restaurants/${actualRestaurantId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}` 
                     }
                 });
-
                 const restaurantResult = await restaurantResponse.json();
 
                 if (restaurantResponse.ok) {
@@ -184,36 +182,27 @@ export default function OrderPage({ user }) {
                     </h3>
                     
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '30px' }}>
-                        {OrderData.productsIDs.map((productID, index) => {
-                            const productList = RestaurantData.menu || RestaurantData.products || [];
-                            const product = productList.find(p => p.id === productID);
-                            
-                            return product ? (
-                                <div key={index} style={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between', 
-                                    alignItems: 'center',
-                                    paddingBottom: '15px',
-                                    borderBottom: index !== OrderData.productsIDs.length - 1 ? '1px solid #f1f2f6' : 'none'
-                                }}>
-                                    <div>
-                                        <h4 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', color: '#2c3e50' }}>{product.productName || product.name}</h4>
-                                        {product.description && (
-                                            <p style={{ margin: 0, color: '#95a5a6', fontSize: '0.85rem', maxWidth: '250px' }}>
-                                                {product.description}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#333' }}>
-                                        ₪{product.price}
-                                    </div>
+                        {OrderData.productsIDs.map((product, index) => (
+                            <div key={index} style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                paddingBottom: '15px',
+                                borderBottom: index !== OrderData.productsIDs.length - 1 ? '1px solid #f1f2f6' : 'none'
+                            }}>
+                                <div>
+                                    <h4 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', color: '#2c3e50' }}>{product.productName || product.name}</h4>
+                                    {product.description && (
+                                        <p style={{ margin: 0, color: '#95a5a6', fontSize: '0.85rem', maxWidth: '250px' }}>
+                                            {product.description}
+                                        </p>
+                                    )}
                                 </div>
-                            ) : (
-                                <div key={index} style={{ color: '#e74c3c', fontSize: '0.9rem' }}>
-                                    פריט לא נמצא במערכת (מזהה: {productID})
+                                <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#333' }}>
+                                    ₪{product.price}
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
 
                     {/* Total Price Section */}

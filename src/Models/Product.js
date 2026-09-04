@@ -33,12 +33,20 @@ const ProductSchema = new Schema({
         default: 0 
     }
 });
-ProductSchema.set('toJSON', {
+const transformOptions = {
     virtuals: true,
     transform: (doc, ret) => {
+        // Map the internal MongoDB _id to standard id
+        ret.id = ret._id;
+        
+        // Remove the internal MongoDB _id
+        delete ret._id;
+        
         // Remove the internal version key
         delete ret.__v;
     }
-});
+};
+ProductSchema.set('toJSON', transformOptions);
+ProductSchema.set('toObject', transformOptions);
 
 module.exports = mongoose.model('Product', ProductSchema);

@@ -141,7 +141,7 @@ export default function OrdersHistoryPage() {
                         }}>
                             <div>
                                 <h3 style={{ margin: '0 0 5px 0', color: '#333' }}>
-                                    {getRestaurantName(order.restaurantID)}
+                                    {order.restaurantID.name}
                                 </h3>
                                 <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: '10px' }}>
                                     <span>הזמנה #{order.id}</span>
@@ -157,7 +157,7 @@ export default function OrdersHistoryPage() {
                                 <CustomButton 
                                     text="צפה בפירוט" 
                                     colorId={2} 
-                                    onClickHandler={() => navigate(`/orders/${order.id}`)} 
+                                    onClickHandler={() => navigate(`/orders/${order.id}`)}
                                 />
                                 <CustomButton 
                                     text="בטל הזמנה" 
